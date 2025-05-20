@@ -1,0 +1,41 @@
+uniform shader inputImage;
+uniform int radius;
+uniform float fillOpacity;
+
+half4 main(float2 fragCoord) {
+    vec4 color = vec4(0, 0, 0, 0);
+
+    half4 current = inputImage.eval(fragCoord);
+    if (current.a != 0) { //fill
+        //https://skia.org/docs/user/sksl/#premultiplied-alpha
+        color = current.rgb1 * fillOpacity;
+        return color;
+    }
+
+
+    for (int x = 0; x < 16; x++) {
+        if (x > radius * 2) {
+            break;
+        }
+        for (int y = 0; y < 16; y++) {
+            if (y > radius * 2) {
+                break;
+            }
+            half4 currentColor = inputImage.eval(fragCoord + vec2(x - radius, y - radius));
+            if (currentColor.a != 0) {
+                color = currentColor;
+            }
+        }
+    }
+
+     /*for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                half4 currentColor = inputImage.eval(fragCoord + vec2(x, y));
+                if (currentColor.a != 0) {
+                    color = currentColor;
+                }
+            }
+        }*/
+
+    return color;
+}

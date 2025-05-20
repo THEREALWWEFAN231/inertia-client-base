@@ -1,0 +1,18 @@
+package com.inertiaclient.base.event.impl;
+
+import com.inertiaclient.base.event.Event;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.block.Block;
+
+@AllArgsConstructor
+public class BlockVelocityMultiplierEvent extends Event {
+
+    @Getter
+    private Block block;
+    @Getter
+    @Setter
+    private float velocityMultiplier;
+
+}

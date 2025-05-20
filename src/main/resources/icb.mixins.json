@@ -1,0 +1,37 @@
+{
+  "required": true,
+  "package": "com.inertiaclient.base.mixin.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AbstractBlockStateMixin",
+    "BlockEntityRenderDispatcherMixin",
+    "BlockMixin",
+    "CapabilityTrackerMixin",
+    "ChatInputSuggestorMixin",
+    "ClientConnectionMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "ClientWorldMixin",
+    "EntityMixin",
+    "EntityRenderDispatcherMixin",
+    "EntityRendererMixin",
+    "EntityRenderStateMixin",
+    "FramebufferMixin",
+    "GameRendererMixin",
+    "InGameHudMixin",
+    "KeyboardInputMixin",
+    "KeyboardMixin",
+    "LiteralArgumentBuilderMixin",
+    "LiteralCommandNodeMixin",
+    "LivingEntityRendererMixin",
+    "MinecraftClientMixin",
+    "PlayerInteractEntityC2SPacketMixin",
+    "PlayerListHudMixin",
+    "WorldRendererMixin",
+    "accessors.ClientPlayerInteractionManagerAccessor",
+    "accessors.FrustumAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

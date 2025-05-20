@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "icb",
+  "version": "${version}",
+  "name": "Inertia Client Base",
+  "description": "Powerful base system for modules, commands, guis and utilities within minecraft",
+  "authors": [
+    "THEREALWWEFAN231/IKnowImEZ"
+  ],
+  "contact": {
+    "email": "developer@inertiaclient.com",
+    "homepage": "https://inertiaclient.com",
+    "issues": "https://github.com/THEREALWWEFAN231/Inertia/issues"
+  },
+  "license": "GNU GENERAL PUBLIC LICENSE",
+  "icon": "assets/icb/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.inertiaclient.base.FabricMod"
+    ]
+  },
+  "mixins": [
+    "icb.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.7",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*",
+    "fabric-language-kotlin": "*"
+  },
+  "accessWidener": "icb.accesswidener"
+}

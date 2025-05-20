@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="128"
+   height="128"
+   viewBox="0 0 128 128"
+   version="1.1"
+   id="svg24"
+   sodipodi:docname="reshot-icon-user-interface-B47KXVQ3ZR.svg"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs28" />
+  <sodipodi:namedview
+     id="namedview26"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="7.0234375"
+     inkscape:cx="55.314794"
+     inkscape:cy="53.107898"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg24" />
+  <title
+     id="title2">User Interface</title>
+  <path
+     d="M114,15.25H14A9.761,9.761,0,0,0,4.25,25v77A10.762,10.762,0,0,0,15,112.75h98A10.762,10.762,0,0,0,123.75,102V25A9.761,9.761,0,0,0,114,15.25ZM120.25,25V36.683H52.888L61.37,18.75H114A6.257,6.257,0,0,1,120.25,25ZM14,18.75H57.5L49.016,36.683H7.75V25A6.257,6.257,0,0,1,14,18.75Zm99,90.5H15A7.258,7.258,0,0,1,7.75,102V40.183h112.5V102A7.258,7.258,0,0,1,113,109.25Z"
+     id="path4"
+     style="stroke:none;stroke-opacity:1;fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M21.57,33.467a5.75,5.75,0,1,0-5.75-5.75A5.756,5.756,0,0,0,21.57,33.467Zm0-8a2.25,2.25,0,1,1-2.25,2.25A2.253,2.253,0,0,1,21.57,25.467Z"
+     id="path6"
+     style="fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M37.626,33.467a5.75,5.75,0,1,0-5.75-5.75A5.756,5.756,0,0,0,37.626,33.467Zm0-8a2.25,2.25,0,1,1-2.25,2.25A2.253,2.253,0,0,1,37.626,25.467Z"
+     id="path8"
+     style="fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M67.522,29.467h44.745a1.75,1.75,0,0,0,0-3.5H67.522a1.75,1.75,0,0,0,0,3.5Z"
+     id="path10"
+     style="fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M65.933,78.467h-48a1.75,1.75,0,0,0,0,3.5h48a1.75,1.75,0,0,0,0-3.5Z"
+     id="path12"
+     style="fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M55.193,89.467H17.933a1.75,1.75,0,0,0,0,3.5h37.26a1.75,1.75,0,0,0,0-3.5Z"
+     id="path14"
+     style="fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M17.933,70.967h37.26a1.75,1.75,0,0,0,0-3.5H17.933a1.75,1.75,0,0,0,0,3.5Z"
+     id="path16"
+     style="fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M65.933,56.467h-48a1.75,1.75,0,0,0,0,3.5h48a1.75,1.75,0,0,0,0-3.5Z"
+     id="path18"
+     style="fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M110.067,85.1H83.519a1.75,1.75,0,0,0-1.75,1.75v9.868a1.75,1.75,0,0,0,1.75,1.75h26.548a1.749,1.749,0,0,0,1.75-1.75V86.849A1.749,1.749,0,0,0,110.067,85.1Zm-1.75,9.868H85.269V88.6h23.048Z"
+     id="path20"
+     style="fill:#ffffff;fill-opacity:1" />
+  <path
+     d="M96.793,50.967A15.024,15.024,0,1,0,111.817,65.99,15.04,15.04,0,0,0,96.793,50.967Zm0,26.548A11.524,11.524,0,1,1,108.317,65.99,11.537,11.537,0,0,1,96.793,77.515Z"
+     id="path22"
+     style="fill:#ffffff;fill-opacity:1" />
+  <metadata
+     id="metadata845">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>User Interface</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

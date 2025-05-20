@@ -1,0 +1,176 @@
+plugins {
+    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'maven-publish'
+    id 'com.gradleup.shadow' version '9.0.0-beta6'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/icb.accesswidener")
+}
+
+repositories {
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+
+    //Mixin Extras
+    repositories {
+        maven { url = "https://jitpack.io" }
+    }
+
+    //jcenter()
+
+    //lwjgl snapshot
+    //maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
+
+sourceSets {
+    api {
+        runtimeClasspath += main.runtimeClasspath
+        compileClasspath += main.compileClasspath
+    }
+}
+
+configurations {
+    shadowCommon {
+        //extendsFrom implementation
+    }
+}
+
+dependencies {
+    // To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "maven.modrinth:fabric-language-kotlin:${fabric_kotlin_version}"
+
+
+    // Lombok
+    compileOnly "org.projectlombok:lombok:${project.lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${project.lombok_version}"
+
+    //mixinextras
+    //include(implementation(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.10")))
+
+    modImplementation "maven.modrinth:modmenu:${modmenu_version}"
+    //modImplementation "maven.modrinth:sodium:mc1.20.1-0.5.2"
+    //modImplementation "maven.modrinth:iris:1.6.8+1.20.1"
+    modCompileOnly("maven.modrinth:sodium:${sodium_version}") { transitive = false }
+    modCompileOnly("maven.modrinth:iris:${iris_version}") { transitive = false }
+    //modCompileOnly("maven.modrinth:owo-lib:0.12.20+1.21.4") { transitive = false }
+
+    //yoga, only use the newer version of yoga, not lwjgl, hopefully nothing breaks?!?!?!
+    //so we can use gap
+    implementation("org.lwjgl:lwjgl-yoga:${lwjglVersion}") {
+        exclude group: 'org.lwjgl', module: 'lwjgl'
+    }
+    implementation("org.lwjgl:lwjgl-yoga::${lwjglNatives}") {
+        exclude group: 'org.lwjgl', module: 'lwjgl'
+    }
+
+    //requires kotlin
+    implementation "com.dorkbox:TweenEngine:9.2"
+
+    implementation("io.github.humbleui:skija-windows-x64:0.116.4")
+    implementation("io.github.humbleui:types:0.2.0")
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+task copyToLibIdk(type: Copy) {
+    into("$buildDir/libs/all_dependencies")
+    from(project.configurations.runtimeClasspath)
+}
+
+shadowJar {
+    //I used chat gbt & google for this crap, I don't really know whats going on
+    archiveClassifier.set('all') // Creates a JAR with dependencies
+
+    //configurations = [project.configurations.implementation] // Include implementation dependencies
+    //configurations = [project.configurations.shadow]
+    configurations = [project.configurations.shadowCommon]
+
+    //for skia, since we dont copy all the meta-inf folders/files this is missing and is needed https://github.com/HumbleUI/Skija/issues/60
+    manifest {
+        attributes("Multi-Release": "true")
+    }
+
+    exclude("META-INF")
+    // Relocate dependencies to avoid conflicts
+    //relocate 'com.google.gson', 'my.mod.shadow.gson'
+}
+
+remapJar {
+    dependsOn shadowJar
+    inputFile.set(shadowJar.archiveFile)
+    archiveFileName.set("${archivesBaseName}-${version}.jar")
+}
+
+
+// configure the maven publication
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
+}

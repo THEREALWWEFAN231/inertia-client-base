@@ -1,0 +1,19 @@
+sword, https://www.svgrepo.com/svg/510250/sword
+eye, https://www.svgrepo.com/svg/509920/eye
+airplane, https://www.svgrepo.com/svg/509707/airplane
+earth, https://www.svgrepo.com/svg/480957/earth-9
+wheel chair, https://uxwing.com/wheelchair-icon/
+
+
+
+left arrow, https://www.svgrepo.com/svg/510041/left-arrow
+reset, https://www.svgrepo.com/svg/501336/reset
+settinng, https://www.svgrepo.com/svg/500685/setting
+list, https://www.svgrepo.com/svg/532192/list
+close, https://www.svgrepo.com/svg/522801/close-circle
+trash, https://www.svgrepo.com/svg/533010/trash-alt
+ui, https://www.reshot.com/free-svg-icons/item/user-interface-B47KXVQ3ZR/
+linked, https://www.svgrepo.com/svg/374953/linked
+next, https://www.svgrepo.com/svg/521767/next
+star-stroke, https://www.svgrepo.com/svg/526669/star
+edit, https://www.svgrepo.com/svg/522527/edit-3
