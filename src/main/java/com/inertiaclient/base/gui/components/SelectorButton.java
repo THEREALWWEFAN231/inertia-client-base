@@ -6,16 +6,19 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.Paint;
+import net.minecraft.text.Text;
 
 import java.util.function.Supplier;
 
 public class SelectorButton extends YogaNode {
 
-    private Supplier<String> buttonText;
     private String cachedButtonText;
 
+    public SelectorButton(Text buttonText, Supplier<Boolean> isSelected, Runnable onClick) {
+        this(buttonText::getString, isSelected, onClick);
+    }
+
     public SelectorButton(Supplier<String> buttonText, Supplier<Boolean> isSelected, Runnable onClick) {
-        this.buttonText = buttonText;
 
         this.styleSetMinWidth(30);
         this.styleSetHeight(14);

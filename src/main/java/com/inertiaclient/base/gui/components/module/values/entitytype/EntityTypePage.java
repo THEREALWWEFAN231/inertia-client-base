@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,7 @@ public class EntityTypePage extends TabbedPage {
 
         WrappedListContainer allWrappedListContainer = new WrappedListContainer();
         //allWrappedListContainer.getListNode().styleSetJustifyContent(Yoga.YGJustifySpaceAround);
-        Tab<WrappedListContainer> all = new Tab("All", allWrappedListContainer);
+        Tab<WrappedListContainer> all = new Tab(TabbedPage.getTextForPage("entitytype", "all"), allWrappedListContainer);
         tabs.add(all);
 
         for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
@@ -30,7 +31,7 @@ public class EntityTypePage extends TabbedPage {
 
         for (SpawnGroup spawnGroup : SpawnGroup.values()) {
             SpawnGroupContainer wrappedListContainer = new SpawnGroupContainer(entityTypeValue, spawnGroup);
-            Tab<SpawnGroupContainer> tab = new Tab(spawnGroup.getName(), wrappedListContainer);
+            Tab<SpawnGroupContainer> tab = new Tab(Text.literal(spawnGroup.getName()), wrappedListContainer);
             tabs.add(tab);
         }
 

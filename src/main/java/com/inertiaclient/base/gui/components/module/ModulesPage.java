@@ -21,19 +21,19 @@ public class ModulesPage extends TabbedPage {
     public ArrayList<Tab> createTabs() {
         var tabs = new ArrayList<Tab>();
 
-        Tab<FavoritesList> favorites = new Tab("Favorites", new FavoritesList());
+        Tab<FavoritesList> favorites = new Tab(TabbedPage.getTextForPage("modules", "favorites"), new FavoritesList());
         tabs.add(favorites);
 
         favorites.getYogaNode().refresh();
 
-        Tab<VerticalListContainer> all = new Tab("All", new VerticalListContainer());
+        Tab<VerticalListContainer> all = new Tab(TabbedPage.getTextForPage("modules", "all"), new VerticalListContainer());
         tabs.add(all);
         InertiaBase.instance.getModuleManager().getModules().stream().sorted(Comparator.comparing(Module::getNameString)).forEach(module -> {
             all.getYogaNode().addToList(new ModuleComponent(module, favorites.getYogaNode()));
         });
 
         for (Category category : Category.values()) {
-            Tab<VerticalListContainer> categoryTab = new Tab(category.name(), new VerticalListContainer());
+            Tab<VerticalListContainer> categoryTab = new Tab(category.getRenderName(), new VerticalListContainer());
             tabs.add(categoryTab);
 
             var modulesInCategory = InertiaBase.instance.getModuleManager().getModulesByCategory().get(category);

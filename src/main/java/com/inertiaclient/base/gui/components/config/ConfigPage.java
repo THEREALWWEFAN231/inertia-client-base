@@ -17,6 +17,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.value.Value;
 import com.inertiaclient.base.value.group.ValueGroup;
+import net.minecraft.text.Text;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,16 +33,17 @@ public class ConfigPage extends TabbedPage {
     public ArrayList<Tab> createTabs() {
         var tabs = new ArrayList<Tab>();
 
-        Tab<VerticalListContainer> all = new Tab("Public", new VerticalListContainer());
+        Tab<VerticalListContainer> all = new Tab(TabbedPage.getTextForPage("config", "public"), new VerticalListContainer());
         tabs.add(all);
 
-        this.localTab = new Tab("Local", new VerticalListContainer());
+
+        this.localTab = new Tab(TabbedPage.getTextForPage("config", "local"), new VerticalListContainer());
         tabs.add(this.localTab);
 
-        Tab<YogaNode> newTab = new Tab("New", createNewNode());
+        Tab<YogaNode> newTab = new Tab(TabbedPage.getTextForPage("config", "new"), createNewNode());
         tabs.add(newTab);
 
-        Tab<YogaNode> defaultTab = new Tab("Default", createDefaultNode());
+        Tab<YogaNode> defaultTab = new Tab(TabbedPage.getTextForPage("config", "default"), createDefaultNode());
         tabs.add(defaultTab);
 
         this.refreshLocalTab();
@@ -72,7 +74,7 @@ public class ConfigPage extends TabbedPage {
         YogaTextField name = new YogaTextField();
 
         {
-            name.setPlaceHolderText("Name");
+            name.setPlaceHolderText(configText("new.textbox_placeholder_text"));
 
             name.setBackgroundColor(() -> SearchBox.BACKGROUND_COLOR);
             //name.styleSetWidth(100, ExactPercentAuto.PERCENTAGE);
@@ -86,11 +88,11 @@ public class ConfigPage extends TabbedPage {
 
         YogaNode configSettings = YogaBuilder.getFreshBuilder().setFlexDirection(FlexDirection.COLUMN).setAlignItems(AlignItems.CENTER).setGap(GapGutter.ROW, 1).build();
 
-        configSettings.addChild(new ConfigSaveTextComponent(() -> "Module", saveProperties, 0));
-        configSettings.addChild(new ConfigSaveTextComponent(() -> "Hud", saveProperties, 1));
-        configSettings.addChild(new ConfigSaveTextComponent(() -> "Setting", saveProperties, 2));
+        configSettings.addChild(new ConfigSaveTextComponent(configText("properties.module"), saveProperties, 0));
+        configSettings.addChild(new ConfigSaveTextComponent(configText("properties.hud"), saveProperties, 1));
+        configSettings.addChild(new ConfigSaveTextComponent(configText("properties.setting"), saveProperties, 2));
 
-        SelectButton saveButton = new SelectButton(() -> "Save", () -> {
+        SelectButton saveButton = new SelectButton(configText("button.save"), () -> {
             String configName = name.getText();
             if (configName.isEmpty()) {
 
@@ -100,9 +102,9 @@ public class ConfigPage extends TabbedPage {
                     this.refreshLocalTab();
                     this.setSelectedIndex(1);
                     name.setText("");
-                    GenericAdvancedInfo.addNotification("Successfully saved config " + configName, false);
+                    GenericAdvancedInfo.addNotification(configText("notification.save_success", configName), false);
                 } else {
-                    GenericAdvancedInfo.addNotification("Failed to save config " + configName, true);
+                    GenericAdvancedInfo.addNotification(configText("notification.save_failed", configName), true);
                 }
             }
         });
@@ -125,14 +127,14 @@ public class ConfigPage extends TabbedPage {
 
         YogaNode nameAndSettings = YogaBuilder.getFreshBuilder(middleContainer).setFlexDirection(FlexDirection.COLUMN).setGap(GapGutter.ROW, 1).setAlignItems(AlignItems.CENTER).build();
 
-        nameAndSettings.addChild(new TextLabel(() -> "Reset"));
+        nameAndSettings.addChild(new TextLabel(configText("label.reset")));
 
         YogaNode configSettings = YogaBuilder.getFreshBuilder().setFlexDirection(FlexDirection.COLUMN).setAlignItems(AlignItems.CENTER).setGap(GapGutter.ROW, 1).build();
-        configSettings.addChild(new ConfigSaveTextComponent(() -> "Module", saveProperties, 0));
-        configSettings.addChild(new ConfigSaveTextComponent(() -> "Hud", saveProperties, 1));
-        configSettings.addChild(new ConfigSaveTextComponent(() -> "Setting", saveProperties, 2));
+        configSettings.addChild(new ConfigSaveTextComponent(configText("properties.module"), saveProperties, 0));
+        configSettings.addChild(new ConfigSaveTextComponent(configText("properties.hud"), saveProperties, 1));
+        configSettings.addChild(new ConfigSaveTextComponent(configText("properties.setting"), saveProperties, 2));
 
-        SelectButton loadButton = new SelectButton(() -> "Load", () -> {
+        SelectButton loadButton = new SelectButton(configText("button.load"), () -> {
 
             for (Module module : InertiaBase.instance.getModuleManager().getModules()) {
                 for (ValueGroup valueGroup : module.getValueGroups()) {
@@ -157,6 +159,14 @@ public class ConfigPage extends TabbedPage {
 
 
         return yogaNode;
+    }
+
+    private Text configText(String key) {
+        return Text.translatable("icb.gui.pages.config." + key);
+    }
+
+    private Text configText(String key, Object... args) {
+        return Text.translatable("icb.gui.pages.config." + key, args);
     }
 
 }

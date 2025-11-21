@@ -6,6 +6,7 @@ import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.value.impl.EntityTypeColorValue;
 import lombok.Getter;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.text.Text;
 
 public class EntityColorPage extends YogaNode {
 
@@ -37,7 +38,7 @@ public class EntityColorPage extends YogaNode {
             spawnGroupsContainer.addChild(allButtons);
             spawnGroupsContainer.enableHorizontalScrollbar();
             spawnGroupsContainer.setShouldScissorChildren(true);
-            allButtons.addChild(new SelectorButton(() -> "All", () -> selectedIndex == 0, () -> {
+            allButtons.addChild(new SelectorButton(Text.translatable("icb.gui.pages.entitycolor.buttons.all"), () -> selectedIndex == 0, () -> {
                 changeContents(null);
             }));
             for (SpawnGroup spawnGroup : SpawnGroup.values()) {

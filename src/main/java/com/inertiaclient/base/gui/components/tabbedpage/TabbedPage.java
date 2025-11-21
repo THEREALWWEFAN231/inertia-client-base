@@ -6,6 +6,7 @@ import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.render.yoga.layouts.YogaEdge;
 import lombok.Getter;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,7 @@ public abstract class TabbedPage extends YogaNode {
 
             for (int i = 0; i < tabs.size(); i++) {
                 int index = i;
-                allTabs.addChild(new SelectorButton(() -> tabs.get(index).getLabel(), () -> selectedButtonIndex == index, () -> {
+                allTabs.addChild(new SelectorButton(() -> tabs.get(index).getLabel().getString(), () -> selectedButtonIndex == index, () -> {
                     setSelectedIndex(index);
                 }));
             }
@@ -82,5 +83,13 @@ public abstract class TabbedPage extends YogaNode {
     }
 
     public abstract ArrayList<Tab> createTabs();
+
+    public static String getLanguageKeyForPage(String page, String tab) {
+        return "icb.gui.pages." + page + ".tabs." + tab;
+    }
+
+    public static Text getTextForPage(String page, String tab) {
+        return Text.translatable(TabbedPage.getLanguageKeyForPage(page, tab));
+    }
 
 }

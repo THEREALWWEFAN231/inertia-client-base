@@ -85,4 +85,8 @@ public class GenericAdvancedInfo extends ValueAdvanceInfoContainer {
     public static void addNotification(String notification, boolean fail) {
         ModernClickGui.MODERN_CLICK_GUI.getNotifcations().addNotification(Notifcations.Notification.builder().text(notification).displayTime(750 + (fail ? 500 : 0)).build());
     }
+
+    public static void addNotification(Text notification, boolean fail) {
+        GenericAdvancedInfo.addNotification(notification.getString(), fail);
+    }
 }

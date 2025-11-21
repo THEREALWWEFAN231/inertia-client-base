@@ -9,6 +9,7 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.Paint;
+import net.minecraft.text.Text;
 
 import java.awt.Color;
 import java.util.function.Supplier;
@@ -18,6 +19,10 @@ public class SelectButton extends YogaNode {
     private AnimationValue animation;
     private Supplier<String> label;
     private String cachedLabel;
+
+    public SelectButton(Text label, Runnable onClick) {
+        this(() -> label.getString(), onClick);
+    }
 
     public SelectButton(Supplier<String> label, Runnable onClick) {
         this.label = label;

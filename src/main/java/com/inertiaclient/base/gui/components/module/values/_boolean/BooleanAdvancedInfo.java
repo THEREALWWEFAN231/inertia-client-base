@@ -8,6 +8,7 @@ import com.inertiaclient.base.render.yoga.layouts.AlignItems;
 import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.value.impl.BooleanValue;
+import net.minecraft.text.Text;
 
 import java.util.function.Supplier;
 
@@ -33,13 +34,13 @@ public class BooleanAdvancedInfo extends ValueAdvanceInfoContainer {
             BooleanValue value = (BooleanValue) this.getValue();
 
             buttonsContainer.addChild(GenericAdvancedInfo.createDefaultButton(this.getValue()).setTooltip(() -> String.valueOf(value.getDefaultValue())));
-            buttonsContainer.addChild(new SelectorButton(() -> "False", () -> false, () -> {
+            buttonsContainer.addChild(new SelectorButton(translation("false"), () -> false, () -> {
                 value.setValue(false);
             }));
-            buttonsContainer.addChild(new SelectorButton(() -> "True", () -> false, () -> {
+            buttonsContainer.addChild(new SelectorButton(translation("true"), () -> false, () -> {
                 value.setValue(true);
             }));
-            buttonsContainer.addChild(new SelectorButton(() -> "Toggle", () -> false, () -> {
+            buttonsContainer.addChild(new SelectorButton(translation("toggle"), () -> false, () -> {
                 value.setValue(!value.getValue());
             }));
             buttonsContainer.addChild(GenericAdvancedInfo.createCopyButton(this.getValue()));
@@ -47,5 +48,9 @@ public class BooleanAdvancedInfo extends ValueAdvanceInfoContainer {
         }
 
         return content;
+    }
+
+    private Text translation(String key) {
+        return Text.translatable("icb.gui.advanced_info.boolean." + key);
     }
 }

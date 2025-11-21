@@ -56,7 +56,7 @@ public class SvgComponent extends YogaNode {
                 float blurRadius = this.blurRadius.get();
                 if (blurRadius > 0) {
                     try (var paint = SkiaUtils.createPaintForColor(color)) {
-                        paint.setImageFilter(ImageFilter.makeBlur(blurRadius, blurRadius, FilterTileMode.CLAMP));
+                        paint.setImageFilter(ImageFilter.makeBlur(blurRadius, blurRadius, FilterTileMode.DECAL));
                         this.render(canvas, svgRenderer, paint);
                     }
                 }

@@ -16,6 +16,7 @@ import com.inertiaclient.base.render.yoga.layouts.YogaEdge;
 import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.impl.EntityTypeColorValue;
 import net.minecraft.entity.EntityType;
+import net.minecraft.text.Text;
 
 import java.awt.Color;
 
@@ -79,7 +80,7 @@ public class EntityTypeColorComponent extends YogaNode {
 
                 if (isLinked) {
                     var linkedToText = CanvasWrapper.getFreshTextBuilder();
-                    linkedToText.basic("Linked to " + entityType.getSpawnGroup().getName(), 0, 8, this.isHoveredAndInsideParent(globalMouseX, globalMouseY) ? MainFrame.s_selectedTextColor.get() : MainFrame.s_unselectedTextColor.get());
+                    linkedToText.basic(Text.translatable("icb.gui.pages.entitycolor.linked_to", entityType.getSpawnGroup().getName()), 0, 8, this.isHoveredAndInsideParent(globalMouseX, globalMouseY) ? MainFrame.s_selectedTextColor.get() : MainFrame.s_unselectedTextColor.get());
                     linkedToText.setFontSize(4);
                     linkedToText.draw(canvas);
                 }

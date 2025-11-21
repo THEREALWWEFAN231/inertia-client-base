@@ -12,6 +12,7 @@ import com.inertiaclient.base.utils.UIUtils;
 import com.inertiaclient.base.value.WrappedColor;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.text.Text;
 
 import java.awt.Color;
 import java.util.function.Supplier;
@@ -203,7 +204,7 @@ public class ColorContainer extends AbsoulteYogaNode {
                 buttonsContainer.styleSetGap(GapGutter.COLUMN, 5);
                 rightWrapper.addChild(buttonsContainer);
 
-                buttonsContainer.addChild(new SelectorButton(() -> "Default", () -> false, () -> {
+                buttonsContainer.addChild(new SelectorButton(translation("default"), () -> false, () -> {
                     WrappedColor defaultColor = implementation.getDefault();
                     this.renderedColorRed = defaultColor.getColorValueDontTouchUnlessYouKnow().getRed();
                     this.renderedColorGreen = defaultColor.getColorValueDontTouchUnlessYouKnow().getGreen();
@@ -238,10 +239,10 @@ public class ColorContainer extends AbsoulteYogaNode {
                         }
                     }
                 }));
-                buttonsContainer.addChild(new SelectorButton(() -> "Rainbow", () -> false, () -> {
+                buttonsContainer.addChild(new SelectorButton(translation("rainbow"), () -> false, () -> {
                     this.renderedRainbow = !this.renderedRainbow;
                 }));
-                buttonsContainer.addChild(new SelectorButton(() -> "Save", () -> false, () -> {
+                buttonsContainer.addChild(new SelectorButton(translation("save"), () -> false, () -> {
                     implementation.setColor(new WrappedColor(this.renderedColor, this.renderedRainbow));
                 }));
             }
@@ -289,6 +290,10 @@ public class ColorContainer extends AbsoulteYogaNode {
         this.renderedColorHue = hsb[0];
         this.renderedColorSaturation = hsb[1];
         this.renderedColorBrightness = hsb[2];
+    }
+
+    private Text translation(String key) {
+        return Text.translatable("icb.gui.color_picker.buttons." + key);
     }
 
 }

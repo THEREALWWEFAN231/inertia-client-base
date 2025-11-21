@@ -4,6 +4,7 @@ import com.inertiaclient.base.render.yoga.ClickType;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.CursorUtils;
 import lombok.Setter;
+import net.minecraft.text.Text;
 
 import java.awt.Color;
 import java.util.function.Consumer;
@@ -92,7 +93,7 @@ public class YogaTextField extends YogaNode {
         return this;
     }
 
-    public YogaTextField setPlaceHolderText(String placeHolderText) {
+    public YogaTextField setPlaceHolderText(Text placeHolderText) {
         this.textField.setPlaceHolderText(placeHolderText);
         return this;
     }

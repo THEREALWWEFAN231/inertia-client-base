@@ -6,6 +6,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.minecraft.text.Text;
 
 import java.awt.Color;
 import java.util.function.Supplier;
@@ -46,6 +47,10 @@ public class TextLabel extends YogaNode {
     @Accessors(chain = true)
     private Supplier<Boolean> hasWidth = () -> true;
 
+    public TextLabel(Text label) {
+        this(label::getString);
+    }
+
     public TextLabel(Supplier<String> label) {
         this.label = label;
         // this.setDebug(true);
@@ -55,7 +60,6 @@ public class TextLabel extends YogaNode {
             var textBuilder = CanvasWrapper.getFreshTextBuilder();
             textBuilder.setText(this.cachedLabel);
             textBuilder.setFontSize(this.cachedFontSize);
-
 
             if (scrollWidth != null) {
                 float stringWidth = textBuilder.getTextWidth();

@@ -18,8 +18,8 @@ public class HashsetPage<T> extends TabbedPage {
     public ArrayList<Tab> createTabs() {
         var tabs = new ArrayList<Tab>();
 
-        Tab<WrappedListContainer> add = new Tab("Add", new WrappedListContainer());
-        Tab<WrappedListContainer> remove = new Tab("Remove", new WrappedListContainer());
+        Tab<WrappedListContainer> add = new Tab(TabbedPage.getTextForPage("hashset", "add"), new WrappedListContainer());
+        Tab<WrappedListContainer> remove = new Tab(TabbedPage.getTextForPage("hashset", "remove"), new WrappedListContainer());
         tabs.add(add);
         tabs.add(remove);
 

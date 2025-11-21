@@ -14,6 +14,7 @@ import io.github.humbleui.types.Rect;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -66,7 +67,7 @@ public class TextField {
     @Setter
     private Supplier<Float> borderRadius = () -> 0f;
     @Setter
-    private String placeHolderText = "";
+    private Text placeHolderText = Text.literal("");
     @Setter
     private Color placeHolderTextColor = Color.lightGray;
     @Setter
@@ -103,7 +104,7 @@ public class TextField {
             Color textColor = this.textColor.get();
             String renderString = text.toString();
             if (text.isEmpty()) {
-                renderString = this.placeHolderText;
+                renderString = this.placeHolderText.getString();
                 textColor = this.placeHolderTextColor;
             }
 
