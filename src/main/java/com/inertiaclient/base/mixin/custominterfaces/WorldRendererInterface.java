@@ -1,6 +1,6 @@
 package com.inertiaclient.base.mixin.custominterfaces;
 
-import net.minecraft.client.render.Frustum;
+import net.minecraft.client.renderer.culling.Frustum;
 
 public interface WorldRendererInterface {
 

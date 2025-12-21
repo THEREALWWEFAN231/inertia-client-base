@@ -2,13 +2,13 @@ package com.inertiaclient.base.module;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 @AllArgsConstructor
 public enum Category {
-    Combat(Text.translatable("icb.category.combat")), Player(Text.translatable("icb.category.player")), Movement(Text.translatable("icb.category.movement")), Render(Text.translatable("icb.category.render")), World(Text.translatable("icb.category.world")), Other(Text.translatable("icb.category.other"));
+    Combat(Component.translatable("icb.category.combat")), Player(Component.translatable("icb.category.player")), Movement(Component.translatable("icb.category.movement")), Render(Component.translatable("icb.category.render")), World(Component.translatable("icb.category.world")), Other(Component.translatable("icb.category.other"));
 
     @Getter
-    private Text renderName;
+    private Component renderName;
 
 }

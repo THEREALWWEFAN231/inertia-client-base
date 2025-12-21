@@ -3,7 +3,7 @@ package com.inertiaclient.base.gui.components.tabbedpage;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import lombok.*;
 import lombok.experimental.Accessors;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Consumer;
 
@@ -12,7 +12,7 @@ public class Tab<T extends YogaNode> {
 
     @NonNull
     @Getter
-    private Text label;
+    private Component label;
     @NonNull
     @Getter
     private T yogaNode;

@@ -1,17 +1,17 @@
 package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
 
 public class PlayerInteractionHelper {
 
-    public static void interactItem(PlayerEntity player, Hand hand) {
-        ActionResult result = InertiaBase.mc.interactionManager.interactItem(player, hand);
-        if (result instanceof ActionResult.Success success) {
-            if (success.swingSource() == ActionResult.SwingSource.CLIENT) {
-                InertiaBase.mc.player.swingHand(hand);
+    public static void interactItem(Player player, InteractionHand hand) {
+        InteractionResult result = InertiaBase.mc.gameMode.useItem(player, hand);
+        if (result instanceof InteractionResult.Success success) {
+            if (success.swingSource() == InteractionResult.SwingSource.CLIENT) {
+                InertiaBase.mc.player.swing(hand);
             }
         }
     }

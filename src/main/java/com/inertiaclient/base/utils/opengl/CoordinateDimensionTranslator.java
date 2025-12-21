@@ -2,11 +2,11 @@ package com.inertiaclient.base.utils.opengl;
 
 import com.inertiaclient.base.InertiaBase;
 import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.ProjectionType;
+import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.util.Window;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.platform.Window;
 import org.joml.*;
 
 public class CoordinateDimensionTranslator {
@@ -22,25 +22,25 @@ public class CoordinateDimensionTranslator {
         CoordinateDimensionTranslator.cachedProjectionMatrix.set(RenderSystem.getProjectionMatrix());
         CoordinateDimensionTranslator.cachedWorldSpacePositionMatrix.set(worldPositionPositionMatrix);
 
-        CoordinateDimensionTranslator.scaledWidth = InertiaBase.mc.getWindow().getScaledWidth();
-        CoordinateDimensionTranslator.scaledHeight = InertiaBase.mc.getWindow().getScaledHeight();
+        CoordinateDimensionTranslator.scaledWidth = InertiaBase.mc.getWindow().getGuiScaledWidth();
+        CoordinateDimensionTranslator.scaledHeight = InertiaBase.mc.getWindow().getGuiScaledHeight();
     }
 
     //xyz should not subtract camera position
     public static ScreenPosition toScreen(double x, double y, double z) {
-        Vector4f transformedCoordinates = new Vector4f((float) (x - InertiaBase.mc.getEntityRenderDispatcher().camera.getPos().x), (float) (y - InertiaBase.mc.getEntityRenderDispatcher().camera.getPos().y), (float) (z - InertiaBase.mc.getEntityRenderDispatcher().camera.getPos().z), 1);
+        Vector4f transformedCoordinates = new Vector4f((float) (x - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().x), (float) (y - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().y), (float) (z - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().z), 1);
         transformedCoordinates.mul(CoordinateDimensionTranslator.cachedWorldSpacePositionMatrix);
 
         Vector3f projectionOutput = new Vector3f();
-        CoordinateDimensionTranslator.cachedProjectionMatrix.project(transformedCoordinates.x(), transformedCoordinates.y(), transformedCoordinates.z(), new int[]{0, 0, InertiaBase.mc.getWindow().getScaledWidth(), InertiaBase.mc.getWindow().getScaledHeight()}, projectionOutput);
+        CoordinateDimensionTranslator.cachedProjectionMatrix.project(transformedCoordinates.x(), transformedCoordinates.y(), transformedCoordinates.z(), new int[]{0, 0, InertiaBase.mc.getWindow().getGuiScaledWidth(), InertiaBase.mc.getWindow().getGuiScaledHeight()}, projectionOutput);
 
         float screenXPosition = projectionOutput.x();
-        float screenYPosition = InertiaBase.mc.getWindow().getScaledHeight() - projectionOutput.y();
+        float screenYPosition = InertiaBase.mc.getWindow().getGuiScaledHeight() - projectionOutput.y();
         float screenZPosition = projectionOutput.z();
         if (screenZPosition > 1) {
             int bigFactor = 100000;
-            screenXPosition = InertiaBase.mc.getWindow().getScaledWidth() - screenXPosition;
-            screenYPosition = InertiaBase.mc.getWindow().getScaledHeight() - screenYPosition;
+            screenXPosition = InertiaBase.mc.getWindow().getGuiScaledWidth() - screenXPosition;
+            screenYPosition = InertiaBase.mc.getWindow().getGuiScaledHeight() - screenYPosition;
             screenXPosition *= bigFactor;
             screenYPosition *= bigFactor;
         }
@@ -57,13 +57,13 @@ public class CoordinateDimensionTranslator {
         //GameRenderer
         Window window = InertiaBase.mc.getWindow();
         RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT);
-        Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, (float) ((double) window.getFramebufferWidth() / window.getScaleFactor()), (float) ((double) window.getFramebufferHeight() / window.getScaleFactor()), 0.0f, 1000.0f, 21000.0f);
+        Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, (float) ((double) window.getWidth() / window.getGuiScale()), (float) ((double) window.getHeight() / window.getGuiScale()), 0.0f, 1000.0f, 21000.0f);
         RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.ORTHOGRAPHIC);
         Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
         matrixStack.pushMatrix();
         //matrixStack.identity();
         matrixStack.translate(0.0f, 0.0f, -11000.0f);
-        DiffuseLighting.enableGuiDepthLighting();
+        Lighting.setupFor3DItems();
     }
 
     public static void setupOverlayRendering(Runnable runnable) {
@@ -74,13 +74,13 @@ public class CoordinateDimensionTranslator {
         //GameRenderer
         Window window = InertiaBase.mc.getWindow();
         RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT);
-        Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, (float) ((double) window.getFramebufferWidth() / window.getScaleFactor()), (float) ((double) window.getFramebufferHeight() / window.getScaleFactor()), 0.0f, 1000.0f, 21000.0f);
+        Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, (float) ((double) window.getWidth() / window.getGuiScale()), (float) ((double) window.getHeight() / window.getGuiScale()), 0.0f, 1000.0f, 21000.0f);
         RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.ORTHOGRAPHIC);
         Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
         matrixStack.pushMatrix();
         //matrixStack.identity();
         matrixStack.translate(0.0f, 0.0f, -11000.0f);
-        DiffuseLighting.enableGuiDepthLighting();
+        Lighting.setupFor3DItems();
 
         runnable.run();
 

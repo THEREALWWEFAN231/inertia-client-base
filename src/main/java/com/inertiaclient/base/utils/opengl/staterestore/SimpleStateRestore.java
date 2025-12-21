@@ -26,14 +26,14 @@ public class SimpleStateRestore implements AutoCloseable {
     private int depthFunc;
 
     public void cache() {
-        blendState = getState(GlStateManager.BLEND.capState);
-        cullState = getState(GlStateManager.CULL.capState);
-        depthTestState = getState(GlStateManager.DEPTH.capState);
+        blendState = getState(GlStateManager.BLEND.mode);
+        cullState = getState(GlStateManager.CULL.enable);
+        depthTestState = getState(GlStateManager.DEPTH.mode);
 
-        srcFactorRGB = GlStateManager.BLEND.srcFactorRGB;
-        dstFactorRGB = GlStateManager.BLEND.dstFactorRGB;
-        srcFactorAlpha = GlStateManager.BLEND.srcFactorAlpha;
-        dstFactorAlpha = GlStateManager.BLEND.dstFactorAlpha;
+        srcFactorRGB = GlStateManager.BLEND.srcRgb;
+        dstFactorRGB = GlStateManager.BLEND.dstRgb;
+        srcFactorAlpha = GlStateManager.BLEND.srcAlpha;
+        dstFactorAlpha = GlStateManager.BLEND.dstAlpha;
 
         colorMaskRed = GlStateManager.COLOR_MASK.red;
         colorMaskGreen = GlStateManager.COLOR_MASK.green;
@@ -47,9 +47,9 @@ public class SimpleStateRestore implements AutoCloseable {
     //resets the state if any were change, from GlStateManager
     @Override
     public void close() {
-        this.setState(GlStateManager.BLEND.capState, blendState);
-        this.setState(GlStateManager.CULL.capState, cullState);
-        this.setState(GlStateManager.DEPTH.capState, depthTestState);
+        this.setState(GlStateManager.BLEND.mode, blendState);
+        this.setState(GlStateManager.CULL.enable, cullState);
+        this.setState(GlStateManager.DEPTH.mode, depthTestState);
 
         GlStateManager._blendFuncSeparate(srcFactorRGB, dstFactorRGB, srcFactorAlpha, dstFactorAlpha);
         GlStateManager._colorMask(colorMaskRed, colorMaskGreen, colorMaskBlue, colorMaskAlpha);
@@ -58,11 +58,11 @@ public class SimpleStateRestore implements AutoCloseable {
         GlStateManager._depthFunc(depthFunc);
     }
 
-    private void setState(GlStateManager.CapabilityTracker capabilityTracker, boolean state) {
-        capabilityTracker.setState(state);
+    private void setState(GlStateManager.BooleanState capabilityTracker, boolean state) {
+        capabilityTracker.setEnabled(state);
     }
 
-    private boolean getState(GlStateManager.CapabilityTracker capabilityTracker) {
+    private boolean getState(GlStateManager.BooleanState capabilityTracker) {
         return ((CapabilityTrackerInterface) capabilityTracker).getState();
     }
 }

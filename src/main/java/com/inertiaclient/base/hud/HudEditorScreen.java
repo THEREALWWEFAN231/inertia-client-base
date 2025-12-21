@@ -4,9 +4,9 @@ import com.inertiaclient.base.gui.BetterScreen;
 import com.inertiaclient.base.render.skia.SkiaOpenGLInstance;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public class HudEditorScreen extends BetterScreen {
 
@@ -19,7 +19,7 @@ public class HudEditorScreen extends BetterScreen {
     private Screen parentScreen;
 
     public HudEditorScreen() {
-        super(Text.literal(""));
+        super(Component.literal(""));
 
         if (skiaInstance == null) {
             skiaInstance = new SkiaOpenGLInstance();
@@ -29,7 +29,7 @@ public class HudEditorScreen extends BetterScreen {
     }
 
     @Override
-    public void betterRender(DrawContext context, float mouseX, float mouseY, float delta) {
+    public void betterRender(GuiGraphics context, float mouseX, float mouseY, float delta) {
         hudEditor.beforeRender(this.skiaInstance);
 
         skiaInstance.setup(() -> {
@@ -56,8 +56,8 @@ public class HudEditorScreen extends BetterScreen {
     }
 
     @Override
-    public void close() {
-        this.client.setScreen(this.parentScreen);
+    public void onClose() {
+        this.minecraft.setScreen(this.parentScreen);
     }
 
 }

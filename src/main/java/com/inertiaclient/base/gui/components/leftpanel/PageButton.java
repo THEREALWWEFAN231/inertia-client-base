@@ -10,7 +10,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.ExactPercentAuto;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.Rect;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
 import java.util.function.Supplier;
@@ -27,7 +27,7 @@ public class PageButton extends YogaNode {
         this.styleSetHeight(16);
         this.setHoverCursorToIndicateClick();
 
-        Text label = Text.translatable("icb.gui.pages." + labelId + ".name");
+        Component label = Component.translatable("icb.gui.pages." + labelId + ".name");
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             boolean isSelected = MainFrame.leftPanel.pages.getSelectedPageIndex() == index;
             if (isSelected) {

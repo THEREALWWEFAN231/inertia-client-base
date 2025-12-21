@@ -15,11 +15,11 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.command.CommandSource;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.Registries;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class ValueCommand extends Command {
 
@@ -28,7 +28,7 @@ public class ValueCommand extends Command {
     }
 
     @Override
-    public void buildArguments(LiteralArgumentBuilder<CommandSource> builder) {
+    public void buildArguments(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
 
         /*var moduleBuilder = this.argument("module", new ModuleSelectorArgumentType());
         moduleBuilder.then(this.argument("valuegroup", new ValueGroupArgumentType()));
@@ -68,11 +68,11 @@ public class ValueCommand extends Command {
                             }
                             hsv.getValue().forEach(something -> {
                                 if (something instanceof Block block) {
-                                    InertiaBase.sendChatMessage(Registries.BLOCK.getId(block));
+                                    InertiaBase.sendChatMessage(BuiltInRegistries.BLOCK.getKey(block));
                                 } else if (something instanceof BlockEntityType blockEntity) {
-                                    InertiaBase.sendChatMessage(BlockEntityType.getId(blockEntity));
+                                    InertiaBase.sendChatMessage(BlockEntityType.getKey(blockEntity));
                                 } else if (something instanceof EntityType entityType) {
-                                    InertiaBase.sendChatMessage(EntityType.getId(entityType));
+                                    InertiaBase.sendChatMessage(EntityType.getKey(entityType));
                                 }
                             });
                             return com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -97,16 +97,16 @@ public class ValueCommand extends Command {
         }
     }
 
-    private static int executeFloat(CommandContext<CommandSource> context, FloatValue floatValue, float value) throws CommandSyntaxException {
+    private static int executeFloat(CommandContext<SharedSuggestionProvider> context, FloatValue floatValue, float value) throws CommandSyntaxException {
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
     }
 
-    private static int executeString(CommandContext<CommandSource> context, ModeValue valueObject, ModeValue.Mode value) throws CommandSyntaxException {
+    private static int executeString(CommandContext<SharedSuggestionProvider> context, ModeValue valueObject, ModeValue.Mode value) throws CommandSyntaxException {
         valueObject.setValue(value);
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
     }
 
-    private static int execute(CommandContext<CommandSource> context, Value value) throws CommandSyntaxException {
+    private static int execute(CommandContext<SharedSuggestionProvider> context, Value value) throws CommandSyntaxException {
 
 
         System.out.println(context.getArgument("value", String.class));

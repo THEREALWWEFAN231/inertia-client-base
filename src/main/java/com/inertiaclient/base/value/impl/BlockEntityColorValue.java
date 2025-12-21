@@ -5,9 +5,9 @@ import com.google.gson.JsonObject;
 import com.inertiaclient.base.value.Value;
 import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.group.ValueGroup;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -64,7 +64,7 @@ public class BlockEntityColorValue extends Value<HashMap<BlockEntityType<?>, Wra
     public JsonElement toJson() {
         JsonObject jsonObject = new JsonObject();
         this.getValue().forEach((blockEntityType, wrappedColor) -> {
-            jsonObject.add(BlockEntityType.getId(blockEntityType).toString(), wrappedColor.toJson());
+            jsonObject.add(BlockEntityType.getKey(blockEntityType).toString(), wrappedColor.toJson());
         });
         return jsonObject;
     }
@@ -74,7 +74,7 @@ public class BlockEntityColorValue extends Value<HashMap<BlockEntityType<?>, Wra
         JsonObject jsonObject = data.getAsJsonObject();
         jsonObject.entrySet().forEach(entry -> {
             try {
-                BlockEntityType<?> blockEntityType = Registries.BLOCK_ENTITY_TYPE.get(Identifier.of(entry.getKey()));
+                BlockEntityType<?> blockEntityType = BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(ResourceLocation.parse(entry.getKey()));
                 WrappedColor wrappedColor = new WrappedColor(Color.white);
                 wrappedColor.fromJson(entry.getValue());
                 this.getValue().put(blockEntityType, wrappedColor);

@@ -5,13 +5,13 @@ import com.inertiaclient.base.gui.components.MainFrame;
 import com.inertiaclient.base.render.animation.AnimationValue;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import lombok.Getter;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public class ModernClickGui extends YogaScreen {
 
     public static final ModernClickGui MODERN_CLICK_GUI = new ModernClickGui();
-    public static Identifier UNKNOWN_TEXTURE = Identifier.of("icb", "textures/gui-unknown.png");//MissingSprite.getMissingSpriteId()
+    public static ResourceLocation UNKNOWN_TEXTURE = ResourceLocation.fromNamespaceAndPath("icb", "textures/gui-unknown.png");//MissingSprite.getMissingSpriteId()
 
     @Getter
     private MainFrame mainFrame;
@@ -21,7 +21,7 @@ public class ModernClickGui extends YogaScreen {
     private Notifcations notifcations;
 
     public ModernClickGui() {
-        super(Text.literal(""));
+        super(Component.literal(""));
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ModernClickGui extends YogaScreen {
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 

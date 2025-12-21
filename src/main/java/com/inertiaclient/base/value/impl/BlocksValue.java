@@ -2,9 +2,9 @@ package com.inertiaclient.base.value.impl;
 
 import com.inertiaclient.base.value.RegistryHashsetValue;
 import com.inertiaclient.base.value.group.ValueGroup;
-import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,7 +29,7 @@ public class BlocksValue extends RegistryHashsetValue<Block> {
 
     @Override
     protected Registry<Block> getRegistry() {
-        return Registries.BLOCK;
+        return BuiltInRegistries.BLOCK;
     }
 
 }

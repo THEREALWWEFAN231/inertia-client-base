@@ -6,7 +6,7 @@ import com.inertiaclient.base.event.EventTarget;
 import com.inertiaclient.base.event.impl.PlayerUpdateEvent;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -77,7 +77,7 @@ public class TickRateCalculator {
             }
             averageMillisecondsFromUpdates /= samples.size();
             float tickRate = 20 / (averageMillisecondsFromUpdates / 1000);
-            this.tickRate = MathHelper.clamp(tickRate, 0, 20);
+            this.tickRate = Mth.clamp(tickRate, 0, 20);
         }
 
         lastUpdateTime = currentTime;

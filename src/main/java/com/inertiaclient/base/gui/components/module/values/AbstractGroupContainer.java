@@ -5,7 +5,7 @@ import com.inertiaclient.base.render.yoga.GenericStyle;
 import com.inertiaclient.base.render.yoga.YogaBuilder;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
 import java.util.function.Consumer;
@@ -15,7 +15,7 @@ public class AbstractGroupContainer extends YogaNode {
     public static float valuesFontSize = 6;
     public static float gap = 2;
 
-    public AbstractGroupContainer(Text label, Consumer<YogaNode> addToValuesContainer) {
+    public AbstractGroupContainer(Component label, Consumer<YogaNode> addToValuesContainer) {
         this.styleSetFlexDirection(FlexDirection.COLUMN);
         this.styleSetWidth(100, ExactPercentAuto.PERCENTAGE);
         //this.styleSetGap(GapGutter.ROW, gap);

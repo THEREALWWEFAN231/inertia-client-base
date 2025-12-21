@@ -7,8 +7,8 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import lombok.Getter;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class Command implements LanguageBaseKey {
@@ -19,32 +19,32 @@ public abstract class Command implements LanguageBaseKey {
     @Getter
     private String[] aliases;
     @Getter
-    private Text description;
+    private Component description;
 
 
     public Command(String name, String... aliases) {
         this.name = name;
         this.aliases = aliases;
-        this.description = Text.translatableWithFallback(this.baseKeyWithParameter("description"), "no description");
+        this.description = Component.translatableWithFallback(this.baseKeyWithParameter("description"), "no description");
     }
 
     public Command(String name) {
         this(name, (String[]) null);
     }
 
-    public abstract void buildArguments(LiteralArgumentBuilder<CommandSource> builder);
+    public abstract void buildArguments(LiteralArgumentBuilder<SharedSuggestionProvider> builder);
 
     //a helper(so we don't have to add the generics every time we call RequiredArgumentBuilder.argument) like CommandManager.argument, with a generic CommandSource,
-    public <T> RequiredArgumentBuilder<CommandSource, T> argument(String name, ArgumentType<T> type) {
+    public <T> RequiredArgumentBuilder<SharedSuggestionProvider, T> argument(String name, ArgumentType<T> type) {
         return RequiredArgumentBuilder.argument(name, type);
     }
 
-    public LiteralArgumentBuilder<CommandSource> literal(String name) {
-        return LiteralArgumentBuilder.<CommandSource>literal(name);
+    public LiteralArgumentBuilder<SharedSuggestionProvider> literal(String name) {
+        return LiteralArgumentBuilder.<SharedSuggestionProvider>literal(name);
     }
 
-    public LiteralArgumentBuilder<CommandSource> literal(String name, Message message) {
-        var literalBuilder = LiteralArgumentBuilder.<CommandSource>literal(name);
+    public LiteralArgumentBuilder<SharedSuggestionProvider> literal(String name, Message message) {
+        var literalBuilder = LiteralArgumentBuilder.<SharedSuggestionProvider>literal(name);
         ((LiteralCommandNodeInterface) literalBuilder).setMessage(message);
 
         return literalBuilder;

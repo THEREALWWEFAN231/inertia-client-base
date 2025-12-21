@@ -6,7 +6,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.PositionType;
 import com.inertiaclient.base.utils.TimerUtil;
 import lombok.Setter;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class Tooltip extends AbsoulteYogaNode {
 

@@ -10,14 +10,14 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ModuleSelectorArgumentType implements ArgumentType<Module> {
 
-    private static final DynamicCommandExceptionType MODULE_NOT_FOUND = new DynamicCommandExceptionType(o -> Text.translatable("icb.command.module_not_found", o));
+    private static final DynamicCommandExceptionType MODULE_NOT_FOUND = new DynamicCommandExceptionType(o -> Component.translatable("icb.command.module_not_found", o));
 
     @Override
     public Module parse(StringReader reader) throws CommandSyntaxException {
@@ -31,7 +31,7 @@ public class ModuleSelectorArgumentType implements ArgumentType<Module> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(InertiaBase.instance.getModuleManager().getModules(), builder, module -> module.getId(), module -> new LiteralMessage(module.getDescriptionString()));
+        return SharedSuggestionProvider.suggest(InertiaBase.instance.getModuleManager().getModules(), builder, module -> module.getId(), module -> new LiteralMessage(module.getDescriptionString()));
         //return CommandSource.suggestMatching(InertiaClient.instance.getModuleManager().getModules().stream().map(module -> module.getId()).toList(), builder);
     }
 

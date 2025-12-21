@@ -10,7 +10,7 @@ import com.inertiaclient.base.utils.UIUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import org.lwjgl.util.yoga.Yoga;
 
 import java.awt.Color;
@@ -481,7 +481,7 @@ public class YogaNode {
         return YGNodeLayoutGetHeight(nativeNode);
     }
 
-    public void setWidths(DrawContext context, float globalMouseX, float globalMouseY, float delta) {
+    public void setWidths(GuiGraphics context, float globalMouseX, float globalMouseY, float delta) {
         if (this.display == Display.NONE) {
             return;
         }
@@ -506,7 +506,7 @@ public class YogaNode {
         }
     }
 
-    public void setWidths(float currentX, float currentY, DrawContext context, float globalMouseX, float globalMouseY, float delta) {
+    public void setWidths(float currentX, float currentY, GuiGraphics context, float globalMouseX, float globalMouseY, float delta) {
         width = width();
         height = height();
         if (widthModifier != null) {
@@ -527,7 +527,7 @@ public class YogaNode {
         }
     }
 
-    public void setGlobalPositions(float currentX, float currentY, DrawContext context, float globalMouseX, float globalMouseY, float delta) {
+    public void setGlobalPositions(float currentX, float currentY, GuiGraphics context, float globalMouseX, float globalMouseY, float delta) {
         if (this.display == Display.NONE) {
             return;
         }
@@ -558,7 +558,7 @@ public class YogaNode {
         }
     }
 
-    public void beforeLayoutCalculations(DrawContext context, float mouseX, float mouseY, float delta, CanvasWrapper canvas) {
+    public void beforeLayoutCalculations(GuiGraphics context, float mouseX, float mouseY, float delta, CanvasWrapper canvas) {
 
         if (!this.hasDoneFirstInit) {
             this.doRenderCallback(this.firstInitCallback, context, mouseX, mouseY, mouseX - this.getGlobalX(), mouseY - this.getGlobalY(), delta, canvas);
@@ -590,7 +590,7 @@ public class YogaNode {
 
     }
 
-    public void beforeDraw(DrawContext context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
+    public void beforeDraw(GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
         if (this.display == Display.NONE) {
             return;
         }
@@ -669,7 +669,7 @@ public class YogaNode {
     }
 
 
-    public void draw(DrawContext context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
+    public void draw(GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
         if (this.display == Display.NONE) {
             return;
         }
@@ -893,7 +893,7 @@ public class YogaNode {
         return true;
     }
 
-    protected void doRenderCallback(RenderCallback renderCallback, DrawContext context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
+    protected void doRenderCallback(RenderCallback renderCallback, GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
         if (renderCallback != null) {
             renderCallback.render(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
         }
@@ -960,7 +960,7 @@ public class YogaNode {
 
     public interface RenderCallback {
 
-        void render(DrawContext context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas);
+        void render(GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas);
     }
 
     public interface MouseCallback {

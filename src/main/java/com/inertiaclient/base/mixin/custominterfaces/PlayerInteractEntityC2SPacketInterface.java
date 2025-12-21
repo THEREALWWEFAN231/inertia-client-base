@@ -1,10 +1,10 @@
 package com.inertiaclient.base.mixin.custominterfaces;
 
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 
 public interface PlayerInteractEntityC2SPacketInterface {
 
-    PlayerInteractEntityC2SPacket.InteractType getInteractionType();
+    ServerboundInteractPacket.ActionType getInteractionType();
 
     int getEntityId();
 

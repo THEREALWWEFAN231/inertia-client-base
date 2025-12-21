@@ -4,7 +4,7 @@ import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.render.skia.SkiaOpenGLInstance;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -120,7 +120,7 @@ public class HudManager {
         }
     }
 
-    public void render(DrawContext drawContext, float screenWidth, float screenHeight, boolean editor) {
+    public void render(GuiGraphics drawContext, float screenWidth, float screenHeight, boolean editor) {
         Runnable draw = () -> {
             for (HudGroup hudGroup : this.groups) {
                 hudGroup.doStuff(0, 0, 0);

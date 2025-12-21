@@ -2,9 +2,9 @@ package com.inertiaclient.base.gui.components.module.values.entitycolor;
 
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.registry.Registries;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class SpawnGroupContainer extends YogaNode {
 
@@ -21,18 +21,18 @@ public class SpawnGroupContainer extends YogaNode {
         this.styleSetFlexGrow(0);
     }
 
-    public void changeSpawnGroup(SpawnGroup spawnGroup) {
+    public void changeSpawnGroup(MobCategory spawnGroup) {
         this.removeAllChildren();
 
         if (spawnGroup == null) {//all
-            for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
+            for (EntityType entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
                 this.addChild(new EntityTypeColorComponent(entityColorPage.getEntityTypeColorValue(), entityType));
             }
             return;
         }
 
-        for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
-            if (entityType.getSpawnGroup() != spawnGroup) {
+        for (EntityType entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
+            if (entityType.getCategory() != spawnGroup) {
                 continue;
             }
             this.addChild(new EntityTypeColorComponent(entityColorPage.getEntityTypeColorValue(), entityType));

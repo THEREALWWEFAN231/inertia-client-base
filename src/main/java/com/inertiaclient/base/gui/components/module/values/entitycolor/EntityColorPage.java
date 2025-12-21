@@ -5,8 +5,8 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.value.impl.EntityTypeColorValue;
 import lombok.Getter;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.text.Text;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.network.chat.Component;
 
 public class EntityColorPage extends YogaNode {
 
@@ -38,10 +38,10 @@ public class EntityColorPage extends YogaNode {
             spawnGroupsContainer.addChild(allButtons);
             spawnGroupsContainer.enableHorizontalScrollbar();
             spawnGroupsContainer.setShouldScissorChildren(true);
-            allButtons.addChild(new SelectorButton(Text.translatable("icb.gui.pages.entitycolor.buttons.all"), () -> selectedIndex == 0, () -> {
+            allButtons.addChild(new SelectorButton(Component.translatable("icb.gui.pages.entitycolor.buttons.all"), () -> selectedIndex == 0, () -> {
                 changeContents(null);
             }));
-            for (SpawnGroup spawnGroup : SpawnGroup.values()) {
+            for (MobCategory spawnGroup : MobCategory.values()) {
                 allButtons.addChild(new SelectorButton(() -> spawnGroup.getName(), () -> selectedIndex == spawnGroup.ordinal() + 1, () -> {
                     changeContents(spawnGroup);
                 }));
@@ -87,10 +87,10 @@ public class EntityColorPage extends YogaNode {
             }));
         }*/
 
-        this.changeContents(SpawnGroup.values()[0]);
+        this.changeContents(MobCategory.values()[0]);
     }
 
-    public void changeContents(SpawnGroup spawnGroup) {
+    public void changeContents(MobCategory spawnGroup) {
         if (spawnGroup == null) {//all
             this.selectedIndex = 0;
         } else {

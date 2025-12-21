@@ -9,9 +9,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import lombok.Getter;
-import net.minecraft.client.network.ClientCommandSource;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.ChatFormatting;
 
 import java.util.ArrayList;
 
@@ -20,16 +20,16 @@ public class CommandManager {
     @Getter
     private String prefix = ".";
     @Getter
-    private Formatting bracketColor = Formatting.GRAY;
+    private ChatFormatting bracketColor = ChatFormatting.GRAY;
     @Getter
-    private Formatting nameColor = Formatting.RED;
+    private ChatFormatting nameColor = ChatFormatting.RED;
     @Getter
-    private Formatting messageColor = Formatting.WHITE;
+    private ChatFormatting messageColor = ChatFormatting.WHITE;
 
     @Getter
-    private CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher();
+    private CommandDispatcher<SharedSuggestionProvider> dispatcher = new CommandDispatcher();
     @Getter
-    private CommandSource commandSource = new ClientCommandSource(null, InertiaBase.mc);
+    private SharedSuggestionProvider commandSource = new ClientSuggestionProvider(null, InertiaBase.mc);
     @Getter
     private ArrayList<Command> commands = new ArrayList<>();//honestly its easier to keep our own list of Command, rather then using CommandDispatcher root children to do some weird lookup
 
@@ -48,16 +48,16 @@ public class CommandManager {
 
     private void registerCommand(Command command) {
         this.commands.add(command);
-        LiteralArgumentBuilder<CommandSource> builder = command.literal(command.getName(), command.getDescription());
+        LiteralArgumentBuilder<SharedSuggestionProvider> builder = command.literal(command.getName(), command.getDescription());
         command.buildArguments(builder);
-        LiteralCommandNode<CommandSource> mainCommand = this.dispatcher.register(builder);
+        LiteralCommandNode<SharedSuggestionProvider> mainCommand = this.dispatcher.register(builder);
 
         if (command.getAliases() != null) {
             for (String alias : command.getAliases()) {
                 //i dont know why this doesn't work for no argument commands, like help(it works with arguments, like toggle command)... so we will just build another command
                 //this.dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal(alias).redirect(mainCommand));
 
-                LiteralArgumentBuilder<CommandSource> aliasBuilder = LiteralArgumentBuilder.literal(alias);
+                LiteralArgumentBuilder<SharedSuggestionProvider> aliasBuilder = LiteralArgumentBuilder.literal(alias);
                 command.buildArguments(aliasBuilder);
                 this.dispatcher.register(aliasBuilder);
             }

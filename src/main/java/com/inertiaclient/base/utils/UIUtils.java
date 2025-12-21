@@ -2,9 +2,9 @@ package com.inertiaclient.base.utils;
 
 
 import com.inertiaclient.base.InertiaBase;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.OrderedText;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
@@ -28,7 +28,7 @@ public class UIUtils {
     }
 
     public static float getTickDelta() {
-        return InertiaBase.mc.getRenderTickCounter().getTickDelta(true);
+        return InertiaBase.mc.getDeltaTracker().getGameTimeDeltaPartialTick(true);
     }
 
     public static Color colorWithAlpha(Color color, int alpha) {
@@ -111,7 +111,7 @@ public class UIUtils {
         return new float[]{h, s, l};
     }
 
-    public static String orderedTextToString(OrderedText orderedText) {
+    public static String orderedTextToString(FormattedCharSequence orderedText) {
         StringBuilder realString = new StringBuilder();
         orderedText.accept((index, style, codePoint) -> {
             realString.appendCodePoint(codePoint);
@@ -136,6 +136,6 @@ public class UIUtils {
     }
 
     public static void playButtonPressedSound() {
-        InertiaBase.mc.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+        InertiaBase.mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
     }
 }

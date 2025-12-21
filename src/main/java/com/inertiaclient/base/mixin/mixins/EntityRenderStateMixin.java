@@ -1,8 +1,8 @@
 package com.inertiaclient.base.mixin.mixins;
 
 import com.inertiaclient.base.mixin.custominterfaces.EntityRenderStateInterface;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 

@@ -1,24 +1,24 @@
 package com.inertiaclient.base.mixin.mixins;
 
 import com.inertiaclient.base.mixin.custominterfaces.PlayerInteractEntityC2SPacketInterface;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(PlayerInteractEntityC2SPacket.class)
-public class PlayerInteractEntityC2SPacketMixin implements PlayerInteractEntityC2SPacketInterface {
+@Mixin(ServerboundInteractPacket.class)
+public class ServerboundInteractPacketMixin implements PlayerInteractEntityC2SPacketInterface {
 
     @Shadow
     @Final
     private int entityId;
     @Shadow
     @Final
-    private PlayerInteractEntityC2SPacket.InteractTypeHandler type;
+    private ServerboundInteractPacket.Action action;
 
     @Override
-    public PlayerInteractEntityC2SPacket.InteractType getInteractionType() {
-        return this.type.getType();
+    public ServerboundInteractPacket.ActionType getInteractionType() {
+        return this.action.getType();
     }
 
     @Override

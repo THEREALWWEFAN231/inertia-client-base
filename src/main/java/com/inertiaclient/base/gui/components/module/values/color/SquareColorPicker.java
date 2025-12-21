@@ -6,7 +6,7 @@ import com.inertiaclient.base.render.yoga.ClickType;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.RuntimeEffect;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -31,11 +31,11 @@ public class SquareColorPicker extends YogaNode {
 
             if (isBeingDragged) {
                 float newSaturation = (globalMouseX - this.getGlobalX()) / this.getWidth();
-                newSaturation = MathHelper.clamp(newSaturation, 0, 1);
+                newSaturation = Mth.clamp(newSaturation, 0, 1);
 
                 float newBrightness = (globalMouseY - this.getGlobalY()) / this.getHeight();
                 newBrightness = 1 - newBrightness;
-                newBrightness = MathHelper.clamp(newBrightness, 0, 1);
+                newBrightness = Mth.clamp(newBrightness, 0, 1);
 
                 colorContainer.setRenderedColorSaturation(newSaturation);
                 colorContainer.setRenderedColorBrightness(newBrightness);

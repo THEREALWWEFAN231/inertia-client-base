@@ -1,7 +1,7 @@
 package com.inertiaclient.base.utils;
 
 import lombok.AllArgsConstructor;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class CursorUtils {
             cursor = GLFW.glfwCreateStandardCursor(glfwCursor);
             cursors.put(glfwCursor, cursor);
         }
-        GLFW.glfwSetCursor(MinecraftClient.getInstance().getWindow().getHandle(), cursor);
+        GLFW.glfwSetCursor(Minecraft.getInstance().getWindow().getWindow(), cursor);
         currentCursor = glfwCursor;
     }
 

@@ -4,7 +4,7 @@ import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.value.impl.EntityTypeValue;
-import net.minecraft.entity.EntityType;
+import net.minecraft.world.entity.EntityType;
 
 import java.awt.Color;
 
@@ -17,14 +17,14 @@ public class EntityTypeComponent extends YogaNode {
 
     public EntityTypeComponent(EntityTypeValue entityTypeValue, EntityType entityType) {
         this.entityType = entityType;
-        this.setSearchContext(entityType.getName().getString());
+        this.setSearchContext(entityType.getDescription().getString());
 
         this.styleSetHeight(12);
         this.setHoverCursorToIndicateClick();
         //this.setDebug(true);
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             var name = CanvasWrapper.getFreshTextBuilder();
-            name.basic(entityType.getName().getString(), 0, this.getHeight() / 2, entityTypeValue.getValue().contains(entityType) ? EntityTypeComponent.selectedColor : EntityTypeComponent.unSelectedColor);
+            name.basic(entityType.getDescription().getString(), 0, this.getHeight() / 2, entityTypeValue.getValue().contains(entityType) ? EntityTypeComponent.selectedColor : EntityTypeComponent.unSelectedColor);
             name.setFontSize(6);
             name.setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE).setHorizontalAlignment(CanvasWrapper.TextBuilder.HorizontalAlignment.LEFT);
             name.draw(canvas);
@@ -46,7 +46,7 @@ public class EntityTypeComponent extends YogaNode {
 
         this.setPreLayoutCalculationsCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             var name = CanvasWrapper.getFreshTextBuilder();
-            name.setText(entityType.getName().getString());
+            name.setText(entityType.getDescription().getString());
             name.setFontSize(6);
 
             this.styleSetWidth(name.getTextWidth());

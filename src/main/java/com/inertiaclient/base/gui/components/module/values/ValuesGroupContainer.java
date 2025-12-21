@@ -17,12 +17,12 @@ import com.inertiaclient.base.gui.components.module.values.string.StringComponen
 import com.inertiaclient.base.value.Value;
 import com.inertiaclient.base.value.group.ValueGroup;
 import com.inertiaclient.base.value.impl.*;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.network.chat.Component;
 
 public class ValuesGroupContainer extends AbstractGroupContainer {
 
-    private static final Text ENTITY_COLOR_LABEL = Text.translatable("icb.gui.pages.entity_color");
+    private static final Component ENTITY_COLOR_LABEL = Component.translatable("icb.gui.pages.entity_color");
 
     private ValueGroup valueGroup;
 
@@ -62,12 +62,12 @@ public class ValuesGroupContainer extends AbstractGroupContainer {
                 if (value instanceof KeybindValue kbv) {
                     valuesContainer.addChild(new KeyBindComponent(new KeyBindComponent.KeyWrapper() {
                         @Override
-                        public InputUtil.Key get() {
+                        public InputConstants.Key get() {
                             return kbv.getValue();
                         }
 
                         @Override
-                        public void set(InputUtil.Key key) {
+                        public void set(InputConstants.Key key) {
                             kbv.setValue(key);
                         }
                     }));

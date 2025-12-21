@@ -3,7 +3,7 @@ package com.inertiaclient.base.gui.components;
 import com.inertiaclient.base.render.yoga.*;
 import com.inertiaclient.base.render.yoga.layouts.PositionType;
 import com.inertiaclient.base.render.yoga.layouts.YogaEdge;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.Color;
 
@@ -86,7 +86,7 @@ public class VerticalScrollbar extends AbsoulteYogaNode {
         this.applyGenericStyle(new GenericStyle().setRenderIf(() -> this.isAbleToScroll).setBackgroundColor(() -> VerticalScrollbar.scrollbarColor));
     }
 
-    public void setGlobalPositions(float currentX, float currentY, DrawContext context, float globalMouseX, float globalMouseY, float delta) {
+    public void setGlobalPositions(float currentX, float currentY, GuiGraphics context, float globalMouseX, float globalMouseY, float delta) {
         this.contentsAllowedHeight = this.getParent().getHeight();
         this.contentHeight = this.getParentsContentHeight();
         this.overflowAmount = this.contentHeight - this.contentsAllowedHeight;

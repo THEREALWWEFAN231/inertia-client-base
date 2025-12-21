@@ -9,7 +9,7 @@ import com.inertiaclient.base.value.Value;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -25,7 +25,7 @@ public class ValueGroup implements LanguageBaseKey, JsonState {
     private final ArrayList<Value> values = new ArrayList<>();
     private String parentTranslationKey;
     @Getter
-    private Text name;
+    private Component name;
     @Setter
     @Getter
     private Runnable saveHandler;
@@ -53,11 +53,11 @@ public class ValueGroup implements LanguageBaseKey, JsonState {
         return this.parentTranslationKey + ".groups." + this.id;
     }
 
-    protected Text createName() {
+    protected Component createName() {
         if (this.getId().equals("main")) {
-            return Text.translatableWithFallback(LanguageConstants.MAIN_GROUP_NAME, this.getId());
+            return Component.translatableWithFallback(LanguageConstants.MAIN_GROUP_NAME, this.getId());
         }
-        return Text.translatableWithFallback(getLanguageBaseKey() + ".name", this.getId());
+        return Component.translatableWithFallback(getLanguageBaseKey() + ".name", this.getId());
 
     }
 

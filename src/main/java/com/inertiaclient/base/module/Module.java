@@ -14,9 +14,9 @@ import com.inertiaclient.base.value.group.ValueGroup;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -27,12 +27,12 @@ public class Module implements LanguageBaseKey, JsonState {
     @Setter(AccessLevel.PROTECTED)
     private String id;
     @Getter
-    private Text name;
+    private Component name;
     @Getter
-    private Text description;
+    private Component description;
     @Getter
     @Setter
-    private InputUtil.Key bind;
+    private InputConstants.Key bind;
     @Getter
     private final Category category;
     private boolean enabledState;
@@ -53,12 +53,12 @@ public class Module implements LanguageBaseKey, JsonState {
     @Setter(AccessLevel.PROTECTED)
     protected InertiaMod mod;
 
-    protected final MinecraftClient mc;
+    protected final Minecraft mc;
 
-    public Module(String id, InputUtil.Key bind, Category category) {
+    public Module(String id, InputConstants.Key bind, Category category) {
         this.id = id;
-        this.name = Text.translatableWithFallback(getLanguageBaseKey() + ".name", this.getId());
-        this.description = Text.translatableWithFallback(getLanguageBaseKey() + ".description", "no description");
+        this.name = Component.translatableWithFallback(getLanguageBaseKey() + ".name", this.getId());
+        this.description = Component.translatableWithFallback(getLanguageBaseKey() + ".description", "no description");
         this.bind = bind;
         this.category = category;
         this.valueGroups = new ArrayList();

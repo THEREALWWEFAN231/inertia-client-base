@@ -5,7 +5,7 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.value.Value;
 import lombok.Getter;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ValueYogaNode<T extends Value<?>> extends YogaNode {
 

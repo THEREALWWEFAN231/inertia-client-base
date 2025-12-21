@@ -6,8 +6,8 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.CursorUtils;
 import lombok.Getter;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.util.yoga.Yoga;
 
 import static org.lwjgl.util.yoga.Yoga.YGDirectionLTR;
@@ -21,7 +21,7 @@ public abstract class YogaScreen extends BetterScreen {
     private SkiaOpenGLInstance skiaInstance;
 
 
-    public YogaScreen(Text title) {
+    public YogaScreen(Component title) {
         super(title);
 
         if (skiaInstance == null) {
@@ -43,7 +43,7 @@ public abstract class YogaScreen extends BetterScreen {
     protected abstract void initRoot(YogaNode root);
 
     @Override
-    public void betterRender(DrawContext context, float mouseX, float mouseY, float delta) {
+    public void betterRender(GuiGraphics context, float mouseX, float mouseY, float delta) {
         skiaInstance.setup(() -> {
             //calculate "every" components width, then set their positions
             root.beforeLayoutCalculations(context, mouseX, mouseY, delta, skiaInstance.getCanvasWrapper());

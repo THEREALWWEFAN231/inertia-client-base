@@ -6,17 +6,17 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.value.impl.EntityTypeValue;
 import lombok.Getter;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.registry.Registries;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class SpawnGroupContainer extends YogaNode {
 
     @Getter
     private WrappedListContainer wrappedListContainer;
 
-    public SpawnGroupContainer(EntityTypeValue entityTypeValue, SpawnGroup spawnGroup) {
+    public SpawnGroupContainer(EntityTypeValue entityTypeValue, MobCategory spawnGroup) {
         this.styleSetFlexGrow(1);
         this.styleSetFlexShrink(1);
         this.styleSetFlexDirection(FlexDirection.COLUMN);
@@ -26,8 +26,8 @@ public class SpawnGroupContainer extends YogaNode {
         //wrappedListContainer.getListNode().styleSetJustifyContent(Yoga.YGJustifySpaceAround);
         this.addChild(wrappedListContainer);
 
-        for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
-            if (entityType.getSpawnGroup() == spawnGroup)
+        for (EntityType entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
+            if (entityType.getCategory() == spawnGroup)
                 wrappedListContainer.getListNode().addChild(new EntityTypeComponent(entityTypeValue, entityType));
         }
 

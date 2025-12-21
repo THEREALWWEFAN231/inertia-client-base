@@ -5,7 +5,7 @@ import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.skia.Fonts;
 import com.inertiaclient.base.render.skia.SkiaUtils;
 import io.github.humbleui.skija.Paint;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
@@ -29,7 +29,7 @@ public abstract class TextComponent extends HudComponent {
     }
 
     @Override
-    public void render(DrawContext drawContext, boolean editor, CanvasWrapper canvas) {
+    public void render(GuiGraphics drawContext, boolean editor, CanvasWrapper canvas) {
         if (renderedText == null) {
             return;
         }

@@ -9,7 +9,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
@@ -95,7 +95,7 @@ public class MainFrame extends YogaNode {
             }
 
             if (clickGuiSettings.getOpacityAnimation().getValue()) {
-                canvas.saveLayerAlpha(0, 0, this.getWidth(), this.getHeight(), MathHelper.clamp((int) (animationProgress * 255), 0, 255));
+                canvas.saveLayerAlpha(0, 0, this.getWidth(), this.getHeight(), Mth.clamp((int) (animationProgress * 255), 0, 255));
             }
 
             if (clickGuiSettings.getTranslateAnimation().getValue()) {

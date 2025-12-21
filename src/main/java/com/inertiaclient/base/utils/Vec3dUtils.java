@@ -1,47 +1,47 @@
 package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 public class Vec3dUtils {
 
-    public static Vec3d setX(Vec3d vec3d, double newValue) {
-        return new Vec3d(newValue, vec3d.y, vec3d.z);
+    public static Vec3 setX(Vec3 vec3d, double newValue) {
+        return new Vec3(newValue, vec3d.y, vec3d.z);
     }
 
-    public static Vec3d setY(Vec3d vec3d, double newValue) {
-        return new Vec3d(vec3d.x, newValue, vec3d.z);
+    public static Vec3 setY(Vec3 vec3d, double newValue) {
+        return new Vec3(vec3d.x, newValue, vec3d.z);
     }
 
-    public static Vec3d setZ(Vec3d vec3d, double newValue) {
-        return new Vec3d(vec3d.x, vec3d.y, newValue);
+    public static Vec3 setZ(Vec3 vec3d, double newValue) {
+        return new Vec3(vec3d.x, vec3d.y, newValue);
     }
 
-    public static Vec3d setX(Vec3d vec3d, double newValue, Vec3dMath math) {
-        return new Vec3d(math.performMath(vec3d.x, newValue), vec3d.y, vec3d.z);
+    public static Vec3 setX(Vec3 vec3d, double newValue, Vec3dMath math) {
+        return new Vec3(math.performMath(vec3d.x, newValue), vec3d.y, vec3d.z);
     }
 
-    public static Vec3d setY(Vec3d vec3d, double newValue, Vec3dMath math) {
-        return new Vec3d(vec3d.x, math.performMath(vec3d.y, newValue), vec3d.z);
+    public static Vec3 setY(Vec3 vec3d, double newValue, Vec3dMath math) {
+        return new Vec3(vec3d.x, math.performMath(vec3d.y, newValue), vec3d.z);
     }
 
-    public static Vec3d setZ(Vec3d vec3d, double newValue, Vec3dMath math) {
-        return new Vec3d(vec3d.x, vec3d.y, math.performMath(vec3d.z, newValue));
+    public static Vec3 setZ(Vec3 vec3d, double newValue, Vec3dMath math) {
+        return new Vec3(vec3d.x, vec3d.y, math.performMath(vec3d.z, newValue));
     }
 
     public static class Velocity {
 
         public static void setEntityX(Entity entity, double newValue, Vec3dMath math) {
-            entity.setVelocity(Vec3dUtils.setX(entity.getVelocity(), newValue, math));
+            entity.setDeltaMovement(Vec3dUtils.setX(entity.getDeltaMovement(), newValue, math));
         }
 
         public static void setEntityY(Entity entity, double newValue, Vec3dMath math) {
-            entity.setVelocity(Vec3dUtils.setY(entity.getVelocity(), newValue, math));
+            entity.setDeltaMovement(Vec3dUtils.setY(entity.getDeltaMovement(), newValue, math));
         }
 
         public static void setEntityZ(Entity entity, double newValue, Vec3dMath math) {
-            entity.setVelocity(Vec3dUtils.setZ(entity.getVelocity(), newValue, math));
+            entity.setDeltaMovement(Vec3dUtils.setZ(entity.getDeltaMovement(), newValue, math));
         }
 
         public static void setPlayerX(double newValue, Vec3dMath math) {
@@ -60,15 +60,15 @@ public class Vec3dUtils {
     public static class Position {
 
         public static void setEntityX(Entity entity, double newValue, Vec3dMath math) {
-            entity.setPos(math.performMath(entity.getX(), newValue), entity.getY(), entity.getZ());
+            entity.setPosRaw(math.performMath(entity.getX(), newValue), entity.getY(), entity.getZ());
         }
 
         public static void setEntityY(Entity entity, double newValue, Vec3dMath math) {
-            entity.setPos(entity.getX(), math.performMath(entity.getY(), newValue), entity.getZ());
+            entity.setPosRaw(entity.getX(), math.performMath(entity.getY(), newValue), entity.getZ());
         }
 
         public static void setEntityZ(Entity entity, double newValue, Vec3dMath math) {
-            entity.setPos(entity.getX(), entity.getY(), math.performMath(entity.getZ(), newValue));
+            entity.setPosRaw(entity.getX(), entity.getY(), math.performMath(entity.getZ(), newValue));
         }
 
         public static void setPlayerX(double newValue, Vec3dMath math) {

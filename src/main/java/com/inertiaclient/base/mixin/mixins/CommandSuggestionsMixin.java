@@ -7,11 +7,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestions;
-import net.minecraft.client.gui.screen.ChatInputSuggestor;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.command.CommandSource;
+import net.minecraft.client.gui.components.CommandSuggestions;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.commands.SharedSuggestionProvider;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,33 +21,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mixin(ChatInputSuggestor.class)
-public class ChatInputSuggestorMixin {
+@Mixin(CommandSuggestions.class)
+public class CommandSuggestionsMixin {
 
     @Shadow
     @Final
-    private Screen owner;
+    private Screen screen;
     @Shadow
     @Final
-    TextFieldWidget textField;
+    EditBox input;
     @Shadow
-    private ParseResults<CommandSource> parse;
+    private ParseResults<SharedSuggestionProvider> currentParse;
     @Shadow
-    private ChatInputSuggestor.SuggestionWindow window;
+    private CommandSuggestions.SuggestionsList suggestions;
     @Shadow
-    boolean completingSuggestions;
+    boolean keepSuggestions;
     @Shadow
     private CompletableFuture<Suggestions> pendingSuggestions;
 
 
     @Shadow
-    private void showCommandSuggestions() {
+    private void updateUsageInfo() {
 
     }
 
-    @Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true)
+    @Inject(method = "updateCommandInfo", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true)
     public void refresh(CallbackInfo callbackInfo, @Local LocalRef<StringReader> stringReaderRef) {
-        if (!(owner instanceof ChatScreen)) {//dont allow in command blocks or what ever
+        if (!(screen instanceof ChatScreen)) {//dont allow in command blocks or what ever
             return;
         }
         char prefix = '.';
@@ -58,17 +58,17 @@ public class ChatInputSuggestorMixin {
         if (isInertiaCommand) {//cancel what minecraft normally does and use our command dispatcher
             stringReader.skip();
 
-            int cursor = this.textField.getCursor();
-            CommandDispatcher<CommandSource> commandDispatcher = InertiaBase.instance.getCommandManager().getDispatcher();
-            if (this.parse == null) {
-                this.parse = commandDispatcher.parse(stringReader, InertiaBase.instance.getCommandManager().getCommandSource());
+            int cursor = this.input.getCursorPosition();
+            CommandDispatcher<SharedSuggestionProvider> commandDispatcher = InertiaBase.instance.getCommandManager().getDispatcher();
+            if (this.currentParse == null) {
+                this.currentParse = commandDispatcher.parse(stringReader, InertiaBase.instance.getCommandManager().getCommandSource());
             }
 
-            if (!(cursor < 1 || this.window != null && this.completingSuggestions)) {
-                this.pendingSuggestions = commandDispatcher.getCompletionSuggestions(this.parse, cursor);
+            if (!(cursor < 1 || this.suggestions != null && this.keepSuggestions)) {
+                this.pendingSuggestions = commandDispatcher.getCompletionSuggestions(this.currentParse, cursor);
                 this.pendingSuggestions.thenRun(() -> {
                     if (this.pendingSuggestions.isDone()) {
-                        this.showCommandSuggestions();
+                        this.updateUsageInfo();
                     }
                 });
             }

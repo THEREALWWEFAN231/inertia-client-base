@@ -7,14 +7,14 @@ import com.inertiaclient.base.render.yoga.YogaBuilder;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.utils.InputUtils;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyBindComponent extends YogaNode {
 
-    private static final Text LABEL = Text.translatable("icb.gui.text.keybind.label");
-    private static final Text WAITING = Text.translatable("icb.gui.text.keybind.waiting");
+    private static final Component LABEL = Component.translatable("icb.gui.text.keybind.label");
+    private static final Component WAITING = Component.translatable("icb.gui.text.keybind.waiting");
 
     private boolean waitingForKeyPress;
 
@@ -38,7 +38,7 @@ public class KeyBindComponent extends YogaNode {
 
         this.setKeyPressedCallback((keyCode, scanCode, modifiers) -> {
             if (waitingForKeyPress) {
-                InputUtil.Key newKeybind = null;
+                InputConstants.Key newKeybind = null;
                 if (keyCode == GLFW.GLFW_KEY_ESCAPE) {//no longer listen for a key, and don't bind the key
                     waitingForKeyPress = false;
 
@@ -59,8 +59,8 @@ public class KeyBindComponent extends YogaNode {
 
     public interface KeyWrapper {
 
-        InputUtil.Key get();
+        InputConstants.Key get();
 
-        void set(InputUtil.Key key);
+        void set(InputConstants.Key key);
     }
 }

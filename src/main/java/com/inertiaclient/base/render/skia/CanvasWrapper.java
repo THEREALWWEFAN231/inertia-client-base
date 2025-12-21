@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -241,11 +241,11 @@ public class CanvasWrapper {
             return this;
         }
 
-        public TextBuilder basic(Text text, float x, float y) {
+        public TextBuilder basic(Component text, float x, float y) {
             return this.basic(text.getString(), x, y);
         }
 
-        public TextBuilder basic(Text text, float x, float y, Color color) {
+        public TextBuilder basic(Component text, float x, float y, Color color) {
             return this.basic(text.getString(), x, y, color);
         }
 
@@ -262,7 +262,7 @@ public class CanvasWrapper {
             return this;
         }
 
-        public TextBuilder setText(Text text) {
+        public TextBuilder setText(Component text) {
             return this.setText(text.getString());
         }
 

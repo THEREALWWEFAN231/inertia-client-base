@@ -4,7 +4,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.PositionType;
 import com.inertiaclient.base.render.yoga.layouts.YogaEdge;
 import com.inertiaclient.base.value.impl.BlockEntityColorValue;
-import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class ColorDisplay extends YogaNode {
 

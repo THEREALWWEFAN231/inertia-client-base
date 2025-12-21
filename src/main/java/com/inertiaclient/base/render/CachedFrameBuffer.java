@@ -3,14 +3,14 @@ package com.inertiaclient.base.render;
 import com.inertiaclient.base.utils.TimerUtil;
 import com.inertiaclient.base.utils.opengl.staterestore.OpenGLStates;
 import com.inertiaclient.base.utils.opengl.staterestore.SimpleStateRestore;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gl.ShaderProgram;
-import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.gl.SimpleFramebuffer;
-import net.minecraft.client.render.*;
+import net.minecraft.client.renderer.CompiledShaderProgram;
+import net.minecraft.client.renderer.CoreShaders;
 import org.lwjgl.opengl.GL11;
 
 import java.util.function.Supplier;
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 public class CachedFrameBuffer {
 
     @Getter
-    protected SimpleFramebuffer framebuffer;
+    protected TextureTarget framebuffer;
     @Setter
     protected Supplier<Integer> fps = () -> -1;//no cap
     protected TimerUtil fpsTimer = new TimerUtil();
@@ -33,7 +33,7 @@ public class CachedFrameBuffer {
             if (stencil) {
                 this.framebuffer = new StencilFrameBuffer(width, height, useDepth);
             } else {
-                this.framebuffer = new SimpleFramebuffer(width, height, useDepth);
+                this.framebuffer = new TextureTarget(width, height, useDepth);
             }
             framebuffer.setClearColor(0, 0, 0, 0);
             this.forceUpdate = true;
@@ -48,7 +48,7 @@ public class CachedFrameBuffer {
     }
 
     public void bind() {
-        this.framebuffer.beginWrite(false);
+        this.framebuffer.bindWrite(false);
     }
 
     public void drawWithRenderer() {
@@ -68,7 +68,7 @@ public class CachedFrameBuffer {
 
     public void deleteFrameBuffer() {
         if (this.framebuffer != null) {
-            this.framebuffer.delete();
+            this.framebuffer.destroyBuffers();
             this.framebuffer = null;
         }
     }
@@ -78,10 +78,10 @@ public class CachedFrameBuffer {
         GlStateManager._enableBlend();
         GlStateManager._blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        ShaderProgram shaderProgram = RenderSystem.setShader(ShaderProgramKeys.BLIT_SCREEN);
-        shaderProgram.addSamplerTexture("InSampler", this.framebuffer.getColorAttachment());
+        CompiledShaderProgram shaderProgram = RenderSystem.setShader(CoreShaders.BLIT_SCREEN);
+        shaderProgram.bindSampler("InSampler", this.framebuffer.getColorTextureId());
 
-        shaderProgram.bind();
+        shaderProgram.apply();
 
         /*float f = this.lastWidth;
         float g = this.lastHeight;
@@ -94,14 +94,14 @@ public class CachedFrameBuffer {
         bufferBuilder.vertex(f, 0.0f, 0.0f).texture(h, i).color(255, 255, 255, 255);
         bufferBuilder.vertex(0.0f, 0.0f, 0.0f).texture(0.0f, i).color(255, 255, 255, 255);
         BufferRenderer.draw(bufferBuilder.end());*/
-        BufferBuilder bufferBuilder = RenderSystem.renderThreadTesselator().begin(VertexFormat.DrawMode.QUADS, VertexFormats.BLIT_SCREEN);
-        bufferBuilder.vertex(0.0F, 0.0F, 0.0F);
-        bufferBuilder.vertex(1.0F, 0.0F, 0.0F);
-        bufferBuilder.vertex(1.0F, 1.0F, 0.0F);
-        bufferBuilder.vertex(0.0F, 1.0F, 0.0F);
-        BufferRenderer.draw(bufferBuilder.end());
+        BufferBuilder bufferBuilder = RenderSystem.renderThreadTesselator().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.BLIT_SCREEN);
+        bufferBuilder.addVertex(0.0F, 0.0F, 0.0F);
+        bufferBuilder.addVertex(1.0F, 0.0F, 0.0F);
+        bufferBuilder.addVertex(1.0F, 1.0F, 0.0F);
+        bufferBuilder.addVertex(0.0F, 1.0F, 0.0F);
+        BufferUploader.draw(bufferBuilder.buildOrThrow());
 
-        shaderProgram.unbind();
+        shaderProgram.clear();
         this.simpleStateRestore.close();
     }
 

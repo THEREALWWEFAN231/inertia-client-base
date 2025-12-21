@@ -3,7 +3,7 @@ package com.inertiaclient.base.utils.opengl.staterestore;
 import com.inertiaclient.base.mixin.custominterfaces.CapabilityTrackerInterface;
 import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.render.BufferRenderer;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
 
@@ -106,7 +106,7 @@ public class OpenGLStateRestore implements AutoCloseable {
         this.activeTexture = GlStateManager.activeTexture;
         this.boundTextures = new int[GlStateManager.TEXTURES.length];
         for (int i = 0; i < GlStateManager.TEXTURES.length; i++) {
-            boundTextures[i] = GlStateManager.TEXTURES[i].boundTexture;
+            boundTextures[i] = GlStateManager.TEXTURES[i].binding;
         }
         //this.texture2D = glGetInteger(GL_TEXTURE_BINDING_2D);
 
@@ -133,21 +133,21 @@ public class OpenGLStateRestore implements AutoCloseable {
         forceSetBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
         //is this correct?
         forceSetBlendFunc(srcRGB, dstRGB);
-        ((CapabilityTrackerInterface) GlStateManager.CULL.capState).forceSetState(cullFaceEnabled);
+        ((CapabilityTrackerInterface) GlStateManager.CULL.enable).forceSetState(cullFaceEnabled);
         glCullFace(cullFace);
         glFrontFace(frontFace);
-        ((CapabilityTrackerInterface) GlStateManager.BLEND.capState).forceSetState(blendEnabled);
+        ((CapabilityTrackerInterface) GlStateManager.BLEND.mode).forceSetState(blendEnabled);
         GL14.glBlendEquation(blendFunction);
-        ((CapabilityTrackerInterface) GlStateManager.DEPTH.capState).forceSetState(depthTestEnabled);
+        ((CapabilityTrackerInterface) GlStateManager.DEPTH.mode).forceSetState(depthTestEnabled);
         forceSetDepthMask(depthMaskFlag);
-        ((CapabilityTrackerInterface) GlStateManager.SCISSOR.capState).forceSetState(scissorTestEnabled);
+        ((CapabilityTrackerInterface) GlStateManager.SCISSOR.mode).forceSetState(scissorTestEnabled);
         forceSetColorMask(colorMaskRed, colorMaskGreen, colorMaskBlue, colorMaskAlpha);
         forceSetStencilMask(stencilMask);
         forceSetStencilOp(sfail, dpfail, dppass);
         forceSetStencilFunc(stencilFunc, stencilRef, stencilValueMask);
 
         for (int i = 0; i < this.boundTextures.length; i++) {
-            GlStateManager.TEXTURES[i].boundTexture = this.boundTextures[i];
+            GlStateManager.TEXTURES[i].binding = this.boundTextures[i];
             GL13.glActiveTexture(GL_TEXTURE0 + i);
             GL11.glBindTexture(GlConst.GL_TEXTURE_2D, this.boundTextures[i]);
         }
@@ -156,7 +156,7 @@ public class OpenGLStateRestore implements AutoCloseable {
 
         glBindBuffer(GL_UNIFORM_BUFFER, uniformBuffer);
         //VertexBuffer.bind/unbind does this, its "needed" when glBindVertexArray changes
-        BufferRenderer.resetCurrentVertexBuffer();
+        BufferUploader.invalidate();
         glBindVertexArray(vertexArray);
         glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
         //forceSetBindTexture(texture2D);
@@ -173,16 +173,16 @@ public class OpenGLStateRestore implements AutoCloseable {
     }
 
     public static void forceSetBlendFuncSeparate(int srcFactorRGB, int dstFactorRGB, int srcFactorAlpha, int dstFactorAlpha) {
-        GlStateManager.BLEND.srcFactorRGB = srcFactorRGB;
-        GlStateManager.BLEND.dstFactorRGB = dstFactorRGB;
-        GlStateManager.BLEND.srcFactorAlpha = srcFactorAlpha;
-        GlStateManager.BLEND.dstFactorAlpha = dstFactorAlpha;
+        GlStateManager.BLEND.srcRgb = srcFactorRGB;
+        GlStateManager.BLEND.dstRgb = dstFactorRGB;
+        GlStateManager.BLEND.srcAlpha = srcFactorAlpha;
+        GlStateManager.BLEND.dstAlpha = dstFactorAlpha;
         GlStateManager.glBlendFuncSeparate(srcFactorRGB, dstFactorRGB, srcFactorAlpha, dstFactorAlpha);
     }
 
     public static void forceSetBlendFunc(int srcFactorRGB, int dstFactorRGB) {
-        GlStateManager.BLEND.srcFactorRGB = srcFactorRGB;
-        GlStateManager.BLEND.dstFactorRGB = dstFactorRGB;
+        GlStateManager.BLEND.srcRgb = srcFactorRGB;
+        GlStateManager.BLEND.dstRgb = dstFactorRGB;
         GL11.glBlendFunc(srcFactorRGB, dstFactorRGB);
     }
 
@@ -205,21 +205,21 @@ public class OpenGLStateRestore implements AutoCloseable {
     }
 
     public static void forceSetStencilOp(int sfail, int dpfail, int dppass) {
-        GlStateManager.STENCIL.sfail = sfail;
-        GlStateManager.STENCIL.dpfail = dpfail;
-        GlStateManager.STENCIL.dppass = dppass;
+        GlStateManager.STENCIL.fail = sfail;
+        GlStateManager.STENCIL.zfail = dpfail;
+        GlStateManager.STENCIL.zpass = dppass;
         GL11.glStencilOp(sfail, dpfail, dppass);
     }
 
     public static void forceSetStencilFunc(int func, int ref, int mask) {
-        GlStateManager.STENCIL.subState.func = func;
-        GlStateManager.STENCIL.subState.ref = ref;
-        GlStateManager.STENCIL.subState.mask = mask;
+        GlStateManager.STENCIL.func.func = func;
+        GlStateManager.STENCIL.func.ref = ref;
+        GlStateManager.STENCIL.func.mask = mask;
         GL11.glStencilFunc(func, ref, mask);
     }
 
     public static void forceSetBindTexture(int texture) {
-        GlStateManager.TEXTURES[GlStateManager.activeTexture].boundTexture = texture;
+        GlStateManager.TEXTURES[GlStateManager.activeTexture].binding = texture;
         GL11.glBindTexture(GlConst.GL_TEXTURE_2D, texture);
     }
 

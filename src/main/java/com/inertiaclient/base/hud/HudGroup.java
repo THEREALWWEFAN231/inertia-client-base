@@ -13,7 +13,7 @@ import com.inertiaclient.base.value.impl.FloatValue;
 import com.inertiaclient.base.value.impl.ModeValue;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -183,7 +183,7 @@ public class HudGroup implements LanguageBaseKey, JsonState {
         scaledHeight += (enabledComponents.size() - 1) * componentSpacing.getValue();
     }
 
-    public void renderGroup(DrawContext drawContext, float mouseX, float mouseY, float tickDelta, boolean editor, CanvasWrapper canvas) {
+    public void renderGroup(GuiGraphics drawContext, float mouseX, float mouseY, float tickDelta, boolean editor, CanvasWrapper canvas) {
         canvas.save();
 
         float iteratingYOffset = 0;

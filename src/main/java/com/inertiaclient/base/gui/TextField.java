@@ -13,8 +13,8 @@ import io.github.humbleui.skija.Path;
 import io.github.humbleui.types.Rect;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -67,7 +67,7 @@ public class TextField {
     @Setter
     private Supplier<Float> borderRadius = () -> 0f;
     @Setter
-    private Text placeHolderText = Text.literal("");
+    private Component placeHolderText = Component.literal("");
     @Setter
     private Color placeHolderTextColor = Color.lightGray;
     @Setter
@@ -163,7 +163,7 @@ public class TextField {
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (isFocused) {
-            int SYSTEM_COMMAND_MOD = MinecraftClient.IS_SYSTEM_MAC ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL;
+            int SYSTEM_COMMAND_MOD = Minecraft.ON_OSX ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL;
             boolean isControlDown = (modifiers & SYSTEM_COMMAND_MOD) != 0;
             switch (keyCode) {
                 case GLFW.GLFW_KEY_LEFT -> {
@@ -429,12 +429,12 @@ public class TextField {
         int selStart = Math.min(cursorPos, selectionStart);
         int selEnd = Math.max(cursorPos, selectionStart);
         String selected = text.substring(selStart, selEnd);
-        InertiaBase.mc.keyboard.setClipboard(selected);
+        InertiaBase.mc.keyboardHandler.setClipboard(selected);
     }
 
     private void paste() {
         try {
-            String data = InertiaBase.mc.keyboard.getClipboard();
+            String data = InertiaBase.mc.keyboardHandler.getClipboard();
             insertText(data);
         } catch (Exception ignored) {
         }

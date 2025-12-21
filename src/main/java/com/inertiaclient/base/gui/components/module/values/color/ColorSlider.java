@@ -5,7 +5,7 @@ import com.inertiaclient.base.render.yoga.ClickType;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.skija.Shader;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 import java.awt.Color;
 import java.util.function.Consumer;
@@ -51,7 +51,7 @@ public class ColorSlider extends YogaNode {
         this.setPreLayoutCalculationsCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (isBeingDragged) {
                 float progress = relativeMouseX / this.getWidth();
-                progress = MathHelper.clamp(progress, 0, 1);
+                progress = Mth.clamp(progress, 0, 1);
                 setColor.accept((int) (progress * 255));
             }
         });

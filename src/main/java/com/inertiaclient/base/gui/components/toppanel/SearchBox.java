@@ -3,7 +3,7 @@ package com.inertiaclient.base.gui.components.toppanel;
 import com.inertiaclient.base.gui.YogaTextField;
 import com.inertiaclient.base.gui.components.MainFrame;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
 
@@ -14,7 +14,7 @@ public class SearchBox extends YogaTextField {
     public SearchBox() {
 
         this.setTextPadding(() -> 4f);
-        this.setPlaceHolderText(Text.translatable("icb.gui.searchbox.placeholder_text"));
+        this.setPlaceHolderText(Component.translatable("icb.gui.searchbox.placeholder_text"));
         this.setMaxTextLength(90);
         this.setBackgroundColor(() -> BACKGROUND_COLOR);
         this.setBorderRadius(() -> this.getHeight() / 2f);

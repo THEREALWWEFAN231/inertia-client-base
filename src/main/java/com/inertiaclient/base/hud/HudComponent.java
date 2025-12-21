@@ -11,9 +11,9 @@ import com.inertiaclient.base.value.group.ValueGroup;
 import com.inertiaclient.base.value.impl.FloatValue;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -27,7 +27,7 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
     @Getter
     private String id;
     @Getter
-    private Text name;
+    private Component name;
 
     @Getter
     private boolean isEnabled;
@@ -63,12 +63,12 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
     private FloatValue topPadding;
     @Getter
     private FloatValue bottomPadding;
-    protected final MinecraftClient mc;
+    protected final Minecraft mc;
 
 
     public HudComponent(String id) {
         this.id = id;
-        this.name = Text.translatableWithFallback(getLanguageBaseKey() + ".name", this.getId());
+        this.name = Component.translatableWithFallback(getLanguageBaseKey() + ".name", this.getId());
 
         this.valueGroups = new ArrayList();
         this.addGroup(this.mainGroup = new ValueGroup("main", this.getLanguageBaseKey()));
@@ -91,7 +91,7 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
 
     }
 
-    public abstract void render(DrawContext drawContext, boolean editor, CanvasWrapper canvas);
+    public abstract void render(GuiGraphics drawContext, boolean editor, CanvasWrapper canvas);
 
     public float defaultScale() {
         return 1;

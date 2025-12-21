@@ -11,8 +11,8 @@ import com.inertiaclient.base.utils.LibraryDownloader;
 import com.inertiaclient.base.utils.TickRateCalculator;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ public class InertiaBase {
     public static final String CLIENT_NAME = "Inertia";
     public static final String VERSION = "0.0.1";
     public static final String MINECRAFT_VERSION = "1.21.4";//basically equal to SharedConstants.getGameVersion().getName()?
-    public static final MinecraftClient mc = MinecraftClient.getInstance();
+    public static final Minecraft mc = Minecraft.getInstance();
     public static final InertiaBase instance = new InertiaBase();
     public static final Logger LOGGER = LoggerFactory.getLogger("icb");
     public static final String WEBSITE = "https://inertiaclient.com";
@@ -57,7 +57,7 @@ public class InertiaBase {
     public void initialize() {
         this.modLoader = new ModLoader();
 
-        this.fileManager = new FileManager(mc.runDirectory);
+        this.fileManager = new FileManager(mc.gameDirectory);
         try {
             new LibraryDownloader().main();
         } catch (NoSuchMethodException e) {
@@ -81,35 +81,35 @@ public class InertiaBase {
         return !this.mostRecentVersion.equals(VERSION);
     }
 
-    private static MutableText createChatMessage(Object message) {
+    private static MutableComponent createChatMessage(Object message) {
         CommandManager commandManager = instance.getCommandManager();
 
-        MutableText text = Text.literal("");
-        text.append(Text.literal("[").setStyle(Style.EMPTY.withColor(commandManager.getBracketColor())));
-        text.append(Text.literal(CLIENT_NAME).setStyle(Style.EMPTY.withBold(true).withColor(commandManager.getNameColor())));
-        text.append(Text.literal("]").setStyle(Style.EMPTY.withColor(commandManager.getBracketColor())));
-        text.append(Text.literal(" "));
+        MutableComponent text = Component.literal("");
+        text.append(Component.literal("[").setStyle(Style.EMPTY.withColor(commandManager.getBracketColor())));
+        text.append(Component.literal(CLIENT_NAME).setStyle(Style.EMPTY.withBold(true).withColor(commandManager.getNameColor())));
+        text.append(Component.literal("]").setStyle(Style.EMPTY.withColor(commandManager.getBracketColor())));
+        text.append(Component.literal(" "));
 
-        if (message instanceof Text messageText) {
-            if (message instanceof MutableText mutableText) {
+        if (message instanceof Component messageText) {
+            if (message instanceof MutableComponent mutableText) {
                 text.append(mutableText.setStyle(Style.EMPTY.withColor(commandManager.getMessageColor())));
             } else {
                 text.append(messageText);
             }
         } else {
-            text.append(Text.literal(message.toString()).setStyle(Style.EMPTY.withColor(commandManager.getMessageColor())));
+            text.append(Component.literal(message.toString()).setStyle(Style.EMPTY.withColor(commandManager.getMessageColor())));
         }
         return text;
     }
 
     public static void sendChatMessage(Object message) {
-        mc.player.sendMessage(createChatMessage(message), false);
+        mc.player.displayClientMessage(createChatMessage(message), false);
     }
 
     public static void sendFileChatMessage(Object message, String file) {
-        MutableText chatMessage = createChatMessage(message);
-        chatMessage.setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(file))));
-        mc.player.sendMessage(chatMessage, false);
+        MutableComponent chatMessage = createChatMessage(message);
+        chatMessage.setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file)).withHoverEvent(new HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT, Component.literal(file))));
+        mc.player.displayClientMessage(chatMessage, false);
     }
 
 

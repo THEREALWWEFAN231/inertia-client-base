@@ -6,7 +6,7 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.ClickType;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import io.github.humbleui.skija.RuntimeEffect;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class HueSlider extends YogaNode {
         this.setPreLayoutCalculationsCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (isBeingDragged) {
                 float newHue = relativeMouseX / this.getWidth();
-                newHue = MathHelper.clamp(newHue, 0, 1);
+                newHue = Mth.clamp(newHue, 0, 1);
                 colorContainer.setRenderedColorHue(newHue);
                 colorContainer.updateRenderedColorFromHSB();
             }

@@ -5,10 +5,10 @@ import com.inertiaclient.base.gui.components.tabbedpage.TabbedPage;
 import com.inertiaclient.base.gui.components.tabbedpage.WrappedListContainer;
 import com.inertiaclient.base.value.impl.EntityTypeValue;
 import lombok.AllArgsConstructor;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 
@@ -25,13 +25,13 @@ public class EntityTypePage extends TabbedPage {
         Tab<WrappedListContainer> all = new Tab(TabbedPage.getTextForPage("entitytype", "all"), allWrappedListContainer);
         tabs.add(all);
 
-        for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
+        for (EntityType entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
             all.getYogaNode().getListNode().addChild(new EntityTypeComponent(entityTypeValue, entityType));
         }
 
-        for (SpawnGroup spawnGroup : SpawnGroup.values()) {
+        for (MobCategory spawnGroup : MobCategory.values()) {
             SpawnGroupContainer wrappedListContainer = new SpawnGroupContainer(entityTypeValue, spawnGroup);
-            Tab<SpawnGroupContainer> tab = new Tab(Text.literal(spawnGroup.getName()), wrappedListContainer);
+            Tab<SpawnGroupContainer> tab = new Tab(Component.literal(spawnGroup.getName()), wrappedListContainer);
             tabs.add(tab);
         }
 

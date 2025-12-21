@@ -1,13 +1,13 @@
 package com.inertiaclient.base.gui.components.config;
 
 import com.inertiaclient.base.gui.components.TextLabel;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
 
 public class ConfigSaveTextComponent extends TextLabel {
 
-    public ConfigSaveTextComponent(Text label, boolean[] values, int valuesIndex) {
+    public ConfigSaveTextComponent(Component label, boolean[] values, int valuesIndex) {
         super(label::getString);
 
         this.setColor(() -> {

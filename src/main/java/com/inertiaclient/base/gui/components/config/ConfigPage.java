@@ -17,7 +17,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.value.Value;
 import com.inertiaclient.base.value.group.ValueGroup;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -161,12 +161,12 @@ public class ConfigPage extends TabbedPage {
         return yogaNode;
     }
 
-    private Text configText(String key) {
-        return Text.translatable("icb.gui.pages.config." + key);
+    private Component configText(String key) {
+        return Component.translatable("icb.gui.pages.config." + key);
     }
 
-    private Text configText(String key, Object... args) {
-        return Text.translatable("icb.gui.pages.config." + key, args);
+    private Component configText(String key, Object... args) {
+        return Component.translatable("icb.gui.pages.config." + key, args);
     }
 
 }

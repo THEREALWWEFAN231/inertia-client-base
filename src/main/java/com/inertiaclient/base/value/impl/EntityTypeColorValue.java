@@ -7,9 +7,9 @@ import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.group.ValueGroup;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
         jsonObject.add("Group Colors", groupColors);
 
         JsonObject entityColors = new JsonObject();
-        value.entityTypesColor.forEach((entityType, wrappedColor) -> entityColors.add(EntityType.getId(entityType).toString(), wrappedColor.toJson()));
+        value.entityTypesColor.forEach((entityType, wrappedColor) -> entityColors.add(EntityType.getKey(entityType).toString(), wrappedColor.toJson()));
         jsonObject.add("Entity Colors", entityColors);
 
         return jsonObject;
@@ -53,7 +53,7 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
 
         JsonObject groupColors = main.get("Group Colors").getAsJsonObject();
         groupColors.entrySet().forEach(entry -> {
-            var spawnGroupOptional = Arrays.stream(SpawnGroup.values()).filter(spawnGroup -> spawnGroup.getName().equals(entry.getKey())).findFirst();
+            var spawnGroupOptional = Arrays.stream(MobCategory.values()).filter(spawnGroup -> spawnGroup.getName().equals(entry.getKey())).findFirst();
             if (spawnGroupOptional.isPresent()) {
                 try {
                     WrappedColor wrappedColor = new WrappedColor(Color.white);
@@ -70,7 +70,7 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
         entityColors.entrySet().forEach(entry -> {
             String entityId = entry.getKey();
 
-            var entityType = EntityType.get(entityId);
+            var entityType = EntityType.byString(entityId);
             if (entityType.isPresent()) {
                 try {
                     WrappedColor wrappedColor = new WrappedColor(Color.white);
@@ -97,7 +97,7 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
     public static class EntitiesColorWrapper {
 
 
-        private HashMap<SpawnGroup, WrappedColor> spawnGroupColors = new HashMap<>();
+        private HashMap<MobCategory, WrappedColor> spawnGroupColors = new HashMap<>();
         //Color can be null, if it is we are assumed to use the spawn group color
         private HashMap<EntityType<?>, WrappedColor> entityTypesColor = new HashMap<>();
         @Setter
@@ -105,7 +105,7 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
         private Runnable changeHandler;
 
         public EntitiesColorWrapper() {
-            for (SpawnGroup spawnGroup : SpawnGroup.values()) {
+            for (MobCategory spawnGroup : MobCategory.values()) {
                 this.spawnGroupColors.put(spawnGroup, new WrappedColor(Color.white));
             }
         }
@@ -135,28 +135,28 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
             return rv;
         }
 
-        public WrappedColor getSpawnGroupColor(SpawnGroup spawnGroup) {
+        public WrappedColor getSpawnGroupColor(MobCategory spawnGroup) {
             return this.spawnGroupColors.get(spawnGroup);
         }
 
-        public EntitiesColorWrapper setSpawnGroupColor(SpawnGroup spawnGroup, WrappedColor wrappedColor) {
+        public EntitiesColorWrapper setSpawnGroupColor(MobCategory spawnGroup, WrappedColor wrappedColor) {
             this.spawnGroupColors.put(spawnGroup, wrappedColor);
             this.runChangeHandler();
             return this;
         }
 
         public EntitiesColorWrapper setPassiveColor(WrappedColor wrappedColor) {
-            this.setSpawnGroupColor(SpawnGroup.CREATURE, wrappedColor);
-            this.setSpawnGroupColor(SpawnGroup.AMBIENT, wrappedColor);
-            this.setSpawnGroupColor(SpawnGroup.AXOLOTLS, wrappedColor);
-            this.setSpawnGroupColor(SpawnGroup.UNDERGROUND_WATER_CREATURE, wrappedColor);
-            this.setSpawnGroupColor(SpawnGroup.WATER_CREATURE, wrappedColor);
-            this.setSpawnGroupColor(SpawnGroup.WATER_AMBIENT, wrappedColor);
+            this.setSpawnGroupColor(MobCategory.CREATURE, wrappedColor);
+            this.setSpawnGroupColor(MobCategory.AMBIENT, wrappedColor);
+            this.setSpawnGroupColor(MobCategory.AXOLOTLS, wrappedColor);
+            this.setSpawnGroupColor(MobCategory.UNDERGROUND_WATER_CREATURE, wrappedColor);
+            this.setSpawnGroupColor(MobCategory.WATER_CREATURE, wrappedColor);
+            this.setSpawnGroupColor(MobCategory.WATER_AMBIENT, wrappedColor);
             return this;
         }
 
         public EntitiesColorWrapper setHostileColor(WrappedColor wrappedColor) {
-            this.setSpawnGroupColor(SpawnGroup.MONSTER, wrappedColor);
+            this.setSpawnGroupColor(MobCategory.MONSTER, wrappedColor);
             return this;
         }
 
@@ -175,7 +175,7 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
             if (individualColor != null) {
                 return individualColor;
             }
-            return this.spawnGroupColors.get(entityType.getSpawnGroup());
+            return this.spawnGroupColors.get(entityType.getCategory());
         }
 
         private void runChangeHandler() {

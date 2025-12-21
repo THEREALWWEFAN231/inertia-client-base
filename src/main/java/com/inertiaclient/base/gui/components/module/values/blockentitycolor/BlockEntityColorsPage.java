@@ -10,14 +10,14 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.impl.BlockEntityColorValue;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class BlockEntityColorsPage extends WrappedListContainer {
 
     public BlockEntityColorsPage(BlockEntityColorValue blockEntityColorValue) {
-        for (BlockEntityType<?> blockEntityType : Registries.BLOCK_ENTITY_TYPE.stream().toList()) {
+        for (BlockEntityType<?> blockEntityType : BuiltInRegistries.BLOCK_ENTITY_TYPE.stream().toList()) {
 
             YogaNode container = new YogaNode();
             container.setHoverCursorToIndicateClick();
@@ -28,7 +28,7 @@ public class BlockEntityColorsPage extends WrappedListContainer {
             container.addChild(blockComponent);
             container.addChild(new ColorDisplay(blockEntityColorValue, blockEntityType));
 
-            String id = BlockEntityType.getId(blockEntityType).toTranslationKey();
+            String id = BlockEntityType.getKey(blockEntityType).toLanguageKey();
             blockComponent.setSearchContext(id);
             blockComponent.setTooltip(() -> id);
             blockComponent.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {

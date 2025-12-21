@@ -3,17 +3,17 @@ package com.inertiaclient.base.value.impl;
 import com.inertiaclient.base.utils.CollectionUtils;
 import com.inertiaclient.base.value.RegistryHashsetValue;
 import com.inertiaclient.base.value.group.ValueGroup;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 
 import java.util.*;
 
 public class EntityTypeValue extends RegistryHashsetValue<EntityType<?>> {
 
-    public static HashMap<SpawnGroup, ArrayList<EntityType<?>>> entityTypesBySpawnGroup;
+    public static HashMap<MobCategory, ArrayList<EntityType<?>>> entityTypesBySpawnGroup;
 
     public EntityTypeValue(String id, ValueGroup parent, HashSet<EntityType<?>> defaultValue) {
         super(id, parent, defaultValue);
@@ -33,28 +33,28 @@ public class EntityTypeValue extends RegistryHashsetValue<EntityType<?>> {
 
     @Override
     protected Registry<EntityType<?>> getRegistry() {
-        return Registries.ENTITY_TYPE;
+        return BuiltInRegistries.ENTITY_TYPE;
     }
 
-    public void addAllInGroup(SpawnGroup spawnGroup) {
-        for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
-            if (entityType.getSpawnGroup() == spawnGroup) {
+    public void addAllInGroup(MobCategory spawnGroup) {
+        for (EntityType entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
+            if (entityType.getCategory() == spawnGroup) {
                 this.addHard(entityType);
             }
         }
     }
 
-    public void removeAllInGroup(SpawnGroup spawnGroup) {
-        for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
-            if (entityType.getSpawnGroup() == spawnGroup) {
+    public void removeAllInGroup(MobCategory spawnGroup) {
+        for (EntityType entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
+            if (entityType.getCategory() == spawnGroup) {
                 this.removeHard(entityType);
             }
         }
     }
 
-    public boolean isAllInGroupSelected(SpawnGroup spawnGroup) {
-        for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
-            if (entityType.getSpawnGroup() == spawnGroup && !this.getValue().contains(entityType)) {
+    public boolean isAllInGroupSelected(MobCategory spawnGroup) {
+        for (EntityType entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
+            if (entityType.getCategory() == spawnGroup && !this.getValue().contains(entityType)) {
                 return false;
             }
         }
@@ -64,8 +64,8 @@ public class EntityTypeValue extends RegistryHashsetValue<EntityType<?>> {
     public static HashSet<EntityType<?>> getLivingEntities() {
         HashSet<EntityType<?>> entities = new HashSet<>();
 
-        for (EntityType<?> entityType : Registries.ENTITY_TYPE.stream().toList()) {
-            if (entityType.getSpawnGroup() != SpawnGroup.MISC) {
+        for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
+            if (entityType.getCategory() != MobCategory.MISC) {
                 entities.add(entityType);
             }
         }
@@ -143,8 +143,8 @@ public class EntityTypeValue extends RegistryHashsetValue<EntityType<?>> {
 
     static {
         entityTypesBySpawnGroup = new HashMap<>();
-        for (EntityType entityType : Registries.ENTITY_TYPE.stream().toList()) {
-            CollectionUtils.addToArrayListHashMap(entityTypesBySpawnGroup, entityType.getSpawnGroup(), entityType);
+        for (EntityType entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
+            CollectionUtils.addToArrayListHashMap(entityTypesBySpawnGroup, entityType.getCategory(), entityType);
         }
     }
 

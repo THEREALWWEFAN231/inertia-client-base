@@ -12,7 +12,7 @@ import com.inertiaclient.base.utils.UIUtils;
 import com.inertiaclient.base.value.WrappedColor;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
 import java.util.function.Supplier;
@@ -292,8 +292,8 @@ public class ColorContainer extends AbsoulteYogaNode {
         this.renderedColorBrightness = hsb[2];
     }
 
-    private Text translation(String key) {
-        return Text.translatable("icb.gui.color_picker.buttons." + key);
+    private Component translation(String key) {
+        return Component.translatable("icb.gui.color_picker.buttons." + key);
     }
 
 }

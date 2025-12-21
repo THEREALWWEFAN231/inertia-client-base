@@ -12,17 +12,17 @@ import com.inertiaclient.base.render.yoga.layouts.AlignItems;
 import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.value.Value;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Supplier;
 
 public class GenericAdvancedInfo extends ValueAdvanceInfoContainer {
 
-    private static final Text COPY_VALUE_SUCCESS = Text.translatable("icb.gui.copy_value_success");
-    private static final Text COPY_VALUE_FAILED = Text.translatable("icb.gui.copy_value_failed");
-    private static final Text PASTE_VALUE_SUCCESS = Text.translatable("icb.gui.paste_value_success");
-    private static final Text PASTE_VALUE_FAILED = Text.translatable("icb.gui.paste_value_failed");
+    private static final Component COPY_VALUE_SUCCESS = Component.translatable("icb.gui.copy_value_success");
+    private static final Component COPY_VALUE_FAILED = Component.translatable("icb.gui.copy_value_failed");
+    private static final Component PASTE_VALUE_SUCCESS = Component.translatable("icb.gui.paste_value_success");
+    private static final Component PASTE_VALUE_FAILED = Component.translatable("icb.gui.paste_value_failed");
 
     public GenericAdvancedInfo(Value value, Supplier<Float> xPosition, Supplier<Float> yPosition) {
         super(value, xPosition, yPosition);
@@ -59,7 +59,7 @@ public class GenericAdvancedInfo extends ValueAdvanceInfoContainer {
         return new SelectorButton(() -> "Copy", () -> false, () -> {
             try {
                 String json = InertiaBase.instance.getFileManager().getNormalGson().toJson(value.toJson());
-                MinecraftClient.getInstance().keyboard.setClipboard(json);
+                Minecraft.getInstance().keyboardHandler.setClipboard(json);
                 addNotification(COPY_VALUE_SUCCESS.getString(), false);
             } catch (Exception e) {
                 addNotification(String.format(COPY_VALUE_FAILED.getString(), value.getNameString()), true);
@@ -71,7 +71,7 @@ public class GenericAdvancedInfo extends ValueAdvanceInfoContainer {
     public static SelectorButton createPasteButton(Value value) {
         return new SelectorButton(() -> "Paste", () -> false, () -> {
             try {
-                String clipboardText = MinecraftClient.getInstance().keyboard.getClipboard();
+                String clipboardText = Minecraft.getInstance().keyboardHandler.getClipboard();
                 JsonElement fromClipboard = JsonParser.parseString(clipboardText);
                 value.fromJson(fromClipboard);
                 addNotification(PASTE_VALUE_SUCCESS.getString(), false);
@@ -86,7 +86,7 @@ public class GenericAdvancedInfo extends ValueAdvanceInfoContainer {
         ModernClickGui.MODERN_CLICK_GUI.getNotifcations().addNotification(Notifcations.Notification.builder().text(notification).displayTime(750 + (fail ? 500 : 0)).build());
     }
 
-    public static void addNotification(Text notification, boolean fail) {
+    public static void addNotification(Component notification, boolean fail) {
         GenericAdvancedInfo.addNotification(notification.getString(), fail);
     }
 }

@@ -5,7 +5,7 @@ import com.inertiaclient.base.utils.LanguageBaseKey;
 import com.inertiaclient.base.value.group.ValueGroup;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Supplier;
 
@@ -14,9 +14,9 @@ public abstract class Value<T> implements LanguageBaseKey, JsonState { //T is va
     @Getter
     private final String id;
     @Getter
-    private Text name;
+    private Component name;
     @Getter
-    private Text description;
+    private Component description;
     @Getter
     private final ValueGroup parent;
     @Getter
@@ -34,8 +34,8 @@ public abstract class Value<T> implements LanguageBaseKey, JsonState { //T is va
         this.value = defaultValue;
         this.defaultValue = this.copyDefaultValue(defaultValue);//default
 
-        this.name = Text.translatableWithFallback(this.getLanguageBaseKey() + ".name", this.id);
-        this.description = Text.translatableWithFallback(this.getLanguageBaseKey() + ".description", "no description");
+        this.name = Component.translatableWithFallback(this.getLanguageBaseKey() + ".name", this.id);
+        this.description = Component.translatableWithFallback(this.getLanguageBaseKey() + ".description", "no description");
         if (parent != null) {
             parent.add(this);
         }

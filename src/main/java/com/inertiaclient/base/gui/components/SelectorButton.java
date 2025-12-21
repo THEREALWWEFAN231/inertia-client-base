@@ -6,7 +6,7 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.Paint;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Supplier;
 
@@ -14,7 +14,7 @@ public class SelectorButton extends YogaNode {
 
     private String cachedButtonText;
 
-    public SelectorButton(Text buttonText, Supplier<Boolean> isSelected, Runnable onClick) {
+    public SelectorButton(Component buttonText, Supplier<Boolean> isSelected, Runnable onClick) {
         this(buttonText::getString, isSelected, onClick);
     }
 

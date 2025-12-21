@@ -10,13 +10,13 @@ import com.inertiaclient.base.render.yoga.layouts.AlignItems;
 import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.impl.EntityTypeColorValue;
-import net.minecraft.entity.SpawnGroup;
+import net.minecraft.world.entity.MobCategory;
 
 import java.awt.Color;
 
 public class GroupComponent extends YogaNode {
 
-    public GroupComponent(EntityTypeColorValue entityTypeColorValue, SpawnGroup spawnGroup) {
+    public GroupComponent(EntityTypeColorValue entityTypeColorValue, MobCategory spawnGroup) {
         this.setSearchContext(spawnGroup.getName() + " color");
         this.styleSetHeight(12);
         this.styleSetAlignItems(AlignItems.CENTER);

@@ -11,8 +11,8 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.humbleui.skija.*;
 import lombok.Getter;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.texture.NativeImage;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.platform.NativeImage;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL33;
 
@@ -51,7 +51,7 @@ public class SkiaOpenGLInstance {
     }
 
     public SkiaOpenGLInstance() {
-        this(InertiaBase.mc.getWindow().getFramebufferWidth(), InertiaBase.mc.getWindow().getFramebufferHeight());
+        this(InertiaBase.mc.getWindow().getWidth(), InertiaBase.mc.getWindow().getHeight());
     }
 
 
@@ -72,10 +72,10 @@ public class SkiaOpenGLInstance {
         } else {
             this.frameBuffer.createFrameBufferIfNeeded(this.width, this.height, true, true);
         }
-        InertiaBase.mc.getFramebuffer().beginWrite(false);
+        InertiaBase.mc.getMainRenderTarget().bindWrite(false);
 
 
-        this.renderTarget = BackendRenderTarget.makeGL(width, height, 0, 8, this.frameBuffer.getFramebuffer().fbo, FramebufferFormat.GR_GL_RGBA8);
+        this.renderTarget = BackendRenderTarget.makeGL(width, height, 0, 8, this.frameBuffer.getFramebuffer().frameBufferId, FramebufferFormat.GR_GL_RGBA8);
         // TODO load monitor profile
         this.surface = Surface.wrapBackendRenderTarget(SkiaOpenGLInstance.skiaDirectContext, this.renderTarget, SurfaceOrigin.BOTTOM_LEFT, SurfaceColorFormat.RGBA_8888, ColorSpace.getDisplayP3(), new SurfaceProps(PixelGeometry.RGB_H));
         this.canvas = this.surface.getCanvas();
@@ -112,12 +112,12 @@ public class SkiaOpenGLInstance {
     }
 
     public static float getScaleFactor() {
-        return (float) InertiaBase.mc.getWindow().getScaleFactor();
+        return (float) InertiaBase.mc.getWindow().getGuiScale();
     }
 
     public void onEvent(ResolutionChangeEvent event) {
         if (event.getType() == ResolutionChangeEvent.Type.POST) {
-            this.resize(InertiaBase.mc.getWindow().getFramebufferWidth(), InertiaBase.mc.getWindow().getFramebufferHeight());
+            this.resize(InertiaBase.mc.getWindow().getWidth(), InertiaBase.mc.getWindow().getHeight());
         }
     }
 
@@ -126,7 +126,7 @@ public class SkiaOpenGLInstance {
 
     }
 
-    public static void exportFrameBuffer(Framebuffer frameBuffer, File file) {
+    public static void exportFrameBuffer(RenderTarget frameBuffer, File file) {
         GlStateManager._enableBlend();
         GlStateManager._blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -136,15 +136,15 @@ public class SkiaOpenGLInstance {
         //GL20.glBlendFuncSeparate(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
 
-        int i = frameBuffer.textureWidth;
-        int j = frameBuffer.textureHeight;
+        int i = frameBuffer.width;
+        int j = frameBuffer.height;
         NativeImage nativeImage = new NativeImage(i, j, false);
-        RenderSystem.bindTexture(frameBuffer.getColorAttachment());
-        nativeImage.loadFromTextureImage(0, false);
-        nativeImage.mirrorVertically();
+        RenderSystem.bindTexture(frameBuffer.getColorTextureId());
+        nativeImage.downloadTexture(0, false);
+        nativeImage.flipY();
 
         try {
-            nativeImage.writeTo(file);
+            nativeImage.writeToFile(file);
         } catch (IOException e) {
             e.printStackTrace();
         }

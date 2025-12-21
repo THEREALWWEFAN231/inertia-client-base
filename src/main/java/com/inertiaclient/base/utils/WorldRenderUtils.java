@@ -5,17 +5,19 @@ import com.inertiaclient.base.mixin.custominterfaces.BlockEntityRenderDispatcher
 import com.inertiaclient.base.mixin.custominterfaces.WorldRendererInterface;
 import com.inertiaclient.base.mixin.mixins.accessors.FrustumAccessor;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import lombok.Getter;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.FrustumIntersection;
 import org.joml.Vector3f;
 
@@ -26,23 +28,23 @@ import static com.inertiaclient.base.InertiaBase.mc;
 
 public class WorldRenderUtils {//3d render utils
 
-    public static final Box FULL_BOX = new Box(0, 0, 0, 1, 1, 1);
+    public static final AABB FULL_BOX = new AABB(0, 0, 0, 1, 1, 1);
     public static boolean frustumCheck = true;//probably wont use but you can disable and reenable it
     @Getter
     private static Stack<Boolean> subtractCamera = new Stack<>();
 
     //don't use this(I mean you can but there will be float precision errors when far from spawn /teleport IKnowImEZ 10000000 90 10000000)
-    public static void subtractCameraPosition(MatrixStack matrices) {
-        matrices.translate(-mc.gameRenderer.getCamera().getPos().getX(), -mc.gameRenderer.getCamera().getPos().getY(), -mc.gameRenderer.getCamera().getPos().getZ());
+    public static void subtractCameraPosition(PoseStack matrices) {
+        matrices.translate(-mc.gameRenderer.getMainCamera().getPosition().x(), -mc.gameRenderer.getMainCamera().getPosition().y(), -mc.gameRenderer.getMainCamera().getPosition().z());
     }
 
     public static double getEntityInterpolatedX(Entity entity, float delta) {
 
         double posX = 0;
-        if (entity.age == 0) {//if the entity was just spawned, it doesn't have lastTickPosX, this renders better/nicer
+        if (entity.tickCount == 0) {//if the entity was just spawned, it doesn't have lastTickPosX, this renders better/nicer
             posX = entity.getX();
         } else {
-            posX = entity.lastRenderX + ((entity.getX() - entity.lastRenderX) * delta);
+            posX = entity.xOld + ((entity.getX() - entity.xOld) * delta);
         }
 
         return posX;
@@ -51,10 +53,10 @@ public class WorldRenderUtils {//3d render utils
     public static double getEntityInterpolatedY(Entity entity, float delta) {
 
         double posY = 0;
-        if (entity.age == 0) {//if the entity was just spawned, it doesn't have lastTickPosX, this renders better/nicer
+        if (entity.tickCount == 0) {//if the entity was just spawned, it doesn't have lastTickPosX, this renders better/nicer
             posY = entity.getY();
         } else {
-            posY = entity.lastRenderY + ((entity.getY() - entity.lastRenderY) * delta);
+            posY = entity.yOld + ((entity.getY() - entity.yOld) * delta);
         }
 
         return posY;
@@ -63,20 +65,20 @@ public class WorldRenderUtils {//3d render utils
     public static double getEntityInterpolatedZ(Entity entity, float delta) {
 
         double posZ = 0;
-        if (entity.age == 0) {//if the entity was just spawned, it doesn't have lastTickPosX, this renders better/nicer
+        if (entity.tickCount == 0) {//if the entity was just spawned, it doesn't have lastTickPosX, this renders better/nicer
             posZ = entity.getZ();
         } else {
-            posZ = entity.lastRenderZ + ((entity.getZ() - entity.lastRenderZ) * delta);
+            posZ = entity.zOld + ((entity.getZ() - entity.zOld) * delta);
         }
 
         return posZ;
     }
 
     public static float getEntityInterpolatedYaw(Entity entity, float delta) {
-        if (entity.age == 0) {//if the entity was just spawned, it doesn't have lastTickPosX, this renders better/nicer
-            return entity.getYaw();
+        if (entity.tickCount == 0) {//if the entity was just spawned, it doesn't have lastTickPosX, this renders better/nicer
+            return entity.getYRot();
         }
-        return entity.prevYaw + ((entity.getYaw() - entity.prevYaw) * delta);
+        return entity.yRotO + ((entity.getYRot() - entity.yRotO) * delta);
     }
 
     public static void enableGL() {
@@ -86,7 +88,7 @@ public class WorldRenderUtils {//3d render utils
         RenderSystem.disableDepthTest();
     }
 
-    public static void drawEntityESP(MatrixStack matrices, Entity entity, float delta, boolean fill, boolean outline, Color color) {
+    public static void drawEntityESP(PoseStack matrices, Entity entity, float delta, boolean fill, boolean outline, Color color) {
         double renderX = getEntityInterpolatedX(entity, delta);
         double renderY = getEntityInterpolatedY(entity, delta);
         double renderZ = getEntityInterpolatedZ(entity, delta);
@@ -107,11 +109,11 @@ public class WorldRenderUtils {//3d render utils
     }
 
 
-    public static void drawBoxESP(MatrixStack matrices, Box box, boolean fill, boolean outline, Color color) {
-        WorldRenderUtils.drawBoxESP(matrices, BlockPos.ORIGIN, box, fill, outline, color);
+    public static void drawBoxESP(PoseStack matrices, AABB box, boolean fill, boolean outline, Color color) {
+        WorldRenderUtils.drawBoxESP(matrices, BlockPos.ZERO, box, fill, outline, color);
     }
 
-    public static void drawBoxESP(MatrixStack matrices, BlockPos blockPos, Box box, boolean fill, boolean outline, Color color) {
+    public static void drawBoxESP(PoseStack matrices, BlockPos blockPos, AABB box, boolean fill, boolean outline, Color color) {
         double minX = blockPos.getX() + box.minX;
         double minY = blockPos.getY() + box.minY;
         double minZ = blockPos.getZ() + box.minZ;
@@ -126,55 +128,55 @@ public class WorldRenderUtils {//3d render utils
         }
     }
 
-    public static void renderBoxRaw(MatrixStack matrices, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha) {
+    public static void renderBoxRaw(PoseStack matrices, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float red, float green, float blue, float alpha) {
         if (isVisibleInFrustum(minX, minY, minZ, maxX, maxY, maxZ)) {
             if (shouldSubtractCameraPosition()) {
-                minX -= mc.gameRenderer.getCamera().getPos().getX();
-                minY -= mc.gameRenderer.getCamera().getPos().getY();
-                minZ -= mc.gameRenderer.getCamera().getPos().getZ();
-                maxX -= mc.gameRenderer.getCamera().getPos().getX();
-                maxY -= mc.gameRenderer.getCamera().getPos().getY();
-                maxZ -= mc.gameRenderer.getCamera().getPos().getZ();
+                minX -= mc.gameRenderer.getMainCamera().getPosition().x();
+                minY -= mc.gameRenderer.getMainCamera().getPosition().y();
+                minZ -= mc.gameRenderer.getMainCamera().getPosition().z();
+                maxX -= mc.gameRenderer.getMainCamera().getPosition().x();
+                maxY -= mc.gameRenderer.getMainCamera().getPosition().y();
+                maxZ -= mc.gameRenderer.getMainCamera().getPosition().z();
             }
 
             RenderSystem.setShaderColor(1, 1, 1, 1);
-            RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+            RenderSystem.setShader(CoreShaders.POSITION_COLOR);
 
-            Tessellator tessellator = RenderSystem.renderThreadTesselator();
-            BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-            VertexRendering.drawFilledBox(matrices, bufferBuilder, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha);
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            Tesselator tessellator = RenderSystem.renderThreadTesselator();
+            BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+            ShapeRenderer.addChainedFilledBoxVertices(matrices, bufferBuilder, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha);
+            BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
         }
     }
 
-    public static void renderOutlineRaw(MatrixStack matrices, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float lineWidth, float red, float green, float blue, float alpha) {
+    public static void renderOutlineRaw(PoseStack matrices, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float lineWidth, float red, float green, float blue, float alpha) {
         if (isVisibleInFrustum(minX, minY, minZ, maxX, maxY, maxZ)) {
             if (shouldSubtractCameraPosition()) {
-                minX -= mc.gameRenderer.getCamera().getPos().getX();
-                minY -= mc.gameRenderer.getCamera().getPos().getY();
-                minZ -= mc.gameRenderer.getCamera().getPos().getZ();
-                maxX -= mc.gameRenderer.getCamera().getPos().getX();
-                maxY -= mc.gameRenderer.getCamera().getPos().getY();
-                maxZ -= mc.gameRenderer.getCamera().getPos().getZ();
+                minX -= mc.gameRenderer.getMainCamera().getPosition().x();
+                minY -= mc.gameRenderer.getMainCamera().getPosition().y();
+                minZ -= mc.gameRenderer.getMainCamera().getPosition().z();
+                maxX -= mc.gameRenderer.getMainCamera().getPosition().x();
+                maxY -= mc.gameRenderer.getMainCamera().getPosition().y();
+                maxZ -= mc.gameRenderer.getMainCamera().getPosition().z();
             }
 
-            RenderSystem.setShader(ShaderProgramKeys.RENDERTYPE_LINES);
+            RenderSystem.setShader(CoreShaders.RENDERTYPE_LINES);
             RenderSystem.lineWidth(lineWidth);
 
-            Tessellator tessellator = RenderSystem.renderThreadTesselator();
-            BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
-            VertexRendering.drawBox(matrices, bufferBuilder, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha);
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            Tesselator tessellator = RenderSystem.renderThreadTesselator();
+            BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+            ShapeRenderer.renderLineBox(matrices, bufferBuilder, minX, minY, minZ, maxX, maxY, maxZ, red, green, blue, alpha);
+            BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
         }
     }
 
     //allows rendering more than 64 blocks
-    public static <T extends BlockEntity> void renderBlockEntity(BlockEntityRenderer<T> renderer, T blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers) {
+    public static <T extends BlockEntity> void renderBlockEntity(BlockEntityRenderer<T> renderer, T blockEntity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
         ((BlockEntityRenderDispatcherInterface) mc.getBlockEntityRenderDispatcher()).invokeRender(renderer, blockEntity, tickDelta, matrices, vertexConsumers);
     }
 
     public static Frustum getFrustum() {
-        return ((WorldRendererInterface) InertiaBase.mc.worldRenderer).getFrustum();
+        return ((WorldRendererInterface) InertiaBase.mc.levelRenderer).getFrustum();
     }
 
     public static boolean isVisibleInFrustum(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
@@ -182,7 +184,7 @@ public class WorldRenderUtils {//3d render utils
             return true;
         }
         Frustum frustum = getFrustum();
-        int result = ((FrustumAccessor) frustum).invokeIntersectAab(minX, minY, minZ, maxX, maxY, maxZ);
+        int result = ((FrustumAccessor) frustum).invokeCubeInFrustum(minX, minY, minZ, maxX, maxY, maxZ);
         return result == FrustumIntersection.INSIDE || result == FrustumIntersection.INTERSECT;
     }
 
@@ -195,12 +197,12 @@ public class WorldRenderUtils {//3d render utils
     }
 
     public static boolean isBlockEntityInFrustum(BlockEntity blockEntity) {
-        VoxelShape blockEntityCollisionShape = mc.world.getBlockState(blockEntity.getPos()).getCollisionShape(mc.world, blockEntity.getPos());
-        if (blockEntityCollisionShape == VoxelShapes.empty()) {
+        VoxelShape blockEntityCollisionShape = mc.level.getBlockState(blockEntity.getBlockPos()).getCollisionShape(mc.level, blockEntity.getBlockPos());
+        if (blockEntityCollisionShape == Shapes.empty()) {
             return false;
         }
 
-        Box box = blockEntityCollisionShape.getBoundingBox().offset(blockEntity.getPos());
+        AABB box = blockEntityCollisionShape.bounds().move(blockEntity.getBlockPos());
         return isVisibleInFrustum(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
     }
 

@@ -9,15 +9,15 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import lombok.AllArgsConstructor;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
 import java.util.concurrent.CompletableFuture;
 
 @AllArgsConstructor
 public class StringModesArgumentType implements ArgumentType<ModeValue.Mode> {
 
-    private static final DynamicCommandExceptionType STRING_MODE_NOT_FOUND = new DynamicCommandExceptionType(o -> Text.translatable("icb.command.string_mode_not_found", o));
+    private static final DynamicCommandExceptionType STRING_MODE_NOT_FOUND = new DynamicCommandExceptionType(o -> Component.translatable("icb.command.string_mode_not_found", o));
     private ModeValue stringValue;
 
     @Override
@@ -32,7 +32,7 @@ public class StringModesArgumentType implements ArgumentType<ModeValue.Mode> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(stringValue.getModes(), builder, stringIdentifier -> stringIdentifier.getId(), stringIdentifier -> stringIdentifier.getDescription());
+        return SharedSuggestionProvider.suggest(stringValue.getModes(), builder, stringIdentifier -> stringIdentifier.getId(), stringIdentifier -> stringIdentifier.getDescription());
     }
 
 }

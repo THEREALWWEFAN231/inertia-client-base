@@ -5,22 +5,22 @@ import com.inertiaclient.base.gui.ModernClickGui;
 import com.inertiaclient.base.render.skia.SkiaNativeRender;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
-import net.minecraft.registry.Registries;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import java.awt.Color;
 
 public class ItemRenderComponent extends YogaNode {
 
     private SkiaNativeRender skiaNativeRender;
-    private static final ItemRenderState itemRenderState = new ItemRenderState();
+    private static final ItemStackRenderState itemRenderState = new ItemStackRenderState();
 
     public ItemRenderComponent(Item item) {
-        String id = Registries.ITEM.getEntry(item).getIdAsString();
+        String id = BuiltInRegistries.ITEM.wrapAsHolder(item).getRegisteredName();
         this.setSearchContext(id);
         this.setTooltip(() -> id);
         this.setTooltipDelay(() -> 0L);
@@ -29,12 +29,12 @@ public class ItemRenderComponent extends YogaNode {
         skiaNativeRender = new SkiaNativeRender();
         skiaNativeRender.setSetNativeRender(drawContext -> {
             ItemStack itemStack = new ItemStack(item);
-            InertiaBase.mc.getItemModelManager().update(itemRenderState, itemStack, ModelTransformationMode.GUI, false, null, null, 0);
+            InertiaBase.mc.getItemModelResolver().updateForTopItem(itemRenderState, itemStack, ItemDisplayContext.GUI, false, null, null, 0);
 
             if (itemRenderState.isEmpty()) {
-                drawContext.drawTexture(RenderLayer::getGuiTextured, ModernClickGui.UNKNOWN_TEXTURE, 0, 0, 0, 0, skiaNativeRender.getNativeWidth(), skiaNativeRender.getNativeHeight(), skiaNativeRender.getNativeWidth(), skiaNativeRender.getNativeHeight());
+                drawContext.blit(RenderType::guiTextured, ModernClickGui.UNKNOWN_TEXTURE, 0, 0, 0, 0, skiaNativeRender.getNativeWidth(), skiaNativeRender.getNativeHeight(), skiaNativeRender.getNativeWidth(), skiaNativeRender.getNativeHeight());
             } else {
-                drawContext.drawItem(itemStack, 0, 0);
+                drawContext.renderItem(itemStack, 0, 0);
                 RenderSystem.enableBlend();
             }
         });

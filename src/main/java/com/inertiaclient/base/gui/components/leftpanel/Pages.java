@@ -14,7 +14,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class Pages extends YogaNode {
 
@@ -48,7 +48,7 @@ public class Pages extends YogaNode {
         editButton.styleSetAlignSelf(AlignItems.CENTER);
         editButton.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
             if (button == ButtonIdentifier.LEFT) {
-                HudEditorScreen.HUD_EDITOR_SCREEN.setParentScreen(InertiaBase.mc.currentScreen);
+                HudEditorScreen.HUD_EDITOR_SCREEN.setParentScreen(InertiaBase.mc.screen);
                 InertiaBase.mc.setScreen(HudEditorScreen.HUD_EDITOR_SCREEN);
                 return true;
             }
@@ -66,7 +66,7 @@ public class Pages extends YogaNode {
         }
     }
 
-    private Text createAction(String id) {
-        return Text.translatable("icb.gui.pages." + id + ".action");
+    private Component createAction(String id) {
+        return Component.translatable("icb.gui.pages." + id + ".action");
     }
 }

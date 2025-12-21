@@ -1,7 +1,7 @@
 package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -22,8 +22,8 @@ public class LibraryDownloader {
     private static Method addURLMethod;
 
     public void main() throws NoSuchMethodException {
-        var os = Util.getOperatingSystem();
-        boolean isLinux = os != Util.OperatingSystem.WINDOWS && os != Util.OperatingSystem.OSX;
+        var os = Util.getPlatform();
+        boolean isLinux = os != Util.OS.WINDOWS && os != Util.OS.OSX;
         String osName = getLibraryNativeOsName(os);
 
         this.downloadAndAddToClassLoaderIfNotExisting("assets/icb/fonts/Comfortaa-Regular.ttf", "inertia-client/fonts/02.zip");
@@ -70,15 +70,15 @@ public class LibraryDownloader {
         addURLMethod.invoke(LibraryDownloader.classLoader, url);
     }
 
-    public String getLibraryNativeOsName(Util.OperatingSystem operatingSystem) {
-        if (operatingSystem == Util.OperatingSystem.OSX) {
+    public String getLibraryNativeOsName(Util.OS operatingSystem) {
+        if (operatingSystem == Util.OS.OSX) {
             return "macos";
         }
 
-        if (operatingSystem == Util.OperatingSystem.SOLARIS) {
-            return Util.OperatingSystem.LINUX.getName();
+        if (operatingSystem == Util.OS.SOLARIS) {
+            return Util.OS.LINUX.telemetryName();
         }
-        return operatingSystem.getName();
+        return operatingSystem.telemetryName();
     }
 
     public boolean isClassInClassLoader(String classToCheck) {

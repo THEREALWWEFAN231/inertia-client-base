@@ -1,6 +1,6 @@
 package com.inertiaclient.base.utils;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,17 +22,17 @@ public class BlockPosUtils {
             @Override
             public int compare(BlockPos first, BlockPos second) {
                 //yes 0.5 is needed, to correctly 100% choose the closest block, we don't need to square root it...
-                return Double.compare(mc.player.squaredDistanceTo(first.getX() + 0.5, first.getY() + 0.5, first.getZ() + 0.5), mc.player.squaredDistanceTo(second.getX() + 0.5, second.getY() + 0.5, second.getZ() + 0.5));
+                return Double.compare(mc.player.distanceToSqr(first.getX() + 0.5, first.getY() + 0.5, first.getZ() + 0.5), mc.player.distanceToSqr(second.getX() + 0.5, second.getY() + 0.5, second.getZ() + 0.5));
             }
         });
     }
 
     public static ArrayList<BlockPos> getAllInBoxPlayerDirection(int forwards, int backwards, int left, int right, int up, int down) {
 
-        BlockPos from = BlockPos.ofFloored(mc.player.getX(), mc.player.getY() - down, mc.player.getZ()).offset(mc.player.getHorizontalFacing(), -backwards).offset(mc.player.getHorizontalFacing().rotateYClockwise(), right);
-        BlockPos to = BlockPos.ofFloored(mc.player.getX(), mc.player.getY() + up, mc.player.getZ()).offset(mc.player.getHorizontalFacing(), forwards).offset(mc.player.getHorizontalFacing().rotateYCounterclockwise(), left);
-        from = from.offset(mc.player.getHorizontalFacing(), 0);
-        to = to.offset(mc.player.getHorizontalFacing(), 0);
+        BlockPos from = BlockPos.containing(mc.player.getX(), mc.player.getY() - down, mc.player.getZ()).relative(mc.player.getDirection(), -backwards).relative(mc.player.getDirection().getClockWise(), right);
+        BlockPos to = BlockPos.containing(mc.player.getX(), mc.player.getY() + up, mc.player.getZ()).relative(mc.player.getDirection(), forwards).relative(mc.player.getDirection().getCounterClockWise(), left);
+        from = from.relative(mc.player.getDirection(), 0);
+        to = to.relative(mc.player.getDirection(), 0);
 
         return getAllInBox(from, to);
     }

@@ -10,8 +10,8 @@ import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.Rect;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.Color;
@@ -32,7 +32,7 @@ public class HudEditor {
         InertiaBase.instance.getHudManager().beforeRender(skiaInstance, true);
     }
 
-    public void render(DrawContext context, float mouseX, float mouseY, float delta, CanvasWrapper canvas) {
+    public void render(GuiGraphics context, float mouseX, float mouseY, float delta, CanvasWrapper canvas) {
 
         if (draggingGroup != null) {
 

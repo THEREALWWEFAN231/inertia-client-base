@@ -8,7 +8,7 @@ import com.inertiaclient.base.render.yoga.layouts.AlignItems;
 import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.value.impl.BooleanValue;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Supplier;
 
@@ -50,7 +50,7 @@ public class BooleanAdvancedInfo extends ValueAdvanceInfoContainer {
         return content;
     }
 
-    private Text translation(String key) {
-        return Text.translatable("icb.gui.advanced_info.boolean." + key);
+    private Component translation(String key) {
+        return Component.translatable("icb.gui.advanced_info.boolean." + key);
     }
 }

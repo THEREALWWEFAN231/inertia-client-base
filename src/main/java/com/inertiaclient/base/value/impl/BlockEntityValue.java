@@ -2,10 +2,10 @@ package com.inertiaclient.base.value.impl;
 
 import com.inertiaclient.base.value.RegistryHashsetValue;
 import com.inertiaclient.base.value.group.ValueGroup;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,7 +30,7 @@ public class BlockEntityValue extends RegistryHashsetValue<BlockEntityType<?>> {
 
     @Override
     protected Registry<BlockEntityType<?>> getRegistry() {
-        return Registries.BLOCK_ENTITY_TYPE;
+        return BuiltInRegistries.BLOCK_ENTITY_TYPE;
     }
 
     public boolean isTargeted(BlockEntity blockEntity) {

@@ -7,27 +7,27 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(GlStateManager.CapabilityTracker.class)
+@Mixin(GlStateManager.BooleanState.class)
 public class CapabilityTrackerMixin implements CapabilityTrackerInterface {
 
     @Shadow
     @Final
-    private int cap;
+    private int state;
     @Shadow
-    private boolean state;
+    private boolean enabled;
 
     @Override
     public boolean getState() {
-        return this.state;
+        return this.enabled;
     }
 
     @Override
     public void forceSetState(boolean state) {
-        this.state = state;
+        this.enabled = state;
         if (state) {
-            GL11.glEnable(this.cap);
+            GL11.glEnable(this.state);
         } else {
-            GL11.glDisable(this.cap);
+            GL11.glDisable(this.state);
         }
     }
 }

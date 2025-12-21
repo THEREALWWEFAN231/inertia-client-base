@@ -9,7 +9,7 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.ExactPercentAuto;
 import com.inertiaclient.base.value.impl.IntegerValue;
 import com.inertiaclient.base.value.impl.NumberValue;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 import java.awt.Color;
 
@@ -29,7 +29,7 @@ public class FloatSlider extends YogaNode {
             this.sliderWidth = this.getWidth() - 3;
 
             if (isBeingDragged) {
-                float clickPercentage = MathHelper.clamp(relativeMouseX / this.sliderWidth, 0, 1);
+                float clickPercentage = Mth.clamp(relativeMouseX / this.sliderWidth, 0, 1);
 
                 float newValue = clickPercentage * (max - min) + min;
 
@@ -43,7 +43,7 @@ public class FloatSlider extends YogaNode {
             float sliderY = this.height() - 4;
 
             float progress = ((numberValue.getValue().floatValue() - min) / (max - min)) * this.sliderWidth;
-            progress = MathHelper.clamp(progress, 0, this.sliderWidth);
+            progress = Mth.clamp(progress, 0, this.sliderWidth);
             {
                 //track
                 canvas.drawRRect(0, sliderY, this.sliderWidth, 2, 1, new Color(183, 183, 183));

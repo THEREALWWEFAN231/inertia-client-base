@@ -15,8 +15,8 @@ import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.render.yoga.layouts.YogaEdge;
 import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.impl.EntityTypeColorValue;
-import net.minecraft.entity.EntityType;
-import net.minecraft.text.Text;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
 
@@ -27,7 +27,7 @@ public class EntityTypeColorComponent extends YogaNode {
 
     public EntityTypeColorComponent(EntityTypeColorValue entityTypeColorValue, EntityType entityType) {
         this.entityType = entityType;
-        this.setSearchContext(entityType.getName().getString());
+        this.setSearchContext(entityType.getDescription().getString());
 
         this.styleSetWidth(100);
         this.styleSetHeight(28);
@@ -64,7 +64,7 @@ public class EntityTypeColorComponent extends YogaNode {
         right.styleSetFlexDirection(FlexDirection.COLUMN);
         this.addChild(right);
 
-        right.addChild(new NameLabel(() -> entityType.getName().getString(), this));
+        right.addChild(new NameLabel(() -> entityType.getDescription().getString(), this));
 
         {
             YogaNode linkComponent = new YogaNode();
@@ -80,7 +80,7 @@ public class EntityTypeColorComponent extends YogaNode {
 
                 if (isLinked) {
                     var linkedToText = CanvasWrapper.getFreshTextBuilder();
-                    linkedToText.basic(Text.translatable("icb.gui.pages.entitycolor.linked_to", entityType.getSpawnGroup().getName()), 0, 8, this.isHoveredAndInsideParent(globalMouseX, globalMouseY) ? MainFrame.s_selectedTextColor.get() : MainFrame.s_unselectedTextColor.get());
+                    linkedToText.basic(Component.translatable("icb.gui.pages.entitycolor.linked_to", entityType.getCategory().getName()), 0, 8, this.isHoveredAndInsideParent(globalMouseX, globalMouseY) ? MainFrame.s_selectedTextColor.get() : MainFrame.s_unselectedTextColor.get());
                     linkedToText.setFontSize(4);
                     linkedToText.draw(canvas);
                 }
@@ -98,7 +98,7 @@ public class EntityTypeColorComponent extends YogaNode {
         this.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
             if (button == ButtonIdentifier.LEFT) {
 
-                WrappedColor spawnGroupColor = entityTypeColorValue.getValue().getSpawnGroupColor(entityType.getSpawnGroup());
+                WrappedColor spawnGroupColor = entityTypeColorValue.getValue().getSpawnGroupColor(entityType.getCategory());
                 WrappedColor color = entityTypeColorValue.getValue().getIndividualColor(entityType);
                 if (color == null) {//it's linked, we are going to create a color and unlink it
                     color = spawnGroupColor;
@@ -107,7 +107,7 @@ public class EntityTypeColorComponent extends YogaNode {
                 ModernClickGui.MODERN_CLICK_GUI.getRoot().addChild(new ColorContainer(color, new ColorContainerInterface() {
                     @Override
                     public String getNameHeader() {
-                        return entityType.getTranslationKey();
+                        return entityType.getDescriptionId();
                     }
 
                     @Override

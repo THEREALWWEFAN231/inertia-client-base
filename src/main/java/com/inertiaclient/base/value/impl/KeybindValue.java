@@ -5,11 +5,11 @@ import com.google.gson.JsonPrimitive;
 import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.value.Value;
 import com.inertiaclient.base.value.group.ValueGroup;
-import net.minecraft.client.util.InputUtil;
+import com.mojang.blaze3d.platform.InputConstants;
 
-public class KeybindValue extends Value<InputUtil.Key> {
+public class KeybindValue extends Value<InputConstants.Key> {
 
-    public KeybindValue(String id, ValueGroup parent, InputUtil.Key defaultValue) {
+    public KeybindValue(String id, ValueGroup parent, InputConstants.Key defaultValue) {
         super(id, parent, defaultValue);
     }
 

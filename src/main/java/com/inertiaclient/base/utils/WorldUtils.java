@@ -1,13 +1,13 @@
 package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 import java.util.ArrayList;
 
@@ -16,28 +16,28 @@ import static com.inertiaclient.base.InertiaBase.mc;
 public class WorldUtils {
 
     public static boolean isWater(Block block) {
-        return block.getDefaultState().getFluidState().isIn(FluidTags.WATER);
+        return block.defaultBlockState().getFluidState().is(FluidTags.WATER);
     }
 
     public static boolean isWater(BlockState blockState) {
-        return blockState.getFluidState().isIn(FluidTags.WATER);
+        return blockState.getFluidState().is(FluidTags.WATER);
     }
 
     public static boolean isWater(BlockPos blockPos) {
-        return mc.world.getFluidState(blockPos).isIn(FluidTags.WATER);
+        return mc.level.getFluidState(blockPos).is(FluidTags.WATER);
     }
 
     public static boolean isLava(Block block) {
-        return block.getDefaultState().getFluidState().isIn(FluidTags.LAVA);
+        return block.defaultBlockState().getFluidState().is(FluidTags.LAVA);
     }
 
     public static boolean isLava(BlockState blockState) {
-        return blockState.getFluidState().isIn(FluidTags.LAVA);
+        return blockState.getFluidState().is(FluidTags.LAVA);
     }
 
 
     public static boolean isLava(BlockPos blockPos) {
-        return mc.world.getFluidState(blockPos).isIn(FluidTags.LAVA);
+        return mc.level.getFluidState(blockPos).is(FluidTags.LAVA);
     }
 
     public static boolean isLiquid(Block block) {
@@ -56,13 +56,13 @@ public class WorldUtils {
     public static ArrayList<BlockEntity> getAllBlockEntities() {
         ArrayList<BlockEntity> blockEntities = new ArrayList<>();
 
-        int viewDistance = InertiaBase.mc.options.getViewDistance().getValue();
-        int playerChunkX = ChunkSectionPos.getSectionCoord(InertiaBase.mc.player.getBlockX());
-        int playerChunkZ = ChunkSectionPos.getSectionCoord(InertiaBase.mc.player.getBlockZ());
+        int viewDistance = InertiaBase.mc.options.renderDistance().get();
+        int playerChunkX = SectionPos.blockToSectionCoord(InertiaBase.mc.player.getBlockX());
+        int playerChunkZ = SectionPos.blockToSectionCoord(InertiaBase.mc.player.getBlockZ());
 
         for (int x = -viewDistance; x <= viewDistance; x++) {
             for (int z = -viewDistance; z <= viewDistance; z++) {
-                WorldChunk chunk = InertiaBase.mc.world.getChunkManager().getWorldChunk(playerChunkX + x, playerChunkZ + z);
+                LevelChunk chunk = InertiaBase.mc.level.getChunkSource().getChunkNow(playerChunkX + x, playerChunkZ + z);
 
                 if (chunk != null) {
                     blockEntities.addAll(chunk.getBlockEntities().values());

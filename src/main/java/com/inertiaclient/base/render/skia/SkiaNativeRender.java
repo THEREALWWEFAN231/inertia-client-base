@@ -8,15 +8,15 @@ import com.inertiaclient.base.event.impl.FrameBufferWriteEvent;
 import com.inertiaclient.base.utils.opengl.staterestore.OpenGLStateRestore;
 import com.inertiaclient.base.utils.opengl.staterestore.OpenGLStates;
 import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.ProjectionType;
+import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.humbleui.skija.*;
 import io.github.humbleui.types.Rect;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.client.gl.SimpleFramebuffer;
-import net.minecraft.client.gui.DrawContext;
+import com.mojang.blaze3d.pipeline.TextureTarget;
+import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11;
@@ -33,12 +33,12 @@ public class SkiaNativeRender {
     private int nativeHeight;
     @Setter
     @Accessors(chain = true)
-    private Consumer<DrawContext> setNativeRender;
+    private Consumer<GuiGraphics> setNativeRender;
     @Setter
     private boolean autoCleanup = true;
 
     @Getter
-    private SimpleFramebuffer frameBuffer;
+    private TextureTarget frameBuffer;
     private Image image = null;
 
     private static boolean cancelMinecraftFrameBufferWrites;
@@ -49,7 +49,7 @@ public class SkiaNativeRender {
         }
     };
 
-    public void update(DrawContext context) {
+    public void update(GuiGraphics context) {
         int scaledWidth = (int) (nativeWidth * SkiaOpenGLInstance.getScaleFactor());
         int scaledHeight = (int) (nativeHeight * SkiaOpenGLInstance.getScaleFactor());
 
@@ -58,21 +58,21 @@ public class SkiaNativeRender {
         OpenGLStates.CLEAR_COLOR.cache();
 
         if (frameBuffer == null) {
-            frameBuffer = new SimpleFramebuffer(scaledWidth, scaledHeight, true);
+            frameBuffer = new TextureTarget(scaledWidth, scaledHeight, true);
 
             if (this.autoCleanup) {
-                final SimpleFramebuffer nonReferance = frameBuffer;
+                final TextureTarget nonReferance = frameBuffer;
                 InertiaBase.CLEANER.register(this, () -> {
                     //framebuffer.delete must be called on main thread
-                    InertiaBase.mc.executeSync(() -> {
-                        System.out.println("deleted " + nonReferance.fbo);
-                        nonReferance.delete();
+                    InertiaBase.mc.executeIfPossible(() -> {
+                        System.out.println("deleted " + nonReferance.frameBufferId);
+                        nonReferance.destroyBuffers();
                     });
                 });
             }
             this.setImage();
         }
-        if (frameBuffer.textureWidth != scaledWidth || frameBuffer.textureHeight != scaledHeight) {
+        if (frameBuffer.width != scaledWidth || frameBuffer.height != scaledHeight) {
             frameBuffer.resize(scaledWidth, scaledHeight);
             this.setImage();
         }
@@ -80,7 +80,7 @@ public class SkiaNativeRender {
         //for some reason skia wants it to be black transparent, instead of minecrafts default white transparent, or our image gets a white background when being drawn with skia
         frameBuffer.setClearColor(0, 0, 0, 0);
         frameBuffer.clear();
-        frameBuffer.beginWrite(true);
+        frameBuffer.bindWrite(true);
 
         {
             RenderSystem.backupProjectionMatrix();
@@ -97,7 +97,7 @@ public class SkiaNativeRender {
             try (var state = new OpenGLStateRestore()) {
                 this.cancelMinecraftFrameBufferWrites = true;
                 setNativeRender.accept(context);
-                context.draw();
+                context.flush();
                 this.cancelMinecraftFrameBufferWrites = false;
             }
 
@@ -125,11 +125,11 @@ public class SkiaNativeRender {
             //this.image.close();
         }
 
-        this.image = Image.adoptGLTextureFrom(SkiaOpenGLInstance.getSkiaDirectContext(), this.frameBuffer.getColorAttachment(), GL11.GL_TEXTURE_2D, this.frameBuffer.textureWidth, this.frameBuffer.textureHeight, GL11.GL_RGBA8, SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888);
+        this.image = Image.adoptGLTextureFrom(SkiaOpenGLInstance.getSkiaDirectContext(), this.frameBuffer.getColorTextureId(), GL11.GL_TEXTURE_2D, this.frameBuffer.width, this.frameBuffer.height, GL11.GL_RGBA8, SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888);
     }
 
     public void delete() {
-        this.frameBuffer.delete();
+        this.frameBuffer.destroyBuffers();
         //does this actually delete the image/backend handle
         image.close();
     }

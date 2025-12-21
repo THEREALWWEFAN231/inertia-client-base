@@ -2,11 +2,11 @@ package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.value.impl.EntityTypeValue;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.util.Mth;
 
 import java.util.Comparator;
 
@@ -15,7 +15,7 @@ public class EntityUtils {
     public static float getDistanceToPositionNoY(double x, double z) {
         float xDifference = (float) (InertiaBase.mc.player.getX() - x);
         float zDifference = (float) (InertiaBase.mc.player.getZ() - z);
-        return MathHelper.sqrt(xDifference * xDifference + zDifference * zDifference);
+        return Mth.sqrt(xDifference * xDifference + zDifference * zDifference);
     }
 
     public static float getDistanceToEntityNoY(Entity entity) {
@@ -23,14 +23,14 @@ public class EntityUtils {
     }
 
     public static float getDistanceToBlockEntityNoY(BlockEntity blockEntity) {
-        return getDistanceToPositionNoY(blockEntity.getPos().getX() + .5f, blockEntity.getPos().getZ() + .5f);
+        return getDistanceToPositionNoY(blockEntity.getBlockPos().getX() + .5f, blockEntity.getBlockPos().getZ() + .5f);
     }
 
     public static boolean isPlayer(Entity entity) {
-        if (entity instanceof ClientPlayerEntity) {
+        if (entity instanceof LocalPlayer) {
             return true;
         }
-        if (InertiaBase.mc.player.hasVehicle() && InertiaBase.mc.player.getVehicle() == entity) {
+        if (InertiaBase.mc.player.isPassenger() && InertiaBase.mc.player.getVehicle() == entity) {
             return true;
         }
         return false;
@@ -56,7 +56,7 @@ public class EntityUtils {
         if (!invisibles && entity.isInvisible()) {
             return false;
         }
-        if (!walls && !InertiaBase.mc.player.canSee(entity)) {
+        if (!walls && !InertiaBase.mc.player.hasLineOfSight(entity)) {
             return false;
         }
 

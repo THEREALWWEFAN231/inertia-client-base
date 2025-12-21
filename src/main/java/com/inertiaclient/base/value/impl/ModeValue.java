@@ -8,7 +8,7 @@ import com.inertiaclient.base.value.Value;
 import com.inertiaclient.base.value.group.ValueGroup;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -91,15 +91,15 @@ public class ModeValue extends Value<ModeValue.Mode> {
         }
 
         public String getName() {
-            return Text.translatableWithFallback(this.getLanguageBaseKey() + ".name", this.id).getString();
+            return Component.translatableWithFallback(this.getLanguageBaseKey() + ".name", this.id).getString();
         }
 
         public String getDescriptionString() {
             return this.getDescription().getString();
         }
 
-        public Text getDescription() {
-            return Text.translatableWithFallback(this.getLanguageBaseKey() + ".description", "no description");
+        public Component getDescription() {
+            return Component.translatableWithFallback(this.getLanguageBaseKey() + ".description", "no description");
         }
 
         @Override

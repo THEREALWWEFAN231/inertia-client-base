@@ -1,8 +1,8 @@
 package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.util.Mth;
 
 import java.awt.Color;
 
@@ -21,7 +21,7 @@ public class DistanceColorUtils {
     }
 
     public static Color interpolateColorSquaredDistance(float squaredDistance) {
-        return interpolateColor(MathHelper.sqrt(squaredDistance));
+        return interpolateColor(Mth.sqrt(squaredDistance));
     }
 
     public static Color getColorForEntity(Entity entity) {

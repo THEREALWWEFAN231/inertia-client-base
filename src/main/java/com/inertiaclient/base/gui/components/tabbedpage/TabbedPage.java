@@ -6,7 +6,7 @@ import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.render.yoga.layouts.YogaEdge;
 import lombok.Getter;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 
@@ -88,8 +88,8 @@ public abstract class TabbedPage extends YogaNode {
         return "icb.gui.pages." + page + ".tabs." + tab;
     }
 
-    public static Text getTextForPage(String page, String tab) {
-        return Text.translatable(TabbedPage.getLanguageKeyForPage(page, tab));
+    public static Component getTextForPage(String page, String tab) {
+        return Component.translatable(TabbedPage.getLanguageKeyForPage(page, tab));
     }
 
 }
