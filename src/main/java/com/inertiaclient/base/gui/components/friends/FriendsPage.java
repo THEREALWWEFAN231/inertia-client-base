@@ -89,6 +89,11 @@ public class FriendsPage extends TabbedPage {
             yogaNode.addToList(new AddedFriendComponent(friend));
         });
 
+        if (yogaNode.listSize() == 0) {
+            yogaNode.styleSetAlignItems(AlignItems.CENTER);
+            yogaNode.addToList(new TextLabel(Component.translatable("icb.command.friend.no_friends")));
+        }
+
         return yogaNode;
     }
 

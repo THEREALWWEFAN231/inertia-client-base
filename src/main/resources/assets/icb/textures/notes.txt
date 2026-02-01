@@ -17,3 +17,4 @@ linked, https://www.svgrepo.com/svg/374953/linked
 next, https://www.svgrepo.com/svg/521767/next
 star-stroke, https://www.svgrepo.com/svg/526669/star
 edit, https://www.svgrepo.com/svg/522527/edit-3
+friend, https://www.svgrepo.com/svg/500866/friend

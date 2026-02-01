@@ -231,6 +231,10 @@ public class TextField {
                         this.enterAction.accept(this.text.toString());
                     }
                 }
+                case GLFW.GLFW_KEY_ESCAPE -> {
+                    this.setFocused(false);
+                    return false;
+                }
             }
             return true;
         }
