@@ -11,6 +11,7 @@ import com.inertiaclient.base.utils.TimerUtil;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.Paint;
 import lombok.Builder;
+import net.minecraft.network.chat.Component;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -110,7 +111,7 @@ public class Notifcations extends AbsoulteYogaNode {
     @Builder
     public static class Notification {
 
-        private String text;
+        private Component text;
         private final TimerUtil displayTimer = new TimerUtil(true);
         @Builder.Default
         private long displayTime = 1500;

@@ -1,7 +1,7 @@
 package com.inertiaclient.base.gui.components.module.values.blockentity;
 
-import com.inertiaclient.base.gui.components.tabbedpage.HashsetPage;
-import com.inertiaclient.base.gui.components.tabbedpage.ItemRenderComponent;
+import com.inertiaclient.base.gui.components.tabbedpage.impl.HashsetPage;
+import com.inertiaclient.base.gui.components.tabbedpage.impl.ItemRenderComponent;
 import com.inertiaclient.base.value.HashsetValue;
 import net.fabricmc.fabric.mixin.lookup.BlockEntityTypeAccessor;
 import net.minecraft.world.level.block.Block;

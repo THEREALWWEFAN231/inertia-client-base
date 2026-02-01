@@ -11,7 +11,10 @@ import com.inertiaclient.base.mods.InertiaMod;
 import com.inertiaclient.base.module.Module;
 import lombok.*;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class FileManager {
@@ -23,12 +26,15 @@ public class FileManager {
     private Gson formattedGson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
 
-    private File mainDirectory;
+    private Path mainDirectory;
     @Getter
-    private File librariesDirectory;
-    private File configsDirectory;
+    private Path librariesDirectory;
+    private Path configsDirectory;
     @Getter
     private boolean mostLikelyFirstTimeLoading;
+
+    @Getter
+    private SkinCache skinCache;
 
     @Getter
     private QueueSave moduleQueuedSave = new QueueSave(() -> {
@@ -45,62 +51,80 @@ public class FileManager {
     @EventTarget
     private final EventListener<ClientTickEvent> clientTickListener = this::onEvent;
 
-    public FileManager(File gameDirectory) {
+    public FileManager(Path gameDirectory) {
         //this.mainDirectory = new File(gameDirectory + File.separator + "Inertia", InertiaClient.MINECRAFT_VERSION);
-        this.mainDirectory = new File(gameDirectory, "icb");
-        if (!this.mainDirectory.exists()) {
-            this.mainDirectory.mkdirs();
+        this.mainDirectory = gameDirectory.resolve("icb");
+        if (Files.notExists(mainDirectory)) {
+            try {
+                Files.createDirectories(mainDirectory);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             this.mostLikelyFirstTimeLoading = true;
         }
 
         this.librariesDirectory = this.getGameFolder("Libraries");
         this.configsDirectory = this.getGameFolder("Configs");
 
+        Path skinHeadCache = this.getGameFolder("Skin Cache").resolve("Heads");
+        if (Files.notExists(skinHeadCache)) {
+            try {
+                Files.createDirectories(skinHeadCache);
+            } catch (IOException e) {
+                InertiaBase.LOGGER.error("Failed to create Skin Cache Heads folder");
+            }
+        }
+        this.skinCache = new SkinCache(skinHeadCache);
+
         EventManager.register(this);
     }
 
-    public File getGameFolder(String folderName) {
-        File file = new File(this.mainDirectory, folderName);
-        if (!file.exists()) {
-            file.mkdirs();
+    public Path getGameFolder(String folderName) {
+        Path path = this.mainDirectory.resolve(folderName);
+        if (Files.notExists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                InertiaBase.LOGGER.error("Failed to create game folder {}", folderName);
+            }
         }
-        return file;
+        return path;
     }
 
-    public File getSaveFolderForMod(File rootFolder, InertiaMod inertiaMod) {
+    public Path getSaveFolderForMod(Path rootFolder, InertiaMod inertiaMod) throws IOException {
 
-        File modsFolder = new File(rootFolder, "Mods");
-        if (!modsFolder.exists()) {
-            modsFolder.mkdirs();
+        Path modsFolder = rootFolder.resolve("Mods");
+        if (Files.notExists(modsFolder)) {
+            Files.createDirectories(modsFolder);
         }
 
-        File file = new File(modsFolder, inertiaMod.getName());
-        if (!file.exists()) {
-            file.mkdirs();
+        Path path = modsFolder.resolve(inertiaMod.getName());
+        if (Files.notExists(path)) {
+            Files.createDirectories(path);
         }
-        return file;
+        return path;
     }
 
     public void saveModulesJson() {
         this.saveModulesJson(this.mainDirectory);
     }
 
-    private void saveModulesJson(File rootFolder) {
+    private void saveModulesJson(Path rootFolder) {
         try {
-
             for (InertiaMod mod : InertiaBase.instance.getModLoader().getMods()) {
                 this.saveModsModulesJson(rootFolder, mod);
             }
         } catch (Exception e) {
+            InertiaBase.LOGGER.warn("Failed to save modules json", e);
         }
     }
 
-    private void saveModsModulesJson(File rootFolder, InertiaMod mod) throws Exception {
+    private void saveModsModulesJson(Path rootFolder, InertiaMod mod) throws Exception {
         ArrayList<Module> modulesAddByMod = InertiaBase.instance.getModuleManager().getModulesByMods().get(mod);
 
-        File file = new File(this.getSaveFolderForMod(rootFolder, mod), "Modules.json");
-        if (!file.exists()) {
-            file.createNewFile();
+        Path file = this.getSaveFolderForMod(rootFolder, mod).resolve("Modules.json");
+        if (Files.notExists(file)) {
+            Files.createFile(file);
         }
 
         JsonObject main = new JsonObject();
@@ -108,8 +132,7 @@ public class FileManager {
             try {
                 main.add(module.getId(), module.toJson());
             } catch (Exception e) {
-                InertiaBase.LOGGER.warn("Failed to encode Module {} to json", module.getId());
-                e.printStackTrace();
+                InertiaBase.LOGGER.warn("Failed to encode Module {} to json", module.getId(), e);
             }
         }
         FileUtils.writeToFile(file, this.formattedGson.toJson(main));
@@ -119,26 +142,26 @@ public class FileManager {
         this.loadModulesJson(this.mainDirectory);
     }
 
-    private void loadModulesJson(File rootFolder) {
+    private void loadModulesJson(Path rootFolder) {
         try {
 
             for (InertiaMod mod : InertiaBase.instance.getModLoader().getMods()) {
                 this.loadModsModulesJson(rootFolder, mod);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            InertiaBase.LOGGER.warn("Failed to decode modules json, saving instead", e);
             this.saveModulesJson();
         }
     }
 
-    private void loadModsModulesJson(File rootFolder, InertiaMod mod) throws Exception {
-        File modFolder = this.getSaveFolderForMod(rootFolder, mod);
-        if (!modFolder.exists()) {
+    private void loadModsModulesJson(Path rootFolder, InertiaMod mod) throws Exception {
+        Path modFolder = this.getSaveFolderForMod(rootFolder, mod);
+        if (Files.notExists(modFolder)) {
             return;
         }
 
-        File file = new File(modFolder, "Modules.json");
-        if (!file.exists()) {
+        Path file = modFolder.resolve("Modules.json");
+        if (Files.notExists(file)) {
             this.saveModulesJson();
             return;
         }
@@ -151,8 +174,7 @@ public class FileManager {
                 try {
                     module.fromJson(entry.getValue());
                 } catch (Exception e) {
-                    InertiaBase.LOGGER.warn("Failed to decode Module {} from json", module.getId());
-                    e.printStackTrace();
+                    InertiaBase.LOGGER.warn("Failed to decode Module {} from json", module.getId(), e);
                 }
             }
         });
@@ -162,12 +184,12 @@ public class FileManager {
         this.saveHudJson(this.mainDirectory);
     }
 
-    private void saveHudJson(File rootFolder) {
+    private void saveHudJson(Path rootFolder) {
         try {
 
-            File file = new File(rootFolder, "Hud.json");
-            if (!file.exists()) {
-                file.createNewFile();
+            Path file = rootFolder.resolve("Hud.json");
+            if (Files.notExists(file)) {
+                Files.createFile(file);
             }
 
             JsonArray main = new JsonArray();
@@ -175,8 +197,7 @@ public class FileManager {
                 try {
                     main.add(group.toJson());
                 } catch (Exception e) {
-                    InertiaBase.LOGGER.warn("Failed to encode Hud Group {} to json", group);
-                    e.printStackTrace();
+                    InertiaBase.LOGGER.warn("Failed to encode Hud Group {} to json", group, e);
                 }
             }
             FileUtils.writeToFile(file, this.formattedGson.toJson(main));
@@ -188,10 +209,10 @@ public class FileManager {
         this.loadHudJson(this.mainDirectory);
     }
 
-    private void loadHudJson(File rootFolder) {
+    private void loadHudJson(Path rootFolder) {
         try {
-            File file = new File(rootFolder, "Hud.json");
-            if (!file.exists()) {
+            Path file = rootFolder.resolve("Hud.json");
+            if (Files.notExists(file)) {
                 this.saveHudJson();
             }
 
@@ -202,23 +223,26 @@ public class FileManager {
                 try {
                     hudGroup.fromJson(jsonElement);
                 } catch (Exception e) {
-                    InertiaBase.LOGGER.warn("Failed to decode Hud Group {} from json", hudGroup);
-                    e.printStackTrace();
+                    InertiaBase.LOGGER.warn("Failed to decode Hud Group {} from json", jsonElement, e);
                 }
             });
 
             //InertiaClient.instance.getHudManager().getGroups().removeIf(hudGroup -> hudGroup.getElements().isEmpty());
         } catch (Exception e) {
-            e.printStackTrace();
+            InertiaBase.LOGGER.warn("Failed to decode hud json, saving instead", e);
             this.saveHudJson();
         }
     }
 
     public boolean saveConfig(String name, boolean module, boolean hud, boolean settings) {
 
-        File configFolder = new File(this.configsDirectory, name);
-        if (!configFolder.exists()) {
-            configFolder.mkdirs();
+        Path configFolder = configsDirectory.resolve(name);
+        if (Files.notExists(configFolder)) {
+            try {
+                Files.createDirectories(configFolder);
+            } catch (IOException e) {
+                InertiaBase.LOGGER.error("Failed to create config directory", e);
+            }
         }
 
         try {
@@ -239,7 +263,7 @@ public class FileManager {
         return true;
     }
 
-    public boolean loadConfig(File configFolder) {
+    public boolean loadConfig(Path configFolder) {
         try {
             this.loadModulesJson(configFolder);
             this.loadHudJson(configFolder);
@@ -254,17 +278,73 @@ public class FileManager {
     }
 
 
-    public File[] getConfigs() {
+    public void saveFriendsJson() {
+        this.saveFriendsJson(this.mainDirectory);
+    }
+
+    private void saveFriendsJson(Path rootFolder) {
         try {
-            File file = new File(this.configsDirectory.getAbsolutePath());
 
-            File[] folders = file.listFiles(File::isDirectory);
+            Path file = rootFolder.resolve("Friends.json");
+            if (Files.notExists(file)) {
+                Files.createFile(file);
+            }
 
-            return folders;
+            JsonArray main = new JsonArray();
+            for (Friend friend : InertiaBase.instance.getFriendManager().getFriends()) {
+                try {
+                    main.add(friend.toJson());
+                } catch (Exception e) {
+                    InertiaBase.LOGGER.warn("Failed to encode friend {} to json", friend, e);
+                }
+            }
+            FileUtils.writeToFile(file, this.formattedGson.toJson(main));
         } catch (Exception e) {
-            e.printStackTrace();
+            InertiaBase.LOGGER.warn("Failed to save friends json", e);
         }
-        return null;
+    }
+
+    public void loadFriendsJson() {
+        this.loadFriendsJson(this.mainDirectory);
+    }
+
+    private void loadFriendsJson(Path rootFolder) {
+        try {
+            Path file = rootFolder.resolve("Friends.json");
+            if (Files.notExists(file)) {
+                this.saveFriendsJson();
+            }
+
+            InertiaBase.instance.getFriendManager().removeAllFriends();
+
+            JsonArray jsonArray = FileUtils.getJsonArrayFromFile(file);
+            jsonArray.forEach(jsonElement -> {
+                try {
+                    Friend friend = Friend.makeFromJson(jsonElement);
+                    InertiaBase.instance.getFriendManager().addFriend(friend, false);
+                } catch (Exception e) {
+                    InertiaBase.LOGGER.warn("Failed to decode friend {} from json", jsonElement, e);
+                }
+            });
+        } catch (Exception e) {
+            InertiaBase.LOGGER.warn("Failed to decode friends json, saving instead", e);
+            this.saveFriendsJson();
+        }
+    }
+
+
+    public ArrayList<Path> getConfigs() {
+        ArrayList<Path> configs = new ArrayList<>();
+        try (DirectoryStream<Path> configStream = Files.newDirectoryStream(this.configsDirectory)) {
+            for (Path path : configStream) {
+                if (Files.isDirectory(path)) {
+                    configs.add(path);
+                }
+            }
+        } catch (IOException e) {
+            InertiaBase.LOGGER.error("Failed to get local config", e);
+        }
+        return configs;
     }
 
     public void onEvent(ClientTickEvent event) {

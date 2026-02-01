@@ -1,7 +1,7 @@
-package com.inertiaclient.base.gui.components.tabbedpage;
+package com.inertiaclient.base.gui.components.tabbedpage.impl;
 
-import net.minecraft.world.level.block.Block;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.Block;
 
 public class BlockRenderComponent extends ItemRenderComponent {
 

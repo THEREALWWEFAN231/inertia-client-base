@@ -5,6 +5,7 @@ import com.inertiaclient.base.gui.components.MainFrame;
 import com.inertiaclient.base.gui.components.Page;
 import com.inertiaclient.base.gui.components.SvgComponent;
 import com.inertiaclient.base.gui.components.config.ConfigPage;
+import com.inertiaclient.base.gui.components.friends.FriendsPage;
 import com.inertiaclient.base.gui.components.helpers.ValuesPage;
 import com.inertiaclient.base.gui.components.hudeditor.HudEditorPage;
 import com.inertiaclient.base.gui.components.module.ModulesPage;
@@ -30,6 +31,7 @@ public class Pages extends YogaNode {
 
         this.addChild(new PageButton("icb/textures/list.svg", "modules", () -> new Page(createAction("modules"), new ModulesPage()), getChildren().size()));
         this.addChild(new PageButton("icb/textures/list.svg", "config", () -> new Page(createAction("config"), new ConfigPage()), getChildren().size()));
+        this.addChild(new PageButton("icb/textures/list.svg", "friends", () -> new Page(createAction("friends"), new FriendsPage()), getChildren().size()));
 
         this.addChild(new PageButton("icb/textures/setting-gear.svg", "settings", () -> new Page(createAction("settings"), new ValuesPage(InertiaBase.instance.getSettings().getAllGroups())), getChildren().size()));
 

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.Color;
+import java.util.function.Supplier;
 
 @AllArgsConstructor
 public class CanvasWrapper {
@@ -77,6 +78,25 @@ public class CanvasWrapper {
         this.canvas.drawImageRect(image, Rect.makeXYWH(x, y, width, height));
     }
 
+    public void drawImageRect(Image image, Rect rect, @Nullable Paint paint) {
+        this.canvas.drawImageRect(image, rect, paint);
+    }
+
+    public void drawImageRect(Image image, Rect rect, @Nullable Paint paint, float blurRadius) {
+        if (blurRadius > 0) {
+            try (var blurPaint = SkiaUtils.createPaintForColor(java.awt.Color.white)) {
+                SkiaUtils.setPaintBlur(blurPaint, blurRadius);
+                this.drawImageRect(image, rect, blurPaint);
+            }
+        }
+
+
+        this.drawImageRect(image, rect, paint);
+    }
+
+    public void drawImageRect(Image image, Rect rect, @Nullable Paint paint, Supplier<Float> blurRadius) {
+        this.drawImageRect(image, rect, paint, blurRadius == null ? 0 : blurRadius.get());
+    }
 
     public CanvasWrapper clipRect(@NotNull Rect r) {
         this.canvas.clipRect(r, true);
@@ -222,6 +242,8 @@ public class CanvasWrapper {
         private HorizontalAlignment horizontalAlignment;
         @Setter
         private VerticalAlignment verticalAlignment;
+        @Setter
+        private float blurRadius = -1;
 
         public TextBuilder() {
             this.setDefaults();
@@ -238,6 +260,7 @@ public class CanvasWrapper {
             this.fontSize = Fonts.DEFAULT_SIZE;
             this.horizontalAlignment = HorizontalAlignment.LEFT;
             this.verticalAlignment = VerticalAlignment.TOP;
+            this.blurRadius = -1;
             return this;
         }
 
@@ -281,6 +304,14 @@ public class CanvasWrapper {
                 case BOTTOM -> this.fontSize;
                 default -> 0;
             };
+
+            if (this.blurRadius > 0) {
+                try (var paint = SkiaUtils.createPaintForColor(this.color)) {
+                    SkiaUtils.setPaintBlur(paint, this.blurRadius);
+                    canvas.drawString(this.text, this.x - xOffset, this.y - yOffset, this.font, paint, this.shadow);
+
+                }
+            }
 
             if (this.paint != null) {
                 canvas.drawString(this.text, this.x - xOffset, this.y - yOffset, this.font, this.paint, this.shadow);

@@ -1,4 +1,4 @@
-package com.inertiaclient.base.gui.components.tabbedpage;
+package com.inertiaclient.base.gui.components.tabbedpage.impl;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.gui.ModernClickGui;
@@ -7,10 +7,10 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
 import java.awt.Color;
 
@@ -27,12 +27,14 @@ public class ItemRenderComponent extends YogaNode {
 
 
         skiaNativeRender = new SkiaNativeRender();
+        skiaNativeRender.setNativeWidth(() -> 16f);
+        skiaNativeRender.setNativeHeight(() -> 16f);
         skiaNativeRender.setSetNativeRender(drawContext -> {
             ItemStack itemStack = new ItemStack(item);
             InertiaBase.mc.getItemModelResolver().updateForTopItem(itemRenderState, itemStack, ItemDisplayContext.GUI, false, null, null, 0);
 
             if (itemRenderState.isEmpty()) {
-                drawContext.blit(RenderType::guiTextured, ModernClickGui.UNKNOWN_TEXTURE, 0, 0, 0, 0, skiaNativeRender.getNativeWidth(), skiaNativeRender.getNativeHeight(), skiaNativeRender.getNativeWidth(), skiaNativeRender.getNativeHeight());
+                drawContext.blit(RenderType::guiTextured, ModernClickGui.UNKNOWN_TEXTURE, 0, 0, 0, 0, (int) skiaNativeRender.getCachedNativeWidth(), (int) skiaNativeRender.getCachedNativeHeight(), (int) skiaNativeRender.getCachedNativeWidth(), (int) skiaNativeRender.getCachedNativeHeight());
             } else {
                 drawContext.renderItem(itemStack, 0, 0);
                 RenderSystem.enableBlend();
@@ -50,10 +52,8 @@ public class ItemRenderComponent extends YogaNode {
                 canvas.drawRect(0, 0, this.getWidth(), this.getHeight(), new Color(255, 255, 255, 100));
             }
 
-            skiaNativeRender.setNativeWidth(16);
-            skiaNativeRender.setNativeHeight(16);
             skiaNativeRender.update(context);
-            skiaNativeRender.drawNanoImage(canvas, 0, 0);
+            skiaNativeRender.drawImageWithSkia(canvas, 0, 0);
         });
     }
 }

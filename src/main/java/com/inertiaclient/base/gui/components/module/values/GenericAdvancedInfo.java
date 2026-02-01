@@ -20,9 +20,9 @@ import java.util.function.Supplier;
 public class GenericAdvancedInfo extends ValueAdvanceInfoContainer {
 
     private static final Component COPY_VALUE_SUCCESS = Component.translatable("icb.gui.copy_value_success");
-    private static final Component COPY_VALUE_FAILED = Component.translatable("icb.gui.copy_value_failed");
+    private static final String COPY_VALUE_FAILED_STRING = "icb.gui.copy_value_failed";
     private static final Component PASTE_VALUE_SUCCESS = Component.translatable("icb.gui.paste_value_success");
-    private static final Component PASTE_VALUE_FAILED = Component.translatable("icb.gui.paste_value_failed");
+    private static final String PASTE_VALUE_FAILED_STRING = "icb.gui.paste_value_failed";
 
     public GenericAdvancedInfo(Value value, Supplier<Float> xPosition, Supplier<Float> yPosition) {
         super(value, xPosition, yPosition);
@@ -60,9 +60,9 @@ public class GenericAdvancedInfo extends ValueAdvanceInfoContainer {
             try {
                 String json = InertiaBase.instance.getFileManager().getNormalGson().toJson(value.toJson());
                 Minecraft.getInstance().keyboardHandler.setClipboard(json);
-                addNotification(COPY_VALUE_SUCCESS.getString(), false);
+                addNotification(COPY_VALUE_SUCCESS, false);
             } catch (Exception e) {
-                addNotification(String.format(COPY_VALUE_FAILED.getString(), value.getNameString()), true);
+                addNotification(Component.translatable(COPY_VALUE_FAILED_STRING, value.getNameString()), true);
                 e.printStackTrace();
             }
         });
@@ -74,19 +74,15 @@ public class GenericAdvancedInfo extends ValueAdvanceInfoContainer {
                 String clipboardText = Minecraft.getInstance().keyboardHandler.getClipboard();
                 JsonElement fromClipboard = JsonParser.parseString(clipboardText);
                 value.fromJson(fromClipboard);
-                addNotification(PASTE_VALUE_SUCCESS.getString(), false);
+                addNotification(PASTE_VALUE_SUCCESS, false);
             } catch (Exception e) {
-                addNotification(String.format(PASTE_VALUE_FAILED.getString(), value.getNameString()), true);
+                addNotification(Component.translatable(PASTE_VALUE_FAILED_STRING, value.getNameString()), true);
                 e.printStackTrace();
             }
         });
     }
 
-    public static void addNotification(String notification, boolean fail) {
-        ModernClickGui.MODERN_CLICK_GUI.getNotifcations().addNotification(Notifcations.Notification.builder().text(notification).displayTime(750 + (fail ? 500 : 0)).build());
-    }
-
     public static void addNotification(Component notification, boolean fail) {
-        GenericAdvancedInfo.addNotification(notification.getString(), fail);
+        ModernClickGui.MODERN_CLICK_GUI.getNotifcations().addNotification(Notifcations.Notification.builder().text(notification).displayTime(750 + (fail ? 500 : 0)).build());
     }
 }

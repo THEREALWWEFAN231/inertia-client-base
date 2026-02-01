@@ -7,8 +7,11 @@ import com.inertiaclient.base.module.Module;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class ModuleInfoGroupContainer extends AbstractGroupContainer {
+
+    private static final MutableComponent enabled = Component.translatable("icb.gui.pages.modules.module.enabled");
 
     public ModuleInfoGroupContainer(Module module) {
         super(Component.translatable("icb.gui.text.module_category"), valuesContainer -> {
@@ -24,7 +27,7 @@ public class ModuleInfoGroupContainer extends AbstractGroupContainer {
                 }
             }));
             YogaNode moduleEnabled = new YogaNode();
-            new BooleanComponent(() -> "Enabled", module::isEnabled, module::setState, moduleEnabled);
+            new BooleanComponent(enabled::getString, module::isEnabled, module::setState, moduleEnabled);
             valuesContainer.addChild(moduleEnabled);
         });
     }

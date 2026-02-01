@@ -7,12 +7,12 @@ import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.YogaEdge;
 import lombok.Getter;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 public class PageHolder extends YogaNode {
 
     @Getter
-    private Stack<Page> pages = new Stack<>();
+    private ArrayDeque<Page> pages = new ArrayDeque<>();
     private YogaNode emptySpace;
 
     private AnimationValue backpageAnimation = new AnimationValue();
@@ -74,12 +74,13 @@ public class PageHolder extends YogaNode {
         }
         Page removing = this.pages.pop();
         emptySpace.removeChild(removing.getNode());
+        removing.getNode().revokeLifeCycle();
+        this.animatedBackPage = removing.getNode();
 
         Page restoredPage = this.pages.peek();
         emptySpace.addChild(restoredPage.getNode());
 
         MainFrame.topPanel.clearSearch();
-        this.animatedBackPage = removing.getNode();
         /*this.backpageAnimation.setValue(0);
         this.backpageAnimation.to(1).ease(Animations.easeOutQuad).value(1).addCallback(TweenEvents.COMPLETE, animationValueTween -> {
             animatedBackPage = null;
@@ -90,6 +91,9 @@ public class PageHolder extends YogaNode {
 
     public void removeHistory() {
         Page p = pages.peek();
+        pages.stream().skip(1).forEach(page -> {
+            page.getNode().revokeLifeCycle();
+        });
         pages.clear();
         pages.add(p);
     }

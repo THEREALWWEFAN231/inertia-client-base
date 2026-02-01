@@ -2,18 +2,22 @@ package com.inertiaclient.base.utils;
 
 import com.google.gson.*;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class FileUtils {
 
-    public static void writeToFile(File file, byte[] toWrite) throws Exception {
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        fileOutputStream.write(toWrite);
-        fileOutputStream.close();
+    public static void writeToFile(Path file, byte[] toWrite) throws Exception {
+        try (OutputStream outputStream = Files.newOutputStream(file)) {
+            outputStream.write(toWrite);
+        }
     }
 
-    public static void writeToFile(File file, String toWrite) throws Exception {
+    public static void writeToFile(Path file, String toWrite) throws Exception {
         FileUtils.writeToFile(file, toWrite.getBytes(StandardCharsets.UTF_8));//UTF-8 allows unicode characters
     }
 
@@ -35,19 +39,21 @@ public class FileUtils {
         return byteArrayOutputStream;
     }
 
-    public static String getTextFromFile(File file) throws Exception {
-        return FileUtils.getTextFromInputStream(new FileInputStream(file));
+    public static String getTextFromFile(Path file) throws Exception {
+        try (InputStream inputStream = Files.newInputStream(file)) {
+            return FileUtils.getTextFromInputStream(inputStream);
+        }
     }
 
-    public static JsonElement getJsonElementFromFile(File file) throws Exception {
+    public static JsonElement getJsonElementFromFile(Path file) throws Exception {
         return JsonParser.parseString(FileUtils.getTextFromFile(file));
     }
 
-    public static JsonObject getJsonObjectFromFile(File file) throws Exception {
+    public static JsonObject getJsonObjectFromFile(Path file) throws Exception {
         return FileUtils.getJsonElementFromFile(file).getAsJsonObject();
     }
 
-    public static JsonArray getJsonArrayFromFile(File file) throws Exception {
+    public static JsonArray getJsonArrayFromFile(Path file) throws Exception {
         return FileUtils.getJsonElementFromFile(file).getAsJsonArray();
     }
 

@@ -1,7 +1,7 @@
 package com.inertiaclient.base.gui.components.module.values.blocks;
 
-import com.inertiaclient.base.gui.components.tabbedpage.BlockRenderComponent;
-import com.inertiaclient.base.gui.components.tabbedpage.HashsetPage;
+import com.inertiaclient.base.gui.components.tabbedpage.impl.BlockRenderComponent;
+import com.inertiaclient.base.gui.components.tabbedpage.impl.HashsetPage;
 import com.inertiaclient.base.value.HashsetValue;
 import net.minecraft.world.level.block.Block;
 

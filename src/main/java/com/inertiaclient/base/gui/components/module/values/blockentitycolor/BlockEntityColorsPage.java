@@ -4,15 +4,15 @@ import com.inertiaclient.base.gui.ModernClickGui;
 import com.inertiaclient.base.gui.components.module.values.blockentity.BlockEntityTypePage;
 import com.inertiaclient.base.gui.components.module.values.color.ColorContainer;
 import com.inertiaclient.base.gui.components.module.values.color.ColorContainerInterface;
-import com.inertiaclient.base.gui.components.tabbedpage.ItemRenderComponent;
 import com.inertiaclient.base.gui.components.tabbedpage.WrappedListContainer;
+import com.inertiaclient.base.gui.components.tabbedpage.impl.ItemRenderComponent;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.impl.BlockEntityColorValue;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.registries.BuiltInRegistries;
 
 public class BlockEntityColorsPage extends WrappedListContainer {
 

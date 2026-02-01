@@ -1,17 +1,15 @@
 package com.inertiaclient.base.command;
 
 import com.inertiaclient.base.InertiaBase;
-import com.inertiaclient.base.command.impl.HelpCommand;
-import com.inertiaclient.base.command.impl.ToggleCommand;
-import com.inertiaclient.base.command.impl.ValueCommand;
+import com.inertiaclient.base.command.impl.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import lombok.Getter;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.ChatFormatting;
 
 import java.util.ArrayList;
 
@@ -37,6 +35,7 @@ public class CommandManager {
         this.registerCommand(new HelpCommand());
         this.registerCommand(new ToggleCommand());
         this.registerCommand(new ValueCommand());
+        this.registerCommand(new FriendCommand());
 
         InertiaBase.instance.getModLoader().getMods().forEach(inertiaMod -> {
             ArrayList<Command> modsCommands = new ArrayList<>();

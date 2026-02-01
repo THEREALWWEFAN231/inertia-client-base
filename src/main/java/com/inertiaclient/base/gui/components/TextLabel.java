@@ -36,6 +36,9 @@ public class TextLabel extends YogaNode {
     @Setter
     @Accessors(chain = true)
     private Supplier<CanvasWrapper.TextBuilder.VerticalAlignment> verticalAlignment = TOP;
+    @Setter
+    @Accessors(chain = true)
+    private Supplier<Float> blurRadius;
     private float scrollProgress;
 
     @Setter
@@ -60,7 +63,7 @@ public class TextLabel extends YogaNode {
             var textBuilder = CanvasWrapper.getFreshTextBuilder();
             textBuilder.setText(this.cachedLabel);
             textBuilder.setFontSize(this.cachedFontSize);
-
+            
             if (scrollWidth != null) {
                 float stringWidth = textBuilder.getTextWidth();
                 boolean shouldScroll = stringWidth > (this.cachedScrollWidth = this.scrollWidth.get());
@@ -80,6 +83,9 @@ public class TextLabel extends YogaNode {
                 textBuilder.setHorizontalAlignment(this.horizontalAlignment.get()).setVerticalAlignment(this.verticalAlignment.get());
                 textBuilder.setColor(this.color.get());
                 textBuilder.setShadow(this.shadow.get());
+                if (blurRadius != null) {
+                    textBuilder.setBlurRadius(this.blurRadius.get());
+                }
                 canvas.save();
                 canvas.clipRect(0, 0, this.cachedScrollWidth, this.getHeight());
                 textBuilder.draw(canvas);
@@ -90,6 +96,9 @@ public class TextLabel extends YogaNode {
                 textBuilder.setHorizontalAlignment(this.horizontalAlignment.get()).setVerticalAlignment(this.verticalAlignment.get());
                 textBuilder.setColor(this.color.get());
                 textBuilder.setShadow(this.shadow.get());
+                if (blurRadius != null) {
+                    textBuilder.setBlurRadius(this.blurRadius.get());
+                }
                 textBuilder.draw(canvas);
             }
         });

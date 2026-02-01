@@ -6,8 +6,6 @@ import com.inertiaclient.base.render.skia.SkiaUtils;
 import com.inertiaclient.base.render.skia.SvgRenderer;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
-import io.github.humbleui.skija.FilterTileMode;
-import io.github.humbleui.skija.ImageFilter;
 import io.github.humbleui.skija.Paint;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -56,7 +54,7 @@ public class SvgComponent extends YogaNode {
                 float blurRadius = this.blurRadius.get();
                 if (blurRadius > 0) {
                     try (var paint = SkiaUtils.createPaintForColor(color)) {
-                        paint.setImageFilter(ImageFilter.makeBlur(blurRadius, blurRadius, FilterTileMode.DECAL));
+                        SkiaUtils.setPaintBlur(paint, blurRadius);
                         this.render(canvas, svgRenderer, paint);
                     }
                 }

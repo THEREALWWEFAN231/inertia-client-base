@@ -11,7 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 public abstract class InertiaMod {
@@ -32,11 +32,11 @@ public abstract class InertiaMod {
 
     public abstract void initializeCommands(ArrayList<Command> commands, CommandManager commandManager);
 
-    public void onConfigSaved(File configFolder) {
+    public void onConfigSaved(Path configFolder) {
 
     }
 
-    public void onConfigLoaded(File configFolder) {
+    public void onConfigLoaded(Path configFolder) {
 
     }
 }

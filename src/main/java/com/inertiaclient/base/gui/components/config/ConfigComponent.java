@@ -12,11 +12,11 @@ import com.inertiaclient.base.render.yoga.layouts.AlignItems;
 import com.inertiaclient.base.render.yoga.layouts.ExactPercentAuto;
 import com.inertiaclient.base.render.yoga.layouts.JustifyContent;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class ConfigComponent extends YogaNode {
 
-    public ConfigComponent(File configFolder) {
+    public ConfigComponent(Path configFolder) {
         this.styleSetMinHeight(30);
         this.styleSetJustifyContent(JustifyContent.FLEX_END);
 
@@ -30,12 +30,12 @@ public class ConfigComponent extends YogaNode {
 
         });
         deleteButton.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
-            ModernClickGui.MODERN_CLICK_GUI.getRoot().addChild(new ConfigDeleteContainer(configFolder, configFolder.getName(), () -> deleteButton.getGlobalX() + relativeMouseX, () -> deleteButton.getGlobalY()));
+            ModernClickGui.MODERN_CLICK_GUI.getRoot().addChild(new ConfigDeleteContainer(configFolder, configFolder.getFileName().toString(), () -> deleteButton.getGlobalX() + relativeMouseX, () -> deleteButton.getGlobalY()));
             return true;
         });
         buttonsContainer.addChild(deleteButton);
 
-        String configName = configFolder.getName();
+        String configName = configFolder.getFileName().toString();
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             canvas.drawRRect(0, 0, this.getWidth(), this.getHeight(), 5, ModuleComponent.BACKGROUND_COLOR);
 

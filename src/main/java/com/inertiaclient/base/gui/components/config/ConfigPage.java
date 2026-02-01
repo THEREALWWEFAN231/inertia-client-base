@@ -19,7 +19,6 @@ import com.inertiaclient.base.value.Value;
 import com.inertiaclient.base.value.group.ValueGroup;
 import net.minecraft.network.chat.Component;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class ConfigPage extends TabbedPage {
@@ -54,12 +53,10 @@ public class ConfigPage extends TabbedPage {
     public void refreshLocalTab() {
         this.localTab.getYogaNode().getListNode().removeAllChildren();
 
-        File[] configs = InertiaBase.instance.getFileManager().getConfigs();
-        for (int i = 0; i < configs.length; i++) {
-            File configFolder = configs[i];
-
-            this.localTab.getYogaNode().addToList(new ConfigComponent(configFolder));
-        }
+        var configs = InertiaBase.instance.getFileManager().getConfigs();
+        configs.forEach(path -> {
+            this.localTab.getYogaNode().addToList(new ConfigComponent(path));
+        });
     }
 
     private YogaNode createNewNode() {

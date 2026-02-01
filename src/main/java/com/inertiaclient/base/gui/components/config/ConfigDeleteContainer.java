@@ -8,15 +8,16 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.AlignItems;
 import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.GapGutter;
+import net.minecraft.network.chat.Component;
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.function.Supplier;
 
-public class ConfigDeleteContainer extends InfoContainer<File> {
+public class ConfigDeleteContainer extends InfoContainer<Path> {
 
-    public ConfigDeleteContainer(File configFolder, String configName, Supplier<Float> xPosition, Supplier<Float> yPosition) {
+    public ConfigDeleteContainer(Path configFolder, String configName, Supplier<Float> xPosition, Supplier<Float> yPosition) {
         super(configFolder, () -> "Delete " + configName + "?", xPosition, yPosition);
     }
 
@@ -36,13 +37,13 @@ public class ConfigDeleteContainer extends InfoContainer<File> {
 
             buttonsContainer.addChild(new SelectorButton(() -> "Delete", () -> false, () -> {
                 try {
-                    FileUtils.deleteDirectory(this.getWrapper());
-                    GenericAdvancedInfo.addNotification("Successfully deleted config", false);
+                    FileUtils.deleteDirectory(this.getWrapper().toFile());
+                    GenericAdvancedInfo.addNotification(Component.literal("Successfully deleted config"), false);
                     ((ConfigPage) MainFrame.pageHolder.getCurrentPage().getNode()).refreshLocalTab();
                     this.close();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    GenericAdvancedInfo.addNotification("Failed to delete config", true);
+                    GenericAdvancedInfo.addNotification(Component.literal("Failed to delete config"), true);
                 }
             }));
             buttonsContainer.addChild(new SelectorButton(() -> "Close", () -> false, this::close));

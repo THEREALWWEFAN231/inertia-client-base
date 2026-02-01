@@ -1,5 +1,8 @@
-package com.inertiaclient.base.gui.components.tabbedpage;
+package com.inertiaclient.base.gui.components.tabbedpage.impl;
 
+import com.inertiaclient.base.gui.components.tabbedpage.Tab;
+import com.inertiaclient.base.gui.components.tabbedpage.TabbedPage;
+import com.inertiaclient.base.gui.components.tabbedpage.WrappedListContainer;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.value.HashsetValue;

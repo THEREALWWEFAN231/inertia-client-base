@@ -7,39 +7,47 @@ import com.inertiaclient.base.event.EventTarget;
 import com.inertiaclient.base.event.impl.FrameBufferWriteEvent;
 import com.inertiaclient.base.utils.opengl.staterestore.OpenGLStateRestore;
 import com.inertiaclient.base.utils.opengl.staterestore.OpenGLStates;
-import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.ProjectionType;
+import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.humbleui.skija.*;
 import io.github.humbleui.types.Rect;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import com.mojang.blaze3d.pipeline.TextureTarget;
 import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class SkiaNativeRender {
 
-    @Getter
     @Setter
-    private int nativeWidth;
+    @Accessors(chain = true)
+    private Supplier<Float> nativeWidth;
     @Setter
-    @Getter
-    private int nativeHeight;
+    @Accessors(chain = true)
+    private Supplier<Float> nativeHeight;
     @Setter
     @Accessors(chain = true)
     private Consumer<GuiGraphics> setNativeRender;
+    @Setter
+    private Supplier<Float> blurRadius;
     @Setter
     private boolean autoCleanup = true;
 
     @Getter
     private TextureTarget frameBuffer;
     private Image image = null;
+
+    @Getter
+    private float cachedNativeWidth;
+    @Getter
+    private float cachedNativeHeight;
 
     private static boolean cancelMinecraftFrameBufferWrites;
     @EventTarget
@@ -49,9 +57,12 @@ public class SkiaNativeRender {
         }
     };
 
-    public void update(GuiGraphics context) {
-        int scaledWidth = (int) (nativeWidth * SkiaOpenGLInstance.getScaleFactor());
-        int scaledHeight = (int) (nativeHeight * SkiaOpenGLInstance.getScaleFactor());
+    public void update(GuiGraphics guiGraphics) {
+        this.cachedNativeWidth = this.nativeWidth.get();
+        this.cachedNativeHeight = this.nativeHeight.get();
+
+        int scaledWidth = (int) (this.cachedNativeWidth * SkiaOpenGLInstance.getScaleFactor());
+        int scaledHeight = (int) (this.cachedNativeHeight * SkiaOpenGLInstance.getScaleFactor());
 
         OpenGLStates.FRAME_BUFFER.cache();
         OpenGLStates.VIEW_PORT.cache();
@@ -87,7 +98,7 @@ public class SkiaNativeRender {
             Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
 
             RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT);
-            Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, nativeWidth, nativeHeight, 0.0f, 1000.0f, 21000.0f);
+            Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, this.cachedNativeWidth, this.cachedNativeHeight, 0.0f, 1000.0f, 21000.0f);
             RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.ORTHOGRAPHIC);
 
             matrixStack.pushMatrix();
@@ -96,8 +107,8 @@ public class SkiaNativeRender {
 
             try (var state = new OpenGLStateRestore()) {
                 this.cancelMinecraftFrameBufferWrites = true;
-                setNativeRender.accept(context);
-                context.flush();
+                setNativeRender.accept(guiGraphics);
+                guiGraphics.flush();
                 this.cancelMinecraftFrameBufferWrites = false;
             }
 
@@ -110,12 +121,12 @@ public class SkiaNativeRender {
         OpenGLStates.CLEAR_COLOR.restore();
     }
 
-    public void drawNanoImage(CanvasWrapper canvas, float x, float y) {
-        this.drawNanoImage(canvas, x, y, null);
+    public void drawImageWithSkia(CanvasWrapper canvas, float x, float y) {
+        this.drawImageWithSkia(canvas, x, y, null);
     }
 
-    public void drawNanoImage(CanvasWrapper canvas, float x, float y, Paint paint) {
-        canvas.getCanvas().drawImageRect(this.image, Rect.makeXYWH(x, y, nativeWidth, nativeHeight), paint);
+    public void drawImageWithSkia(CanvasWrapper canvas, float x, float y, Paint paint) {
+        canvas.drawImageRect(this.image, Rect.makeXYWH(x, y, this.cachedNativeWidth, this.cachedNativeHeight), paint, this.blurRadius);
     }
 
     private void setImage() {

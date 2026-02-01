@@ -75,6 +75,12 @@ public class TextField {
     @Nullable
     @Setter
     private Consumer<String> changedListener;
+    /**
+     * text when enter was pressed
+     */
+    @Nullable
+    @Setter
+    private Consumer<String> enterAction;
     @Setter
     private float fontSize = Fonts.DEFAULT_SIZE;
     @Setter
@@ -218,6 +224,11 @@ public class TextField {
                 case GLFW.GLFW_KEY_V -> {
                     if (isControlDown) {
                         paste();
+                    }
+                }
+                case GLFW.GLFW_KEY_ENTER -> {
+                    if (this.enterAction != null) {
+                        this.enterAction.accept(this.text.toString());
                     }
                 }
             }

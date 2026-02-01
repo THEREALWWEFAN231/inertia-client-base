@@ -15,8 +15,6 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.utils.UIUtils;
-import io.github.humbleui.skija.FilterTileMode;
-import io.github.humbleui.skija.ImageFilter;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.RRect;
 
@@ -96,7 +94,7 @@ public class ModuleComponent extends YogaNode {
 
                 if (favoriteComponent.shouldShowHoveredEffects()) {
                     float blurRadius = module.isFavorite() ? 2 : 1;
-                    blurPaint.setImageFilter(ImageFilter.makeBlur(blurRadius, blurRadius, FilterTileMode.CLAMP));
+                    SkiaUtils.setPaintBlur(blurPaint, blurRadius);
                     this.renderStar(canvas, module, favoriteComponent, blurPaint);
                 }
             }

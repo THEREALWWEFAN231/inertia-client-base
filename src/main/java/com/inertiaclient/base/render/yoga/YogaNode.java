@@ -1,5 +1,6 @@
 package com.inertiaclient.base.render.yoga;
 
+import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.gui.ModernClickGui;
 import com.inertiaclient.base.gui.components.HorizontalScrollbar;
 import com.inertiaclient.base.gui.components.VerticalScrollbar;
@@ -37,13 +38,11 @@ public class YogaNode {
             isSearching = true;
         }
 
-
         this.children.forEach(yogaNode -> yogaNode.onSearch(searchFor));
-
 
         boolean valid = false;
         for (YogaNode yogaNode : this.getChildren()) {
-            if (yogaNode.getSearchContext() == null || (yogaNode.getSearchContext().toLowerCase().contains(searchFor) && yogaNode.implIsVisible())) {
+            if ((yogaNode.getSearchContext() == null || yogaNode.getSearchContext().toLowerCase().contains(searchFor)) && yogaNode.implIsVisible()) {
                 yogaNode.styleSetDisplay(Display.FLEX);
                 this.lastVisible = true;
                 valid = true;
@@ -140,9 +139,19 @@ public class YogaNode {
     private Runnable afterInitCallback;
     @Setter
     private Runnable beforeSetFirstPositionCallback;
+    /**
+     * Revokes the life cycle of this and all children
+     */
+    @Setter
+    @Accessors(chain = true)
+    private Runnable lifeCycleEndCallback;
+    private boolean wasLifeCycleRevoked;
     @Setter
     @Accessors(chain = true)
     private Consumer<Boolean> hoverCallback;//boolean is if start hovering
+    @Setter
+    @Accessors(chain = true)
+    private Consumer<Integer> addedCallback;//integer 0 means this was added, 1 means parent was added, 2 means parents' parent was added, etc
     @Setter
     @Accessors(chain = true)
     private Consumer<Integer> removedCallback;//integer 0 means this was removed, 1 means parent was removed, 2 means parents' parent was removed, etc
@@ -193,6 +202,12 @@ public class YogaNode {
 
     public YogaNode() {
         this.nativeNode = Yoga.YGNodeNew();
+
+        //move to lifecycle?!?!
+        long nativeNodeReference = this.nativeNode;
+        InertiaBase.CLEANER.register(this, () -> {
+            Yoga.YGNodeFree(nativeNodeReference);
+        });
     }
 
     public YogaNode(YogaNode parent) {
@@ -381,6 +396,8 @@ public class YogaNode {
     }
 
     public void insertChild(YogaNode child, int atIndex) {
+        child.doAddCallback(0);
+
         YGNodeInsertChild(this.getNativeNode(), child.getNativeNode(), atIndex);
         children.add(atIndex, child);
         child.parent = this;
@@ -389,6 +406,20 @@ public class YogaNode {
         if (child.afterInitCallback != null) {
             child.afterInitCallback.run();
         }
+    }
+
+    public void addChild(YogaNode child) {
+        this.insertChild(child, children.size());
+    }
+
+    public void insertAbsoluteChild(YogaNode child, int atIndex) {
+        YGNodeInsertChild(this.getNativeNode(), child.getNativeNode(), atIndex);
+        absoluteChildren.add(atIndex, child);
+        child.parent = this;
+    }
+
+    public void addAbsoluteChild(YogaNode child) {
+        this.insertAbsoluteChild(child, absoluteChildren.size());
     }
 
     public void removeChild(YogaNode child) {
@@ -415,17 +446,10 @@ public class YogaNode {
         }
     }
 
-    private void doRemoveCallback(int ancestor) {
-        if (this.removedCallback != null) {
-            this.removedCallback.accept(ancestor);
-        }
-        for (YogaNode yogaNode : this.children) {
-            yogaNode.doRemoveCallback(ancestor + 1);
-        }
-    }
-
-    public void addChild(YogaNode child) {
-        this.insertChild(child, children.size());
+    public void removeAbsoluteChild(YogaNode child) {
+        YGNodeRemoveChild(this.getNativeNode(), child.getNativeNode());
+        absoluteChildren.remove(child);
+        child.parent = null;
     }
 
     public YogaNode getChildAtIndex(int index) {
@@ -436,20 +460,22 @@ public class YogaNode {
         return (T) this.children.stream().filter(yogaNode -> yogaNode.getClass() == type).findFirst().orElse(null);//get or null
     }
 
-    public void insertAbsoluteChild(YogaNode child, int atIndex) {
-        YGNodeInsertChild(this.getNativeNode(), child.getNativeNode(), atIndex);
-        absoluteChildren.add(atIndex, child);
-        child.parent = this;
+    private void doAddCallback(int ancestor) {
+        if (this.addedCallback != null) {
+            this.addedCallback.accept(ancestor);
+        }
+        for (YogaNode yogaNode : this.children) {
+            yogaNode.doAddCallback(ancestor + 1);
+        }
     }
 
-    public void removeAbsoluteChild(YogaNode child) {
-        YGNodeRemoveChild(this.getNativeNode(), child.getNativeNode());
-        absoluteChildren.remove(child);
-        child.parent = null;
-    }
-
-    public void addAbsoluteChild(YogaNode child) {
-        this.insertAbsoluteChild(child, absoluteChildren.size());
+    private void doRemoveCallback(int ancestor) {
+        if (this.removedCallback != null) {
+            this.removedCallback.accept(ancestor);
+        }
+        for (YogaNode yogaNode : this.children) {
+            yogaNode.doRemoveCallback(ancestor + 1);
+        }
     }
 
     public void enableVerticalScrollbar() {
@@ -896,6 +922,21 @@ public class YogaNode {
     protected void doRenderCallback(RenderCallback renderCallback, GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
         if (renderCallback != null) {
             renderCallback.render(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+        }
+    }
+
+    public void revokeLifeCycle() {
+        if (wasLifeCycleRevoked) {
+            InertiaBase.LOGGER.warn("Life cycle for YogaNode {} has already been revoked", this.toString());
+            return;
+        }
+        if (this.lifeCycleEndCallback != null) {
+            this.lifeCycleEndCallback.run();
+        }
+        this.wasLifeCycleRevoked = true;
+
+        for (YogaNode yogaNode : this.children) {
+            yogaNode.revokeLifeCycle();
         }
     }
 

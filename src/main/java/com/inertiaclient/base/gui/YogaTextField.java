@@ -119,6 +119,11 @@ public class YogaTextField extends YogaNode {
         return this;
     }
 
+    public YogaTextField setEnterAction(Consumer<String> enterAction) {
+        this.textField.setEnterAction(enterAction);
+        return this;
+    }
+
     public String getText() {
         return this.textField.getText();
     }

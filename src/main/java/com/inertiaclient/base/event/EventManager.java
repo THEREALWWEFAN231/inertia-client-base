@@ -1,5 +1,6 @@
 package com.inertiaclient.base.event;
 
+import com.inertiaclient.base.InertiaBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -7,7 +8,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -34,7 +34,7 @@ public class EventManager {
 
     public static void unregister(Object object) {
 
-        Iterator<Map.Entry<Class<? extends Event>, CopyOnWriteArrayList<InvokeWrapper>>> iterator = REGISTRY_MAP.entrySet().iterator();
+        var iterator = REGISTRY_MAP.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Class<? extends Event>, CopyOnWriteArrayList<InvokeWrapper>> entry = iterator.next();
 
@@ -66,8 +66,7 @@ public class EventManager {
             try {
                 methodInvokeType.eventListener.handle(event);
             } catch (Throwable e) {
-                System.out.println("Failed to invoke event " + event.getClass() + "+" + methodInvokeType.eventListener);
-                e.printStackTrace();
+                InertiaBase.LOGGER.error("Failed to invoke event {}+{}", event.getClass().toString(), methodInvokeType.eventListener.toString(), e);
             }
         }
     }

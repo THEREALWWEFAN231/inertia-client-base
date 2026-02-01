@@ -106,4 +106,12 @@ public class SkiaUtils {
         canvas.drawString(text, x, y, font, paint);
     }
 
+    public static void setPaintBlur(Paint paint, float blurRadius) {
+        SkiaUtils.setPaintBlur(paint, blurRadius, blurRadius);
+    }
+
+    public static void setPaintBlur(Paint paint, float xRadius, float yRadius) {
+        paint.setImageFilter(ImageFilter.makeBlur(xRadius, yRadius, FilterTileMode.DECAL));
+    }
+
 }

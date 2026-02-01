@@ -9,12 +9,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class LibraryDownloader {
 
@@ -45,12 +46,12 @@ public class LibraryDownloader {
 
             for (String pathToFile : pathsToFiles) {
                 try {
-                    File libraryFile = new File(librariesDirectory, pathToFile);
-                    if (!libraryFile.exists()) {
+                    Path libraryFile = librariesDirectory.resolve(pathToFile);
+                    if (Files.notExists(libraryFile)) {
                         this.downloadURLToLibrariesFolder(librariesWebsite, pathToFile, libraryFile);
                     }
 
-                    this.addURL(libraryFile.toURI().toURL());
+                    this.addURL(libraryFile.toUri().toURL());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -95,10 +96,10 @@ public class LibraryDownloader {
         return false;
     }
 
-    private void downloadURLToLibrariesFolder(String librariesUrl, String pathToFile, File libraryOutputFile) throws Exception {
+    private void downloadURLToLibrariesFolder(String librariesUrl, String pathToFile, Path libraryOutputFile) throws Exception {
 
         URI url = new URI(librariesUrl + pathToFile);
-        libraryOutputFile.getParentFile().mkdirs();
+        Files.createDirectories(libraryOutputFile.getParent());
 
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(7500).build();
         try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
@@ -109,7 +110,7 @@ public class LibraryDownloader {
             try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
-                    try (FileOutputStream outstream = new FileOutputStream(libraryOutputFile)) {
+                    try (OutputStream outstream = Files.newOutputStream(libraryOutputFile)) {
                         entity.writeTo(outstream);
                     }
                 }

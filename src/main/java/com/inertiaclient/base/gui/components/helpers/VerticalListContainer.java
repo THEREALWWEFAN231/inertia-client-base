@@ -34,5 +34,20 @@ public class VerticalListContainer extends YogaNode {
         this.listNode.addChild(yogaNode);
     }
 
+    public void addToList(YogaNode yogaNode, int atIndex) {
+        this.listNode.insertChild(yogaNode, atIndex);
+    }
+
+    public void removeFromList(int childIndex) {
+        this.listNode.removeChildAtIndex(childIndex);
+    }
+
+    public void removeFromList(YogaNode yogaNode) {
+        this.listNode.removeChild(yogaNode);
+    }
+
+    public int listSize() {
+        return this.listNode.getChildren().size();
+    }
 
 }

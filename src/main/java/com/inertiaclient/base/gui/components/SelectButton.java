@@ -16,12 +16,14 @@ import java.util.function.Supplier;
 
 public class SelectButton extends YogaNode {
 
+    public static final float BORDER_RADIUS = 1.5f;
+
     private AnimationValue animation;
     private Supplier<String> label;
     private String cachedLabel;
 
     public SelectButton(Component label, Runnable onClick) {
-        this(() -> label.getString(), onClick);
+        this(label::getString, onClick);
     }
 
     public SelectButton(Supplier<String> label, Runnable onClick) {
@@ -37,10 +39,10 @@ public class SelectButton extends YogaNode {
         });
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
 
-            canvas.drawRRect(0, 0, this.getWidth(), this.getHeight(), 1.5f, MainFrame.s_stringValuesBackgroundColor.get());
+            canvas.drawRRect(0, 0, this.getWidth(), this.getHeight(), BORDER_RADIUS, MainFrame.s_stringValuesBackgroundColor.get());
             if (this.shouldShowHoveredEffects() || this.animation.getValue() != 0) {
                 try (Paint stroke = SkiaUtils.createStrokePaint(UIUtils.transitionColor(new Color(0, 0, 0, 0), MainFrame.s_unselectedTextColor.get(), this.animation.getValue()), MainFrame.s_lineWidth.get())) {
-                    canvas.drawRRect(0, 0, this.getWidth(), this.getHeight(), 1.5f, stroke);
+                    canvas.drawRRect(0, 0, this.getWidth(), this.getHeight(), BORDER_RADIUS, stroke);
                 }
             }
 
