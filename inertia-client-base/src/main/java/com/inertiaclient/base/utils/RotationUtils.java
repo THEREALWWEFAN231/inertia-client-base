@@ -2,11 +2,11 @@ package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
 import lombok.Getter;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 
 public class RotationUtils {

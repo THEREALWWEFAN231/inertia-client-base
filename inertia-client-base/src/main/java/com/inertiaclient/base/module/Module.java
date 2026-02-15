@@ -11,17 +11,17 @@ import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.utils.JsonState;
 import com.inertiaclient.base.utils.LanguageBaseKey;
 import com.inertiaclient.base.value.group.ValueGroup;
+import com.mojang.blaze3d.platform.InputConstants;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-public class Module implements LanguageBaseKey, JsonState {
+public abstract class Module implements LanguageBaseKey, JsonState {
 
     @Getter
     @Setter(AccessLevel.PROTECTED)
@@ -113,7 +113,7 @@ public class Module implements LanguageBaseKey, JsonState {
 
     @Override
     public String getLanguageBaseKey() {
-        return "icb.module." + this.id;
+        return String.format("icb.module.%s", this.id);
     }
 
     public String getNameString() {

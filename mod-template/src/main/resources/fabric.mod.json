@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "icb-mod-template",
+  "version": "${version}",
+  "name": "ICB mod template",
+  "description": "A template for ICB",
+  "authors": [
+  ],
+  "icon": "assets/icb-mod-template/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "inertiabase": [
+      "com.inertiaclient.modtemplate.ModTemplate"
+    ]
+  },
+  "mixins": [
+    "icb-mod-template.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.7",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*",
+    "fabric-language-kotlin": "*",
+    "icb": "*"
+  }
+}
