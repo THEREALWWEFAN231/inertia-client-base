@@ -21,7 +21,7 @@ import net.minecraft.network.chat.Component;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-public abstract class Module implements LanguageBaseKey, JsonState {
+public class Module implements LanguageBaseKey, JsonState {
 
     @Getter
     @Setter(AccessLevel.PROTECTED)

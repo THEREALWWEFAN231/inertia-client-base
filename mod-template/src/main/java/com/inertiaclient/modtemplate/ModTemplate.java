@@ -38,7 +38,7 @@ public class ModTemplate extends InertiaMod {
 
     @Override
     public void initialize() {
-        System.out.println("inertia initialized");
+        System.out.println("ModTemplate initialized");
     }
 
     @Override

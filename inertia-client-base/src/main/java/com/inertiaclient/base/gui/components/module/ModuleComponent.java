@@ -14,6 +14,7 @@ import com.inertiaclient.base.render.skia.SvgRenderer;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
+import com.inertiaclient.base.utils.CursorUtils;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.RRect;
@@ -22,6 +23,7 @@ import java.awt.Color;
 
 public class ModuleComponent extends YogaNode {
 
+    private static final boolean MUST_USE_BUTTONS = true;
     private AnimationValue toggleAnimation;
     private AnimationValue descriptionAnimation;
 
@@ -70,18 +72,20 @@ public class ModuleComponent extends YogaNode {
             }
         });
 
-        this.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
-            if (button == ButtonIdentifier.LEFT) {
-                module.toggle();
-                return true;
-            }
-            if (button == ButtonIdentifier.RIGHT) {
-                this.openSettings(module);
-                return true;
-            }
+        if (!MUST_USE_BUTTONS) {
+            this.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
+                if (button == ButtonIdentifier.LEFT) {
+                    module.toggle();
+                    return true;
+                }
+                if (button == ButtonIdentifier.RIGHT) {
+                    this.openSettings(module);
+                    return true;
+                }
 
-            return false;
-        });
+                return false;
+            });
+        }
 
         YogaNode favoriteComponent = new YogaNode();
         this.addChild(favoriteComponent);
@@ -117,7 +121,9 @@ public class ModuleComponent extends YogaNode {
         });
 
         YogaNode enabledSwitch = new YogaNode();
-        this.addChild(enabledSwitch);
+        enabledSwitch.setHoverCursor(CursorUtils.Cursor.HAND);
+        enabledSwitch.styleSetWidth(28);
+        enabledSwitch.styleSetHeight(12);
         enabledSwitch.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (module.isEnabled() != oldModuleState) {
                 AnimationValue.tweenEngine.cancelTarget(toggleAnimation);
@@ -128,8 +134,14 @@ public class ModuleComponent extends YogaNode {
             float switchHeight = 12;
             drawSwitchAnimation(canvas, 0, 0, 28, switchHeight, toggleAnimation.getValue());
         });
-        enabledSwitch.styleSetWidth(28);
-        enabledSwitch.styleSetHeight(12);
+        enabledSwitch.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
+            if (button == ButtonIdentifier.LEFT) {
+                module.toggle();
+                return true;
+            }
+            return false;
+        });
+        this.addChild(enabledSwitch);
     }
 
     public void openSettings(Module module) {
