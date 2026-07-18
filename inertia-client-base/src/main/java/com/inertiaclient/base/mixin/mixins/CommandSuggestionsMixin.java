@@ -8,10 +8,10 @@ import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestions;
 import net.minecraft.client.gui.components.CommandSuggestions;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,19 +29,19 @@ public class CommandSuggestionsMixin {
     private Screen screen;
     @Shadow
     @Final
-    EditBox input;
+    private EditBox input;
     @Shadow
-    private ParseResults<SharedSuggestionProvider> currentParse;
+    private ParseResults<ClientSuggestionProvider> currentParse;
     @Shadow
     private CommandSuggestions.SuggestionsList suggestions;
     @Shadow
-    boolean keepSuggestions;
+    private boolean keepSuggestions;
     @Shadow
     private CompletableFuture<Suggestions> pendingSuggestions;
 
 
     @Shadow
-    private void updateUsageInfo() {
+    private void updateUsageInfo(final ParseResults<ClientSuggestionProvider> currentParse, final Suggestions suggestions) {
 
     }
 
@@ -59,16 +59,16 @@ public class CommandSuggestionsMixin {
             stringReader.skip();
 
             int cursor = this.input.getCursorPosition();
-            CommandDispatcher<SharedSuggestionProvider> commandDispatcher = InertiaBase.instance.getCommandManager().getDispatcher();
+            CommandDispatcher<ClientSuggestionProvider> commandDispatcher = InertiaBase.instance.getCommandManager().getDispatcher();
             if (this.currentParse == null) {
                 this.currentParse = commandDispatcher.parse(stringReader, InertiaBase.instance.getCommandManager().getCommandSource());
             }
 
             if (!(cursor < 1 || this.suggestions != null && this.keepSuggestions)) {
                 this.pendingSuggestions = commandDispatcher.getCompletionSuggestions(this.currentParse, cursor);
-                this.pendingSuggestions.thenRun(() -> {
+                this.pendingSuggestions.thenAccept(suggestionResult -> {
                     if (this.pendingSuggestions.isDone()) {
-                        this.updateUsageInfo();
+                        this.updateUsageInfo(this.currentParse, suggestionResult);
                     }
                 });
             }

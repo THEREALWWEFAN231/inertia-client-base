@@ -28,7 +28,7 @@ public class ColorValueComponent extends ValueYogaNode<ColorValue> {
         colorDisplay.styleSetWidth(8);
         colorDisplay.styleSetHeight(8);
         colorDisplay.setHoverCursorToIndicateClick();
-        colorDisplay.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        colorDisplay.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             canvas.drawRRect(0, 0, colorDisplay.getWidth(), colorDisplay.getHeight(), 1.5f, colorValue.getValue().getRenderColor());
         });
 

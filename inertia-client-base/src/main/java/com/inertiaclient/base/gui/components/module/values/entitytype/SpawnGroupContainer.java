@@ -6,10 +6,9 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.value.impl.EntityTypeValue;
 import lombok.Getter;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.core.registries.BuiltInRegistries;
 
 public class SpawnGroupContainer extends YogaNode {
 
@@ -47,8 +46,8 @@ public class SpawnGroupContainer extends YogaNode {
             this.addChild(bottom);
         }
 
-        this.setKeyPressedCallback((keyCode, scanCode, modifiers) -> {
-            if (Screen.isSelectAll(keyCode)) {
+        this.setKeyPressedCallback((keyCode, scanCode, modifiers, minecraftEvent) -> {
+            if (minecraftEvent.isSelectAll()) {
 
                 boolean isEverythingSelected = entityTypeValue.isAllInGroupSelected(spawnGroup);
                 if (isEverythingSelected) {

@@ -105,7 +105,7 @@ public class ColorContainer extends AbsoulteYogaNode {
 
         YogaNode label = new YogaNode();
         label.styleSetHeight(AbstractGroupContainer.valuesFontSize);
-        label.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        label.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             CanvasWrapper.getFreshTextBuilder().setText(implementation.getNameHeader()).setFontSize(AbstractGroupContainer.valuesFontSize).draw(canvas);
         });
 
@@ -158,7 +158,7 @@ public class ColorContainer extends AbsoulteYogaNode {
             colorDisplay.styleSetHeight(10);
             colorDisplay.styleSetFlexGrow(0);
 
-            colorDisplay.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+            colorDisplay.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
                 canvas.drawRect(0, 0, colorDisplay.getWidth(), colorDisplay.getHeight(), this.renderedColor);
                 try (var stroke = SkiaUtils.createStrokePaint(Color.white, .35f)) {
                     canvas.drawRect(0, 0, colorDisplay.getWidth(), colorDisplay.getHeight(), stroke);

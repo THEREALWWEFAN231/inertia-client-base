@@ -35,11 +35,11 @@ public class MovementUtils {
     }
 
     public static boolean isPlayerMoving() {
-        return MovementUtils.isMoving(InertiaBase.mc.player.input.forwardImpulse, InertiaBase.mc.player.input.leftImpulse);
+        return MovementUtils.isMoving(InertiaBase.mc.player.input.getMoveVector().y, InertiaBase.mc.player.input.getMoveVector().x);
     }
 
     public static double[] getMovementForPlayer(double speed) {
-        return MovementUtils.getMovement(InertiaBase.mc.player.input.forwardImpulse, InertiaBase.mc.player.input.leftImpulse, InertiaBase.mc.player.getYRot(), speed);
+        return MovementUtils.getMovement(InertiaBase.mc.player.input.getMoveVector().y, InertiaBase.mc.player.input.getMoveVector().x, InertiaBase.mc.player.getYRot(), speed);
     }
 
 }

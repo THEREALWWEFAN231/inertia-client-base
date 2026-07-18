@@ -4,8 +4,8 @@ import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.impl.PacketReceivedEvent;
 import com.inertiaclient.base.event.impl.PacketSendEvent;
+import io.netty.channel.ChannelFutureListener;
 import net.minecraft.network.Connection;
-import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
@@ -32,7 +32,7 @@ public class ConnectionMixin {
     }
 
     @Inject(method = "doSendPacket", at = @At("HEAD"), cancellable = true)
-    private void sendInternal(Packet<?> packet, @Nullable PacketSendListener callbacks, boolean flush, CallbackInfo callbackInfo) {
+    private void sendInternal(Packet<?> packet, @Nullable ChannelFutureListener listener, boolean flush, CallbackInfo callbackInfo) {
         PacketSendEvent event = new PacketSendEvent(packet);
         EventManager.fire(event);
         if (event.isCancelled()) {

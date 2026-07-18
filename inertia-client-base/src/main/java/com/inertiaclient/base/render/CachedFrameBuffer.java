@@ -1,17 +1,15 @@
 package com.inertiaclient.base.render;
 
+import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
 import com.inertiaclient.base.utils.TimerUtil;
-import com.inertiaclient.base.utils.opengl.staterestore.OpenGLStates;
-import com.inertiaclient.base.utils.opengl.staterestore.SimpleStateRestore;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.textures.*;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.renderer.CompiledShaderProgram;
-import net.minecraft.client.renderer.CoreShaders;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 
 import java.util.function.Supplier;
 
@@ -22,7 +20,6 @@ public class CachedFrameBuffer {
     @Setter
     protected Supplier<Integer> fps = () -> -1;//no cap
     protected TimerUtil fpsTimer = new TimerUtil();
-    private SimpleStateRestore simpleStateRestore = new SimpleStateRestore();
     private boolean forceUpdate = false;
 
     @Setter
@@ -31,11 +28,12 @@ public class CachedFrameBuffer {
     public void createFrameBufferIfNeeded(int width, int height, boolean stencil, boolean useDepth) {
         if (this.framebuffer == null) {
             if (stencil) {
-                this.framebuffer = new StencilFrameBuffer(width, height, useDepth);
+                this.framebuffer = new StencilFrameBuffer(null, width, height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
             } else {
-                this.framebuffer = new TextureTarget(width, height, useDepth);
+                this.framebuffer = new TextureTarget(null, width, height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
             }
-            framebuffer.setClearColor(0, 0, 0, 0);
+            //should be zero, isn't controlled by the frame buffer anymore,gameRenderState.guiRenderState.clearColorOverride
+            //framebuffer.setClearColor(0, 0, 0, 0);
             this.forceUpdate = true;
         }
     }
@@ -47,21 +45,14 @@ public class CachedFrameBuffer {
         }
     }
 
-    public void bind() {
-        this.framebuffer.bindWrite(false);
-    }
-
     public void drawWithRenderer() {
         if (this.renderer != null) {
             if (this.shouldUpdate()) {
-                OpenGLStates.FRAME_BUFFER.cache();
 
-                this.framebuffer.clear();
-                this.bind();
+                //not needed if skia clears?!?!?
+                //RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.framebuffer.getColorTexture(), GuiRenderer.CLEAR_COLOR, this.framebuffer.getDepthTexture(), 0.0);
 
                 this.renderer.run();
-
-                OpenGLStates.FRAME_BUFFER.restore();
             }
         }
     }
@@ -73,36 +64,11 @@ public class CachedFrameBuffer {
         }
     }
 
-    public void renderCachedImage() {
-        this.simpleStateRestore.cache();
-        GlStateManager._enableBlend();
-        GlStateManager._blendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        CompiledShaderProgram shaderProgram = RenderSystem.setShader(CoreShaders.BLIT_SCREEN);
-        shaderProgram.bindSampler("InSampler", this.framebuffer.getColorTextureId());
-
-        shaderProgram.apply();
-
-        /*float f = this.lastWidth;
-        float g = this.lastHeight;
-        float h = 1;
-        float i = 1;
-        Tessellator tessellator = RenderSystem.renderThreadTesselator();
-        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(0.0f, g, 0.0f).texture(0.0f, 0.0f).color(255, 255, 255, 255);
-        bufferBuilder.vertex(f, g, 0.0f).texture(h, 0.0f).color(255, 255, 255, 255);
-        bufferBuilder.vertex(f, 0.0f, 0.0f).texture(h, i).color(255, 255, 255, 255);
-        bufferBuilder.vertex(0.0f, 0.0f, 0.0f).texture(0.0f, i).color(255, 255, 255, 255);
-        BufferRenderer.draw(bufferBuilder.end());*/
-        BufferBuilder bufferBuilder = RenderSystem.renderThreadTesselator().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.BLIT_SCREEN);
-        bufferBuilder.addVertex(0.0F, 0.0F, 0.0F);
-        bufferBuilder.addVertex(1.0F, 0.0F, 0.0F);
-        bufferBuilder.addVertex(1.0F, 1.0F, 0.0F);
-        bufferBuilder.addVertex(0.0F, 1.0F, 0.0F);
-        BufferUploader.draw(bufferBuilder.buildOrThrow());
-
-        shaderProgram.clear();
-        this.simpleStateRestore.close();
+    public void renderCachedImage(GuiGraphicsExtractor graphics) {
+        graphics.pose().pushMatrix();
+        graphics.pose().scale(1 / SkiaVulkanInstance.getScaleFactor(), 1 / SkiaVulkanInstance.getScaleFactor());
+        graphics.innerBlit(RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA, this.framebuffer.getColorTextureView(), RenderSystem.getSamplerCache().getSampler(AddressMode.REPEAT, AddressMode.REPEAT, FilterMode.NEAREST, FilterMode.LINEAR, false), 0, 0, this.framebuffer.width, this.framebuffer.height, 0, 1, 0, 1, -1);
+        graphics.pose().popMatrix();
     }
 
     public boolean shouldUpdate() {
@@ -123,5 +89,9 @@ public class CachedFrameBuffer {
         }
 
         return false;
+    }
+
+    private void blitPremultiInertia(GuiGraphicsExtractor graphics, GpuTextureView textureView, GpuSampler sampler, int x0, int y0, int x1, int y1, float u0, float u1, float v0, float v1) {
+
     }
 }

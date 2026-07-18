@@ -6,9 +6,10 @@ import com.inertiaclient.base.event.impl.KeyActionEvent;
 import com.inertiaclient.base.gui.ModernClickGui;
 import com.inertiaclient.base.module.Module;
 import com.inertiaclient.base.utils.InputUtils;
-import net.minecraft.client.KeyboardHandler;
 import com.mojang.blaze3d.platform.InputConstants;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.input.KeyEvent;
+import org.lwjgl.sdl.SDLScancode;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,13 +19,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class KeyboardHandlerMixin {
 
     //@Inject(method = "onKey", at = @At(value = "INVOKE", target = "net/minecraft/client/util/InputUtil.isKeyPressed(JI)Z", ordinal = 5), cancellable = true)
-    @Inject(method = "keyPress", at = @At(value = "FIELD", target = "Lnet/minecraft/client/KeyboardHandler;handledDebugKey:Z", ordinal = 3))
-    private void onKeyEvent(long window, int key, int scancode, int action, int modifiers, CallbackInfo callbackInfo) {
-        InputConstants.Key input = InputUtils.fromKeyCode(key, scancode);
-        if (!InputConstants.isKeyDown(InertiaBase.mc.getWindow().getWindow(), GLFW.GLFW_KEY_F3)) {
-
+    @Inject(method = "keyPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getDebugOverlay()Lnet/minecraft/client/gui/components/DebugScreenOverlay;", ordinal = 0))
+    private void onKeyPress(long handle, @KeyEvent.Action int action, KeyEvent event, CallbackInfo callbackInfo) {
+        if (InertiaBase.mc.gui.screen() != null) {
+            return;
+        }
+        InputConstants.Key input = InputUtils.fromKeyCode(event.shortcutKey());
+        if (!InputUtils.isScancodePressed(SDLScancode.SDL_SCANCODE_F3)) {
             if (InertiaBase.instance.getSettings().getClickGuiSettings().getKeybind().getValue() == input) {
-                InertiaBase.mc.setScreen(ModernClickGui.MODERN_CLICK_GUI);
+                InertiaBase.mc.gui.setScreen(ModernClickGui.MODERN_CLICK_GUI);
             }
 
             for (Module module : InertiaBase.instance.getModuleManager().getModules()) {
@@ -33,9 +36,9 @@ public class KeyboardHandlerMixin {
                 }
             }
 
-            KeyActionEvent event = new KeyActionEvent(key, scancode, action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT, action);//could use != GLFW_RELEASE release, but this is more clear
-            EventManager.fire(event);
-            if (event.isCancelled()) {
+            KeyActionEvent inertiaKeyEvent = new KeyActionEvent(event.shortcutKey(), event.key(), action == KeyActionEvent.MINECRAFT_ACTION_PRESS || action == KeyActionEvent.MINECRAFT_ACTION_REPEAT, action);//could use != GLFW_RELEASE release, but this is more clear
+            EventManager.fire(inertiaKeyEvent);
+            if (inertiaKeyEvent.isCancelled()) {
                 callbackInfo.cancel();
             }
         }

@@ -38,7 +38,7 @@ public class BooleanComponent {
         switchNode.styleSetWidth(16);
         switchNode.styleSetHeight(8);
         switchNode.setHoverCursorToIndicateClick();
-        switchNode.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        switchNode.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             boolean newState = get.get();
             if (newState != oldState) {
                 AnimationValue.tweenEngine.cancelTarget(toggleAnimation);

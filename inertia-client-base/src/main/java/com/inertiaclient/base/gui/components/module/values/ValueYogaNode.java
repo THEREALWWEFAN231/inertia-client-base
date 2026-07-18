@@ -3,9 +3,9 @@ package com.inertiaclient.base.gui.components.module.values;
 import com.inertiaclient.base.gui.ModernClickGui;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
+import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.value.Value;
 import lombok.Getter;
-import net.minecraft.client.gui.screens.Screen;
 
 public class ValueYogaNode<T extends Value<?>> extends YogaNode {
 
@@ -26,7 +26,7 @@ public class ValueYogaNode<T extends Value<?>> extends YogaNode {
         });
 
         this.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
-            if (Screen.hasShiftDown() && button == ButtonIdentifier.LEFT) {
+            if (InputUtils.isShiftDown() && button == ButtonIdentifier.LEFT) {
                 YogaNode advancedInfoContainer = this.createAdvancedInfoContainer(relativeMouseX, relativeMouseY);
                 if (advancedInfoContainer != null) {
                     ModernClickGui.MODERN_CLICK_GUI.getRoot().addChild(advancedInfoContainer);

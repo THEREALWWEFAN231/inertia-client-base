@@ -6,12 +6,12 @@ import com.inertiaclient.base.render.animation.AnimationValue;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ModernClickGui extends YogaScreen {
 
     public static final ModernClickGui MODERN_CLICK_GUI = new ModernClickGui();
-    public static ResourceLocation UNKNOWN_TEXTURE = ResourceLocation.fromNamespaceAndPath("icb", "textures/gui-unknown.png");//MissingSprite.getMissingSpriteId()
+    public static Identifier UNKNOWN_TEXTURE = Identifier.fromNamespaceAndPath("icb", "textures/gui-unknown.png");//MissingSprite.getMissingSpriteId()
 
     @Getter
     private MainFrame mainFrame;

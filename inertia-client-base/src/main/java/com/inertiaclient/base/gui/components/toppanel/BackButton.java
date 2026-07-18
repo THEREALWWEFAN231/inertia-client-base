@@ -7,7 +7,7 @@ import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.Paint;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLScancode;
 
 public class BackButton extends YogaNode {
 
@@ -41,8 +41,8 @@ public class BackButton extends YogaNode {
                 return true;
             }
             return false;
-        }).setKeyPressedCallback((keyCode, scanCode, modifiers) -> {
-            if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+        }).setKeyPressedCallback((keyCode, scanCode, modifiers, minecraftEvent) -> {
+            if (scanCode == SDLScancode.SDL_SCANCODE_ESCAPE) {
                 if (MainFrame.pageHolder.goBack()) {
                     return true;
                 }

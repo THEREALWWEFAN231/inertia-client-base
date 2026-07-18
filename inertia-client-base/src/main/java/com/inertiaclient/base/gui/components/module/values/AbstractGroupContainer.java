@@ -26,7 +26,7 @@ public class AbstractGroupContainer extends YogaNode {
 
         YogaNode valuesContainer = YogaBuilder.getFreshBuilder(this).setFlexDirection(FlexDirection.COLUMN).setGap(GapGutter.ROW, gap).build();
         valuesContainer.styleSetMargin(YogaEdge.LEFT, 3);
-        valuesContainer.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        valuesContainer.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             float x = -2f;
             canvas.save();
             canvas.translate(x, 0);

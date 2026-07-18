@@ -1,12 +1,15 @@
 package com.inertiaclient.base.gui;
 
 import com.inertiaclient.base.InertiaBase;
-import com.inertiaclient.base.render.skia.SkiaOpenGLInstance;
+import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.CursorUtils;
 import lombok.Getter;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.util.yoga.Yoga;
 
@@ -18,14 +21,14 @@ public abstract class YogaScreen extends BetterScreen {
     @Getter
     private YogaNode root;
 
-    private SkiaOpenGLInstance skiaInstance;
+    private SkiaVulkanInstance skiaInstance;
 
 
     public YogaScreen(Component title) {
         super(title);
 
         if (skiaInstance == null) {
-            skiaInstance = new SkiaOpenGLInstance();
+            skiaInstance = new SkiaVulkanInstance();
             //skiaInstance.setFps(() -> 120f);
         }
 
@@ -43,14 +46,16 @@ public abstract class YogaScreen extends BetterScreen {
     protected abstract void initRoot(YogaNode root);
 
     @Override
-    public void betterRender(GuiGraphics context, float mouseX, float mouseY, float delta) {
-        skiaInstance.setup(() -> {
+    public void betterRender(GuiGraphicsExtractor graphics, float mouseX, float mouseY, float delta) {
+        //graphics.fill((int) mouseX, (int) mouseY, (int) mouseX + 5, (int) mouseY + 5, 0xffff0000);
+
+        skiaInstance.setup(graphics, () -> {
             //calculate "every" components width, then set their positions
-            root.beforeLayoutCalculations(context, mouseX, mouseY, delta, skiaInstance.getCanvasWrapper());
+            root.beforeLayoutCalculations(graphics, mouseX, mouseY, delta, skiaInstance.getCanvasWrapper());
             //TODO: only on window size change
             YGNodeCalculateLayout(root.getNativeNode(), width, height, YGDirectionLTR);
-            root.setWidths(0, 0, context, mouseX, mouseY, delta);
-            root.setGlobalPositions(0, 0, context, mouseX, mouseY, delta);
+            root.setWidths(0, 0, graphics, mouseX, mouseY, delta);
+            root.setGlobalPositions(0, 0, graphics, mouseX, mouseY, delta);
             CursorUtils.Cursor cursor = null;
             YogaNode hoveredComponent = root.getHov(mouseX, mouseY);
             YogaNode iteratingParent = hoveredComponent;
@@ -72,32 +77,32 @@ public abstract class YogaScreen extends BetterScreen {
                 }
             }
 
-            root.beforeDraw(context, mouseX, mouseY, 0, 0, delta, skiaInstance.getCanvasWrapper());
-            root.draw(context, mouseX, mouseY, 0, 0, delta, skiaInstance.getCanvasWrapper());
+            root.beforeDraw(graphics, mouseX, mouseY, 0, 0, delta, skiaInstance.getCanvasWrapper());
+            root.draw(graphics, mouseX, mouseY, 0, 0, delta, skiaInstance.getCanvasWrapper());
 
             root.reset(mouseX, mouseY);
         });
     }
 
     @Override
-    public boolean mouseClicked(double mouseXD, double mouseYD, int button) {
-        float mouseX = (float) mouseXD;
-        float mouseY = (float) mouseYD;
+    public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean doubleClick) {
+        float mouseX = (float) mouseButtonEvent.x();
+        float mouseY = (float) mouseButtonEvent.y();
 
-        this.root.globalMouseClicked(mouseX, mouseY, ButtonIdentifier.fromGLFW(button));
-        if (this.root.mouseClicked(mouseX, mouseY, ButtonIdentifier.fromGLFW(button))) {
+        this.root.globalMouseClicked(mouseX, mouseY, ButtonIdentifier.fromGLFW(mouseButtonEvent.button()));
+        if (this.root.mouseClicked(mouseX, mouseY, ButtonIdentifier.fromGLFW(mouseButtonEvent.button()))) {
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean mouseReleased(double mouseXD, double mouseYD, int button) {
-        float mouseX = (float) mouseXD;
-        float mouseY = (float) mouseYD;
+    public boolean mouseReleased(MouseButtonEvent mouseButtonEvent) {
+        float mouseX = (float) mouseButtonEvent.x();
+        float mouseY = (float) mouseButtonEvent.y();
 
-        this.root.globalMouseReleased(mouseX, mouseY, ButtonIdentifier.fromGLFW(button));
-        this.root.mouseReleased(mouseX, mouseY, ButtonIdentifier.fromGLFW(button));
+        this.root.globalMouseReleased(mouseX, mouseY, ButtonIdentifier.fromGLFW(mouseButtonEvent.button()));
+        this.root.mouseReleased(mouseX, mouseY, ButtonIdentifier.fromGLFW(mouseButtonEvent.button()));
         return false;
     }
 
@@ -114,17 +119,17 @@ public abstract class YogaScreen extends BetterScreen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean result = this.root.keyPressed(keyCode, scanCode, modifiers);
+    public boolean keyPressed(KeyEvent event) {
+        boolean result = this.root.keyPressed(event.key(), event.keycode(), event.modifiers(), event);
         if (result) {
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public boolean charTyped(char chr, int modifiers) {
-        this.root.charTyped(chr, modifiers);
+    public boolean charTyped(CharacterEvent event) {
+        this.root.charTyped((char) event.codepoint(), -1);
         return false;
     }
 

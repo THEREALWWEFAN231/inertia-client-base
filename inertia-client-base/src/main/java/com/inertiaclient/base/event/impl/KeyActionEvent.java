@@ -5,6 +5,10 @@ import lombok.Getter;
 
 public class KeyActionEvent extends Event {
 
+    public static final int MINECRAFT_ACTION_PRESS = 1;
+    public static final int MINECRAFT_ACTION_REPEAT = -1;
+    public static final int MINECRAFT_ACTION_RELEASE = 0;
+
     @Getter
     private final int key;
     @Getter

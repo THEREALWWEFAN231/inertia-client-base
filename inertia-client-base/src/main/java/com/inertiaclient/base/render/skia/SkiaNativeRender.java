@@ -1,28 +1,29 @@
 package com.inertiaclient.base.render.skia;
 
 import com.inertiaclient.base.InertiaBase;
-import com.inertiaclient.base.event.EventListener;
-import com.inertiaclient.base.event.EventManager;
-import com.inertiaclient.base.event.EventTarget;
-import com.inertiaclient.base.event.impl.FrameBufferWriteEvent;
-import com.inertiaclient.base.utils.opengl.staterestore.OpenGLStateRestore;
-import com.inertiaclient.base.utils.opengl.staterestore.OpenGLStates;
-import com.mojang.blaze3d.ProjectionType;
+import com.inertiaclient.base.mixin.custominterfaces.GuiRendererInterface;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.backend.vulkan.VulkanConst;
+import com.mojang.renderpearl.backend.vulkan.VulkanGpuTexture;
 import io.github.humbleui.skija.*;
 import io.github.humbleui.types.Rect;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.client.gui.GuiGraphics;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.render.GuiRenderer;
+import net.minecraft.client.gui.render.pip.*;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.renderer.state.GameRenderState;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static org.lwjgl.vulkan.VK10.VK_NULL_HANDLE;
 
 public class SkiaNativeRender {
 
@@ -34,7 +35,7 @@ public class SkiaNativeRender {
     private Supplier<Float> nativeHeight;
     @Setter
     @Accessors(chain = true)
-    private Consumer<GuiGraphics> setNativeRender;
+    private Consumer<GuiGraphicsExtractor> setNativeRender;
     @Setter
     private Supplier<Float> blurRadius;
     @Setter
@@ -42,6 +43,7 @@ public class SkiaNativeRender {
 
     @Getter
     private TextureTarget frameBuffer;
+    @Getter
     private Image image = null;
 
     @Getter
@@ -49,37 +51,35 @@ public class SkiaNativeRender {
     @Getter
     private float cachedNativeHeight;
 
-    private static boolean cancelMinecraftFrameBufferWrites;
-    @EventTarget
-    private static EventListener<FrameBufferWriteEvent> frameBufferWriteListener = frameBufferWriteEvent -> {
-        if (cancelMinecraftFrameBufferWrites) {
-            frameBufferWriteEvent.setCancelled(true);
-        }
-    };
+    private static final GameRenderState gameRenderState = new GameRenderState();
+    private static final GuiRenderer guiRenderer;
+    private static final FeatureRenderDispatcher featureRenderDispatcher;
 
-    public void update(GuiGraphics guiGraphics) {
+    static {
+        featureRenderDispatcher = new FeatureRenderDispatcher(InertiaBase.mc.gameRenderer.renderBuffers(), InertiaBase.mc.getModelManager(), InertiaBase.mc.getAtlasManager(), InertiaBase.mc.font, gameRenderState);
+        guiRenderer = new GuiRenderer(gameRenderState.guiRenderState, featureRenderDispatcher, List.of(new GuiEntityRenderer(Minecraft.getInstance().getEntityRenderDispatcher()), new GuiSkinRenderer(), new GuiBookModelRenderer(), new GuiBannerResultRenderer(InertiaBase.mc.getAtlasManager()), new GuiProfilerChartRenderer()));
+    }
+
+    public void update() {
         this.cachedNativeWidth = this.nativeWidth.get();
         this.cachedNativeHeight = this.nativeHeight.get();
 
-        int scaledWidth = (int) (this.cachedNativeWidth * SkiaOpenGLInstance.getScaleFactor());
-        int scaledHeight = (int) (this.cachedNativeHeight * SkiaOpenGLInstance.getScaleFactor());
-
-        OpenGLStates.FRAME_BUFFER.cache();
-        OpenGLStates.VIEW_PORT.cache();
-        OpenGLStates.CLEAR_COLOR.cache();
+        int scaledWidth = (int) (this.cachedNativeWidth * SkiaVulkanInstance.getScaleFactor());
+        int scaledHeight = (int) (this.cachedNativeHeight * SkiaVulkanInstance.getScaleFactor());
 
         if (frameBuffer == null) {
-            frameBuffer = new TextureTarget(scaledWidth, scaledHeight, true);
+            frameBuffer = new TextureTarget(null, scaledWidth, scaledHeight, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
 
             if (this.autoCleanup) {
-                final TextureTarget nonReferance = frameBuffer;
+                //TODO: vulkan, fux
+                /*final TextureTarget nonReferance = frameBuffer;
                 InertiaBase.CLEANER.register(this, () -> {
                     //framebuffer.delete must be called on main thread
                     InertiaBase.mc.executeIfPossible(() -> {
                         System.out.println("deleted " + nonReferance.frameBufferId);
                         nonReferance.destroyBuffers();
                     });
-                });
+                });*/
             }
             this.setImage();
         }
@@ -87,38 +87,22 @@ public class SkiaNativeRender {
             frameBuffer.resize(scaledWidth, scaledHeight);
             this.setImage();
         }
-
-        //for some reason skia wants it to be black transparent, instead of minecrafts default white transparent, or our image gets a white background when being drawn with skia
-        frameBuffer.setClearColor(0, 0, 0, 0);
-        frameBuffer.clear();
-        frameBuffer.bindWrite(true);
-
         {
-            RenderSystem.backupProjectionMatrix();
-            Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(frameBuffer.getColorTexture(), this.gameRenderState.guiRenderState.clearColorOverride, frameBuffer.getDepthTexture(), 0, 0, 0, frameBuffer.width, frameBuffer.height);
+            gameRenderState.guiRenderState.reset();
 
-            RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT);
-            Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, this.cachedNativeWidth, this.cachedNativeHeight, 0.0f, 1000.0f, 21000.0f);
-            RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.ORTHOGRAPHIC);
+            GuiGraphicsExtractor graphics = new GuiGraphicsExtractor(InertiaBase.mc, gameRenderState.guiRenderState, -999, -999);
+            GuiRendererInterface guiRendererInterface = (GuiRendererInterface) guiRenderer;
+            guiRendererInterface.setRenderTargetOverride(this.frameBuffer);
+            guiRendererInterface.setProjectionOverride(new float[]{this.cachedNativeWidth, this.cachedNativeHeight});
 
-            matrixStack.pushMatrix();
-            matrixStack.identity();
-            matrixStack.translate(0.0f, 0.0f, -11000.0f);
+            setNativeRender.accept(graphics);
 
-            try (var state = new OpenGLStateRestore()) {
-                this.cancelMinecraftFrameBufferWrites = true;
-                setNativeRender.accept(guiGraphics);
-                guiGraphics.flush();
-                this.cancelMinecraftFrameBufferWrites = false;
-            }
-
-            matrixStack.popMatrix();
-            RenderSystem.restoreProjectionMatrix();
+            guiRenderer.render();
+            guiRenderer.endFrame();
+            guiRendererInterface.setRenderTargetOverride(null);
+            guiRendererInterface.setProjectionOverride(null);
         }
-
-        OpenGLStates.FRAME_BUFFER.restore();
-        OpenGLStates.VIEW_PORT.restore();
-        OpenGLStates.CLEAR_COLOR.restore();
     }
 
     public void drawImageWithSkia(CanvasWrapper canvas, float x, float y) {
@@ -136,7 +120,9 @@ public class SkiaNativeRender {
             //this.image.close();
         }
 
-        this.image = Image.adoptGLTextureFrom(SkiaOpenGLInstance.getSkiaDirectContext(), this.frameBuffer.getColorTextureId(), GL11.GL_TEXTURE_2D, this.frameBuffer.width, this.frameBuffer.height, GL11.GL_RGBA8, SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888);
+        var colorTexture = (VulkanGpuTexture) this.frameBuffer.getColorTexture();
+        var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), 0, 0, VulkanConst.toVk(this.frameBuffer.getColorTexture().getFormat()), 15, 1, this.frameBuffer.getColorTexture().getMipLevels(), -1, false, 0);
+        this.image = Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(this.frameBuffer.width, this.frameBuffer.height, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorAlphaType.PREMUL, null, null);
     }
 
     public void delete() {
@@ -145,8 +131,5 @@ public class SkiaNativeRender {
         image.close();
     }
 
-    static {
-        EventManager.register(SkiaNativeRender.class);
-    }
 }
 

@@ -15,8 +15,8 @@ import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.render.yoga.layouts.YogaEdge;
 import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.impl.EntityTypeColorValue;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
 
 import java.awt.Color;
 
@@ -52,7 +52,7 @@ public class EntityTypeColorComponent extends YogaNode {
         left.addChild(colorDisplay);
         colorDisplay.styleSetWidth(18);
         colorDisplay.styleSetHeight(18);
-        colorDisplay.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        colorDisplay.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             canvas.drawRect(0, 0, colorDisplay.getWidth(), colorDisplay.getHeight(), entityTypeColorValue.getValue().getColorForEntityType(entityType).getRenderColor());
             try (var stroke = SkiaUtils.createStrokePaint(Color.black, .3f)) {
                 canvas.drawRect(0, 0, colorDisplay.getWidth(), colorDisplay.getHeight(), stroke);
@@ -72,7 +72,7 @@ public class EntityTypeColorComponent extends YogaNode {
             right.addChild(linkComponent);
             //linkComponent.styleSetWidth(12);
             // linkComponent.styleSetMargin(Yoga.YGEdgeRight, 5);
-            linkComponent.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+            linkComponent.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
                 boolean isLinked = entityTypeColorValue.getValue().isLinked(entityType);
                 try (var paint = SkiaUtils.createPaintForColor(isLinked ? EntityTypeComponent.selectedColor : EntityTypeComponent.unSelectedColor)) {
                     LINKED_SVG.render(canvas, 0, -2, 12, 12, paint);

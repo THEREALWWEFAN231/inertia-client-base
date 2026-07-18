@@ -49,7 +49,7 @@ public class YogaTextField extends YogaNode {
             return false;
         });
 
-        this.setKeyPressedCallback((keyCode, scanCode, modifiers) -> this.textField.keyPressed(keyCode, scanCode, modifiers));
+        this.setKeyPressedCallback((keyCode, scanCode, modifiers, minecraftEvent) -> this.textField.keyPressed(keyCode, scanCode, modifiers));
         this.setCharTypedCallback((chr, modifiers) -> this.textField.charTyped(chr, modifiers));
     }
 

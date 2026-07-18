@@ -2,10 +2,10 @@ package com.inertiaclient.base.event.impl;
 
 import com.inertiaclient.base.event.Event;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.client.gui.GuiGraphics;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 //similar to 2d and 3d render events, renders after the 3d event, but before the traditional 2d event
 //this is a 2d event, should only be used to render stuff on the screen
@@ -16,7 +16,7 @@ public class Skia2D3DEvent extends Event {
 
 
     private CanvasWrapper canvas;
-    private GuiGraphics drawContext;
+    private GuiGraphicsExtractor drawContext;
     private PoseStack matrices;
     private float tickDelta;
 }

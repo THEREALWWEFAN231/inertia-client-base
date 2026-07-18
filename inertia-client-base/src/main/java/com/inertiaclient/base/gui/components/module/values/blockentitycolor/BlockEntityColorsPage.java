@@ -28,7 +28,7 @@ public class BlockEntityColorsPage extends WrappedListContainer {
             container.addChild(blockComponent);
             container.addChild(new ColorDisplay(blockEntityColorValue, blockEntityType));
 
-            String id = BlockEntityType.getKey(blockEntityType).toLanguageKey();
+            String id = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(blockEntityType).toLanguageKey();
             blockComponent.setSearchContext(id);
             blockComponent.setTooltip(() -> id);
             blockComponent.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {

@@ -44,7 +44,7 @@ public class StringComponent extends ValueYogaNode<ModeValue> {
         valuesContainer.styleSetGap(GapGutter.COLUMN, 2);
         Yoga.YGNodeStyleSetMaxWidthPercent(valuesContainer.getNativeNode(), 75);
         valuesContainer.styleSetFlexShrink(1);
-        valuesContainer.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        valuesContainer.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             canvas.drawRRect(0, 0, valuesContainer.getWidth(), valuesContainer.getHeight(), 1.5f, MainFrame.s_stringValuesBackgroundColor.get());
 
             {

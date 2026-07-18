@@ -29,7 +29,7 @@ public class CloseButton extends AbsoulteYogaNode {
         svgComponent.setHoverCursorToIndicateClick();
         svgComponent.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
             if (button == ButtonIdentifier.LEFT) {
-                InertiaBase.mc.setScreen(null);
+                InertiaBase.mc.gui.setScreen(null);
                 return true;
             }
             return false;

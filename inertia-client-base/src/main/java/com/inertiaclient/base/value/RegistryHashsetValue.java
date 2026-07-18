@@ -2,7 +2,7 @@ package com.inertiaclient.base.value;
 
 import com.inertiaclient.base.value.group.ValueGroup;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,7 +44,7 @@ public abstract class RegistryHashsetValue<T> extends HashsetValue<T> {
 
     @Override
     public T getEntryFromKey(String entryKey) {
-        return this.registry.getOptional(ResourceLocation.parse(entryKey)).get();
+        return this.registry.getOptional(Identifier.parse(entryKey)).get();
     }
 
     @Override

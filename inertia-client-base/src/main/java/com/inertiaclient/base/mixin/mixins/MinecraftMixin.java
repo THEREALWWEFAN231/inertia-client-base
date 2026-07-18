@@ -1,12 +1,16 @@
 package com.inertiaclient.base.mixin.mixins;
 
+import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.impl.ClientTickEvent;
 import com.inertiaclient.base.event.impl.ResolutionChangeEvent;
 import com.inertiaclient.base.event.impl.RightClickEvent;
 import com.inertiaclient.base.render.skia.Fonts;
-import com.inertiaclient.base.render.skia.SkiaOpenGLInstance;
+import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.backend.vulkan.VulkanDevice;
+import com.mojang.renderpearl.frontend.FrontendGpuDevice;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,20 +40,25 @@ public class MinecraftMixin {
         EventManager.fire(new ClientTickEvent());
     }
 
-    @Inject(method = "resizeDisplay", at = @At("HEAD"))
-    public void onResolutionChanged(CallbackInfo callbackInfo) {
+    @Inject(method = "resizeGui", at = @At("HEAD"))
+    public void resizeGui(CallbackInfo callbackInfo) {
         EventManager.fire(new ResolutionChangeEvent(ResolutionChangeEvent.Type.PRE, window.getWidth(), window.getHeight()));
     }
 
-    @Inject(method = "resizeDisplay", at = @At("RETURN"))
-    public void onResolutionChangedReturn(CallbackInfo callbackInfo) {
+    @Inject(method = "resizeGui", at = @At("RETURN"))
+    public void resizeGuiReturn(CallbackInfo callbackInfo) {
         EventManager.fire(new ResolutionChangeEvent(ResolutionChangeEvent.Type.POST, window.getWidth(), window.getHeight()));
     }
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;resizeDisplay()V"))
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;resizeGui()V"))
     public void initAfterWindow(CallbackInfo callbackInfo) {
-        SkiaOpenGLInstance.makeDirectContext();
+        if (!(((FrontendGpuDevice) RenderSystem.getDevice()).backend instanceof VulkanDevice)) {
+            InertiaBase.LOGGER.error("Not using vulkan init");
+            return;
+        }
+        SkiaVulkanInstance.makeDirectContext();
         Fonts.initFonts();
+
     }
 
 

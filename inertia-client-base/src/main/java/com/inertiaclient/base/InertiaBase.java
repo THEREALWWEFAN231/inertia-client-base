@@ -13,11 +13,11 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.*;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public class InertiaBase {
@@ -112,20 +113,20 @@ public class InertiaBase {
     }
 
     public static void sendChatMessage(Object message) {
-        mc.player.displayClientMessage(createChatMessage(message), false);
+        mc.gui.hud.getChat().addClientSystemMessage(createChatMessage(message));
     }
 
     public static void sendFileChatMessage(Object message, String file) {
         MutableComponent chatMessage = createChatMessage(message);
-        chatMessage.setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file)).withHoverEvent(new HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT, Component.literal(file))));
-        mc.player.displayClientMessage(chatMessage, false);
+
+        chatMessage.setStyle(Style.EMPTY.withClickEvent(new ClickEvent.OpenFile(file)).withHoverEvent(new HoverEvent.ShowText(Component.literal(file))));
     }
 
 
     /**
      *
      * @param urlString      url to go to
-     * @param responseAction what to do with the response from the website, usually {@link org.apache.http.util.EntityUtils}.something
+     * @param responseAction what to do with the response from the website, usually {@link org.apache.hc.core5.http.io.entity.EntityUtils}.something
      * @param <R>            any object
      * @return can be {@link org.jetbrains.annotations.Nullable}
      */
@@ -138,7 +139,7 @@ public class InertiaBase {
             LOGGER.error("Failed to parse url \"{}\"", urlString, e);
             return null;
         }
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(7500).build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(7500, TimeUnit.MILLISECONDS).build();
         try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
             HttpGet getRequest = new HttpGet(url);
 

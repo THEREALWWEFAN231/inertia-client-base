@@ -1,14 +1,9 @@
 package com.inertiaclient.base.utils.opengl;
 
-import com.inertiaclient.base.InertiaBase;
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.ProjectionType;
-import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.platform.Window;
-import org.joml.*;
+import org.joml.Matrix4f;
 
+//TODO: fixme
 public class CoordinateDimensionTranslator {
 
     private static final Matrix4f cachedProjectionMatrix = new Matrix4f();
@@ -19,16 +14,16 @@ public class CoordinateDimensionTranslator {
 
 
     public static void setMatrixInformation(Matrix4f worldPositionPositionMatrix) {
-        CoordinateDimensionTranslator.cachedProjectionMatrix.set(RenderSystem.getProjectionMatrix());
+        /*CoordinateDimensionTranslator.cachedProjectionMatrix.set(RenderSystem.getProjectionMatrix());
         CoordinateDimensionTranslator.cachedWorldSpacePositionMatrix.set(worldPositionPositionMatrix);
 
         CoordinateDimensionTranslator.scaledWidth = InertiaBase.mc.getWindow().getGuiScaledWidth();
-        CoordinateDimensionTranslator.scaledHeight = InertiaBase.mc.getWindow().getGuiScaledHeight();
+        CoordinateDimensionTranslator.scaledHeight = InertiaBase.mc.getWindow().getGuiScaledHeight();*/
     }
 
     //xyz should not subtract camera position
     public static ScreenPosition toScreen(double x, double y, double z) {
-        Vector4f transformedCoordinates = new Vector4f((float) (x - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().x), (float) (y - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().y), (float) (z - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().z), 1);
+        /*Vector4f transformedCoordinates = new Vector4f((float) (x - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().x), (float) (y - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().y), (float) (z - InertiaBase.mc.getEntityRenderDispatcher().camera.getPosition().z), 1);
         transformedCoordinates.mul(CoordinateDimensionTranslator.cachedWorldSpacePositionMatrix);
 
         Vector3f projectionOutput = new Vector3f();
@@ -50,12 +45,13 @@ public class CoordinateDimensionTranslator {
             isPositionOnTheScreen = false;
         }
 
-        return new ScreenPosition(screenXPosition, screenYPosition, screenZPosition, isPositionOnTheScreen);
+        return new ScreenPosition(screenXPosition, screenYPosition, screenZPosition, isPositionOnTheScreen);*/
+        return null;
     }
 
     public static void setupOverlayRendering() {
         //GameRenderer
-        Window window = InertiaBase.mc.getWindow();
+        /*Window window = InertiaBase.mc.getWindow();
         RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT);
         Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, (float) ((double) window.getWidth() / window.getGuiScale()), (float) ((double) window.getHeight() / window.getGuiScale()), 0.0f, 1000.0f, 21000.0f);
         RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.ORTHOGRAPHIC);
@@ -63,11 +59,11 @@ public class CoordinateDimensionTranslator {
         matrixStack.pushMatrix();
         //matrixStack.identity();
         matrixStack.translate(0.0f, 0.0f, -11000.0f);
-        Lighting.setupFor3DItems();
+        Lighting.setupFor3DItems();*/
     }
 
     public static void setupOverlayRendering(Runnable runnable) {
-        Matrix4f oldProjectionMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
+        /*Matrix4f oldProjectionMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
         ProjectionType oldProjectionType = RenderSystem.getProjectionType();
         Matrix4f oldModelViewMatrix = RenderSystem.getModelViewMatrix();
 
@@ -89,7 +85,7 @@ public class CoordinateDimensionTranslator {
         Matrix4fStack renderSystemMatrixStack = RenderSystem.getModelViewStack();
         renderSystemMatrixStack.identity();
         renderSystemMatrixStack.mul(oldModelViewMatrix);
-        renderSystemMatrixStack.popMatrix();//pushed in CoordinateDimensionTranslator.setupOverlayRendering
+        renderSystemMatrixStack.popMatrix();//pushed in CoordinateDimensionTranslator.setupOverlayRendering*/
     }
 
     public static class ScreenPosition {

@@ -11,7 +11,8 @@ import com.inertiaclient.base.utils.UIUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
 import org.lwjgl.util.yoga.Yoga;
 
 import java.awt.Color;
@@ -507,7 +508,7 @@ public class YogaNode {
         return YGNodeLayoutGetHeight(nativeNode);
     }
 
-    public void setWidths(GuiGraphics context, float globalMouseX, float globalMouseY, float delta) {
+    public void setWidths(GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float delta) {
         if (this.display == Display.NONE) {
             return;
         }
@@ -522,17 +523,17 @@ public class YogaNode {
         }
 
         for (YogaNode child : this.absoluteChildren) {
-            child.setWidths(context, globalMouseX, globalMouseY, delta);
+            child.setWidths(graphics, globalMouseX, globalMouseY, delta);
         }
         for (YogaNode child : this.scrollbars) {
-            child.setWidths(context, globalMouseX, globalMouseY, delta);
+            child.setWidths(graphics, globalMouseX, globalMouseY, delta);
         }
         for (YogaNode child : this.children) {
-            child.setWidths(context, globalMouseX, globalMouseY, delta);
+            child.setWidths(graphics, globalMouseX, globalMouseY, delta);
         }
     }
 
-    public void setWidths(float currentX, float currentY, GuiGraphics context, float globalMouseX, float globalMouseY, float delta) {
+    public void setWidths(float currentX, float currentY, GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float delta) {
         width = width();
         height = height();
         if (widthModifier != null) {
@@ -543,17 +544,17 @@ public class YogaNode {
         }
 
         for (YogaNode child : this.absoluteChildren) {
-            child.setWidths(currentX, currentY, context, globalMouseX, globalMouseY, delta);
+            child.setWidths(currentX, currentY, graphics, globalMouseX, globalMouseY, delta);
         }
         for (YogaNode child : this.scrollbars) {
-            child.setWidths(currentX, currentY, context, globalMouseX, globalMouseY, delta);
+            child.setWidths(currentX, currentY, graphics, globalMouseX, globalMouseY, delta);
         }
         for (YogaNode child : this.children) {
-            child.setWidths(currentX, currentY, context, globalMouseX, globalMouseY, delta);
+            child.setWidths(currentX, currentY, graphics, globalMouseX, globalMouseY, delta);
         }
     }
 
-    public void setGlobalPositions(float currentX, float currentY, GuiGraphics context, float globalMouseX, float globalMouseY, float delta) {
+    public void setGlobalPositions(float currentX, float currentY, GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float delta) {
         if (this.display == Display.NONE) {
             return;
         }
@@ -570,27 +571,27 @@ public class YogaNode {
         globalY = currentY;
 
         for (YogaNode child : this.absoluteChildren) {
-            child.setGlobalPositions(currentX, currentY, context, globalMouseX, globalMouseY, delta);
+            child.setGlobalPositions(currentX, currentY, graphics, globalMouseX, globalMouseY, delta);
         }
         for (YogaNode child : this.scrollbars) {
-            child.setGlobalPositions(currentX, currentY, context, globalMouseX, globalMouseY, delta);
+            child.setGlobalPositions(currentX, currentY, graphics, globalMouseX, globalMouseY, delta);
         }
 
         currentX += this.childrenScrollXOffset;
         currentY += this.childrenScrollYOffset;
 
         for (YogaNode child : this.children) {
-            child.setGlobalPositions(currentX, currentY, context, globalMouseX, globalMouseY, delta);
+            child.setGlobalPositions(currentX, currentY, graphics, globalMouseX, globalMouseY, delta);
         }
     }
 
-    public void beforeLayoutCalculations(GuiGraphics context, float mouseX, float mouseY, float delta, CanvasWrapper canvas) {
+    public void beforeLayoutCalculations(GuiGraphicsExtractor graphics, float mouseX, float mouseY, float delta, CanvasWrapper canvas) {
 
         if (!this.hasDoneFirstInit) {
-            this.doRenderCallback(this.firstInitCallback, context, mouseX, mouseY, mouseX - this.getGlobalX(), mouseY - this.getGlobalY(), delta, canvas);
+            this.doRenderCallback(this.firstInitCallback, graphics, mouseX, mouseY, mouseX - this.getGlobalX(), mouseY - this.getGlobalY(), delta, canvas);
             this.hasDoneFirstInit = true;
         }
-        this.doRenderCallback(this.preLayoutCalculationsCallback, context, mouseX, mouseY, mouseX - this.getGlobalX(), mouseY - this.getGlobalY(), delta, canvas);
+        this.doRenderCallback(this.preLayoutCalculationsCallback, graphics, mouseX, mouseY, mouseX - this.getGlobalX(), mouseY - this.getGlobalY(), delta, canvas);
         if (!this.isSearching) {
             boolean isVisible = this.implIsVisible();
             if (this.lastVisible != isVisible) {
@@ -605,18 +606,18 @@ public class YogaNode {
 
         //if this isn't working move children to the bottom, 9/30/2023, remove this if it's working
         for (YogaNode child : this.children) {
-            child.beforeLayoutCalculations(context, mouseX, mouseY, delta, canvas);
+            child.beforeLayoutCalculations(graphics, mouseX, mouseY, delta, canvas);
         }
         for (YogaNode child : this.absoluteChildren) {
-            child.beforeLayoutCalculations(context, mouseX, mouseY, delta, canvas);
+            child.beforeLayoutCalculations(graphics, mouseX, mouseY, delta, canvas);
         }
         for (YogaNode child : this.scrollbars) {
-            child.beforeLayoutCalculations(context, mouseX, mouseY, delta, canvas);
+            child.beforeLayoutCalculations(graphics, mouseX, mouseY, delta, canvas);
         }
 
     }
 
-    public void beforeDraw(GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
+    public void beforeDraw(GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
         if (this.display == Display.NONE) {
             return;
         }
@@ -640,17 +641,17 @@ public class YogaNode {
             }
         }
 
-        this.doRenderCallback(this.beforeRenderCallback, context, globalMouseX, globalMouseY, globalMouseX - this.getGlobalX(), globalMouseY - this.getGlobalY(), delta, canvas);
+        this.doRenderCallback(this.beforeRenderCallback, graphics, globalMouseX, globalMouseY, globalMouseX - this.getGlobalX(), globalMouseY - this.getGlobalY(), delta, canvas);
 
 
         for (YogaNode child : this.children) {
-            child.beforeDraw(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+            child.beforeDraw(graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
         }
         for (YogaNode child : this.absoluteChildren) {
-            child.beforeDraw(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+            child.beforeDraw(graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
         }
         for (YogaNode child : this.scrollbars) {
-            child.beforeDraw(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+            child.beforeDraw(graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
         }
 
     }
@@ -695,7 +696,7 @@ public class YogaNode {
     }
 
 
-    public void draw(GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
+    public void draw(GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
         if (this.display == Display.NONE) {
             return;
         }
@@ -709,27 +710,27 @@ public class YogaNode {
         if (debug) {
             canvas.drawRect(0, 0, this.getWidth(), this.getHeight(), debugColor);
         }
-        this.doRenderCallback(this.preRenderCallback, context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
-        this.doRenderCallback(this.renderCallback, context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+        this.doRenderCallback(this.preRenderCallback, graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+        this.doRenderCallback(this.renderCallback, graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
 
         canvas.save();
         canvas.translate(this.childrenScrollXOffset, this.childrenScrollYOffset);
         if (shouldScissorChildren) {
             canvas.clipRect(childrenScrollXOffset * -1, childrenScrollYOffset * -1, this.getWidth(), this.getHeight());
         }
-        this.doRenderCallback(this.preChildrenRenderCallback, context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+        this.doRenderCallback(this.preChildrenRenderCallback, graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
         for (YogaNode child : this.children) {
             if (isChildInRenderBounds(child) || debug) {
-                child.draw(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+                child.draw(graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
             }
         }
 
         canvas.restore();
         for (YogaNode child : this.scrollbars) {
-            child.draw(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+            child.draw(graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
         }
         for (YogaNode child : this.absoluteChildren) {
-            child.draw(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+            child.draw(graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
         }
 
         canvas.restore();
@@ -873,20 +874,20 @@ public class YogaNode {
         return false;
     }
 
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers, KeyEvent minecraftEvent) {
         for (YogaNode child : this.absoluteChildren) {
-            if (child.keyPressed(keyCode, scanCode, modifiers)) {
+            if (child.keyPressed(keyCode, scanCode, modifiers, minecraftEvent)) {
                 return true;
             }
         }
         for (YogaNode child : this.children) {
-            if (child.keyPressed(keyCode, scanCode, modifiers)) {
+            if (child.keyPressed(keyCode, scanCode, modifiers, minecraftEvent)) {
                 return true;
             }
         }
 
         if (keyPressedCallback != null) {
-            if (keyPressedCallback.handle(keyCode, scanCode, modifiers)) {
+            if (keyPressedCallback.handle(keyCode, scanCode, modifiers, minecraftEvent)) {
                 return true;
             }
         }
@@ -919,9 +920,9 @@ public class YogaNode {
         return true;
     }
 
-    protected void doRenderCallback(RenderCallback renderCallback, GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
+    protected void doRenderCallback(RenderCallback renderCallback, GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
         if (renderCallback != null) {
-            renderCallback.render(context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+            renderCallback.render(graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
         }
     }
 
@@ -1001,7 +1002,7 @@ public class YogaNode {
 
     public interface RenderCallback {
 
-        void render(GuiGraphics context, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas);
+        void render(GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas);
     }
 
     public interface MouseCallback {
@@ -1016,7 +1017,7 @@ public class YogaNode {
 
     public interface KeyPressedCallback {
 
-        boolean handle(int keyCode, int scanCode, int modifiers);
+        boolean handle(int keyCode, int scanCode, int modifiers, KeyEvent minecraftEvent);
     }
 
     public interface CharTypedCallback {

@@ -1,19 +1,19 @@
 package com.inertiaclient.base.render.yoga;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 
 public enum ButtonIdentifier {
 
     LEFT, RIGHT, MIDDLE, UNKOWN;
 
     public static ButtonIdentifier fromGLFW(int glfwButton) {
-        if (glfwButton == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+        if (glfwButton == SDLMouse.SDL_BUTTON_LEFT) {
             return LEFT;
         }
-        if (glfwButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        if (glfwButton == SDLMouse.SDL_BUTTON_RIGHT) {
             return RIGHT;
         }
-        if (glfwButton == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
+        if (glfwButton == SDLMouse.SDL_BUTTON_MIDDLE) {
             return MIDDLE;
         }
         return UNKOWN;

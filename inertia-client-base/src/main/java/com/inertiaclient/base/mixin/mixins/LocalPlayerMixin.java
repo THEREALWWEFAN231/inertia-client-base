@@ -25,7 +25,7 @@ public class LocalPlayerMixin {
     private PlayerPreMotionServerUpdateEvent preMotionServerUpdate;
 
     //TODO: fix when riding, we don't change the yaw pitch onGround, like sendMovementPackets
-    @Inject(method = "tick", at = @At(target = "Lnet/minecraft/client/player/LocalPlayer;isPassenger()Z", value = "INVOKE_ASSIGN", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "sendChanges", at = @At(target = "Lnet/minecraft/client/player/LocalPlayer;isPassenger()Z", value = "INVOKE_ASSIGN", shift = At.Shift.AFTER), cancellable = true)
     public void preMotionRidingInjection(CallbackInfo callbackInfo) {
         LocalPlayer player = ((LocalPlayer) (Object) this);
         PlayerPreMotionServerUpdateEvent event = new PlayerPreMotionServerUpdateEvent(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround());

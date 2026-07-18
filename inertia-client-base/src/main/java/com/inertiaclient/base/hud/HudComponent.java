@@ -12,7 +12,7 @@ import com.inertiaclient.base.value.impl.FloatValue;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
 
     }
 
-    public abstract void render(GuiGraphics drawContext, boolean editor, CanvasWrapper canvas);
+    public abstract void render(GuiGraphicsExtractor graphics, boolean editor, CanvasWrapper canvas);
 
     public float defaultScale() {
         return 1;

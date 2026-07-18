@@ -92,7 +92,7 @@ public class ModuleComponent extends YogaNode {
         favoriteComponent.styleSetWidth(12);
         favoriteComponent.styleSetHeight(12);
         favoriteComponent.setHoverCursorToIndicateClick();
-        favoriteComponent.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        favoriteComponent.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             try (var paint = SkiaUtils.createPaintForColor(module.isFavorite() ? Color.orange : Color.white); var blurPaint = SkiaUtils.createPaintForColor(module.isFavorite() ? Color.orange : Color.white)) {
                 this.renderStar(canvas, module, favoriteComponent, paint);
 
@@ -124,7 +124,7 @@ public class ModuleComponent extends YogaNode {
         enabledSwitch.setHoverCursor(CursorUtils.Cursor.HAND);
         enabledSwitch.styleSetWidth(28);
         enabledSwitch.styleSetHeight(12);
-        enabledSwitch.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        enabledSwitch.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (module.isEnabled() != oldModuleState) {
                 AnimationValue.tweenEngine.cancelTarget(toggleAnimation);
                 toggleAnimation.to(.75f).value(module.isEnabled() ? 1 : 0).ease(Animations.easeOutBounce).start();

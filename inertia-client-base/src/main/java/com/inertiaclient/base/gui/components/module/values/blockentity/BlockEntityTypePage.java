@@ -4,6 +4,7 @@ import com.inertiaclient.base.gui.components.tabbedpage.impl.HashsetPage;
 import com.inertiaclient.base.gui.components.tabbedpage.impl.ItemRenderComponent;
 import com.inertiaclient.base.value.HashsetValue;
 import net.fabricmc.fabric.mixin.lookup.BlockEntityTypeAccessor;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -16,7 +17,7 @@ public class BlockEntityTypePage extends HashsetPage<BlockEntityType<?>> {
     public BlockEntityTypePage(HashsetValue<BlockEntityType<?>> hashsetValue) {
         super(hashsetValue, blockEntityType -> {
             Block blockForBlockEntity = BlockEntityTypePage.getBlockFromBlockEntity(blockEntityType);
-            String id = BlockEntityType.getKey(blockEntityType).toLanguageKey();
+            String id = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(blockEntityType).toLanguageKey();
             var blockComponent = new ItemRenderComponent(blockForBlockEntity.asItem());
 
             blockComponent.setSearchContext(id);

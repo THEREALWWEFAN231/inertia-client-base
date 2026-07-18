@@ -1,6 +1,7 @@
 package com.inertiaclient.base.render.skia;
 
-import com.inertiaclient.base.gui.components.MainFrame;
+import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.backend.vulkan.VulkanConst;
 import io.github.humbleui.skija.*;
 import io.github.humbleui.types.RRect;
 import io.github.humbleui.types.Rect;
@@ -11,10 +12,11 @@ import lombok.experimental.Accessors;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.Color;
 import java.util.function.Supplier;
+
+import static org.lwjgl.vulkan.VK10.VK_NULL_HANDLE;
 
 @AllArgsConstructor
 public class CanvasWrapper {
@@ -22,7 +24,7 @@ public class CanvasWrapper {
     @Getter
     private Canvas canvas;
     @Getter
-    private SkiaOpenGLInstance skiaInstance;
+    private SkiaVulkanInstance skiaInstance;
 
     private static final TextBuilder TEXT_BUILDER = new TextBuilder();
 
@@ -69,11 +71,13 @@ public class CanvasWrapper {
         this.drawNativeImage(textureId, x, y, width, height, (int) width, (int) height);
     }
 
-    public void drawNativeImage(int textureId, float x, float y, float width, float height, int imageWidth, int imageHeight) {
-        Image image = SkiaOpenGLInstance.getSkiaNativeImages().get(textureId);
+    public void drawNativeImage(long textureId, float x, float y, float width, float height, int imageWidth, int imageHeight) {
+        Image image = SkiaVulkanInstance.getSkiaNativeImages().get(textureId);
         if (image == null) {
-            image = Image.adoptGLTextureFrom(SkiaOpenGLInstance.getSkiaDirectContext(), textureId, GL11.GL_TEXTURE_2D, imageWidth, imageHeight, GL11.GL_RGBA8, SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888);
-            SkiaOpenGLInstance.getSkiaNativeImages().put(textureId, image);
+            //we are guessing on a lot of these, mipmap and usuage and all that might need a parameter, these are the defaults for minecraft TextureTarget
+            var skiaImageInfo = new VkImageInfo(textureId, new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), 0, 0, VulkanConst.toVk(GpuFormat.RGBA8_UNORM), 15, 1, 1, -1, false, 0);
+            image = Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(imageWidth, imageHeight, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorAlphaType.PREMUL, null, null);
+            SkiaVulkanInstance.getSkiaNativeImages().put(textureId, image);
         }
         this.canvas.drawImageRect(image, Rect.makeXYWH(x, y, width, height));
     }
@@ -131,6 +135,14 @@ public class CanvasWrapper {
     public CanvasWrapper drawPath(@NotNull Path path, @NotNull Paint paint) {
         this.canvas.drawPath(path, paint);
         return this;
+    }
+
+    public CanvasWrapper drawPath(@NotNull PathBuilder path, Color color) {
+        return this.drawPath(path.snapshot(), color);
+    }
+
+    public CanvasWrapper drawPath(@NotNull PathBuilder path, @NotNull Paint paint) {
+        return this.drawPath(path.snapshot(), paint);
     }
 
     public CanvasWrapper drawCircle(float x, float y, float radius, Color color) {
@@ -196,13 +208,13 @@ public class CanvasWrapper {
     }
 
     public Path getTooltipPath(float x, float y, float width, float height, float borderRadius, float thumbCenterX, float thumbRadius) {
-        Path mainRectangle = new Path();
+        PathBuilder mainRectangle = new PathBuilder();
         mainRectangle.addRRect(RRect.makeXYWH(x, y, width, height, borderRadius));
-        Path thumb = new Path();
+        PathBuilder thumb = new PathBuilder();
         thumb.moveTo(thumbCenterX + thumbRadius, height);
         thumb.lineTo(thumbCenterX, height + thumbRadius);
         thumb.lineTo(thumbCenterX - thumbRadius, height);
-        Path path = Path.makeCombining(mainRectangle, thumb, PathOp.UNION);
+        Path path = Path.makeCombining(mainRectangle.snapshot(), thumb.snapshot(), PathOp.UNION);
         mainRectangle.close();
         thumb.close();
         return path;
@@ -210,12 +222,13 @@ public class CanvasWrapper {
 
     //yikes, this probably shouldn't be in this class but we will keep it for now
     public void drawTooltip(float x, float y, float width, float height, float borderRadius, float thumbCenterX, float thumbRadius) {
-        try (Path path = this.getTooltipPath(x, y, width, height, borderRadius, thumbCenterX, thumbRadius)) {
+        //TODO: uncomment
+        /*try (Path path = this.getTooltipPath(x, y, width, height, borderRadius, thumbCenterX, thumbRadius)) {
             this.drawPath(path, MainFrame.s_selectorButtonSelectedColor.get());
             try (var stroke = SkiaUtils.createStrokePaint(MainFrame.s_lineColor.get(), MainFrame.s_lineWidth.get())) {
                 this.drawPath(path, stroke);
             }
-        }
+        }*/
     }
 
     @Accessors(chain = true)

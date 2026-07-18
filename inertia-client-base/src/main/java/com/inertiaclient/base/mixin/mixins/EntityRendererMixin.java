@@ -3,12 +3,12 @@ package com.inertiaclient.base.mixin.mixins;
 import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.impl.EntityLabelRenderEvent;
 import com.inertiaclient.base.mixin.custominterfaces.EntityRenderStateInterface;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,9 +22,9 @@ public class EntityRendererMixin<T extends Entity, S extends EntityRenderState> 
         ((EntityRenderStateInterface) state).setInertiaclient$entity(entity);
     }
 
-    @Inject(method = "renderNameTag", at = @At("HEAD"), cancellable = true)
-    protected void renderLabelIfPresent(S state, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo callbackInfo) {
-        EntityLabelRenderEvent event = new EntityLabelRenderEvent(EntityRenderStateInterface.getEntity(state), state, text);
+    @Inject(method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;I)V", at = @At("HEAD"), cancellable = true)
+    protected final <S extends EntityRenderState> void submitNameDisplay(final S state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final CameraRenderState camera, final int offset, CallbackInfo callbackInfo) {
+        EntityLabelRenderEvent event = new EntityLabelRenderEvent(EntityRenderStateInterface.getEntity(state), state);
         EventManager.fire(event);
         if (event.isCancelled()) {
             callbackInfo.cancel();

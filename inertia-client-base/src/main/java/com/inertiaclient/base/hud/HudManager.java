@@ -1,10 +1,10 @@
 package com.inertiaclient.base.hud;
 
 import com.inertiaclient.base.InertiaBase;
-import com.inertiaclient.base.render.skia.SkiaOpenGLInstance;
+import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class HudManager {
     private ArrayList<HudComponent> components = new ArrayList<>();
     @Getter
     private ArrayList<HudGroup> groups = new ArrayList<>();
-    private SkiaOpenGLInstance skiaInstance;
+    private SkiaVulkanInstance skiaInstance;
     @Nullable
     @Setter
     @Getter
@@ -113,14 +113,14 @@ public class HudManager {
         return group;
     }
 
-    public void beforeRender(SkiaOpenGLInstance skiaInstance, boolean editor) {
+    public void beforeRender(SkiaVulkanInstance skiaInstance, boolean editor) {
         this.skiaInstance = skiaInstance;
         for (HudGroup hudGroup : this.groups) {
             hudGroup.doComponentsBeforeRender(0, 0, 0, editor, this.skiaInstance.getCanvasWrapper());
         }
     }
 
-    public void render(GuiGraphics drawContext, float screenWidth, float screenHeight, boolean editor) {
+    public void render(GuiGraphicsExtractor graphics, float screenWidth, float screenHeight, boolean editor) {
         Runnable draw = () -> {
             for (HudGroup hudGroup : this.groups) {
                 hudGroup.doStuff(0, 0, 0);
@@ -146,14 +146,14 @@ public class HudManager {
 
             this.skiaInstance.getCanvas().save();
             for (HudGroup hudGroup : this.groups) {
-                hudGroup.renderGroup(drawContext, 0, 0, 0, editor, this.skiaInstance.getCanvasWrapper());
+                hudGroup.renderGroup(graphics, 0, 0, 0, editor, this.skiaInstance.getCanvasWrapper());
             }
             this.skiaInstance.getCanvas().restore();
         };
         if (editor) {
             draw.run();
         } else {
-            skiaInstance.setup(draw);
+            skiaInstance.setup(graphics, draw);
         }
 
     }

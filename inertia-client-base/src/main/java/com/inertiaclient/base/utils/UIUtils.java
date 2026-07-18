@@ -5,7 +5,7 @@ import com.inertiaclient.base.InertiaBase;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLTimer;
 
 import java.awt.Color;
 
@@ -121,7 +121,7 @@ public class UIUtils {
     }
 
     public static Color rainbow(long timeOffset, float speed) {
-        double time = GLFW.glfwGetTime() * speed * 75;
+        double time = (SDLTimer.SDL_GetTicks() * 1000) * speed * 75;
         float hue = (float) (((time + timeOffset) % 360) / 360f);
 
         return new Color(Color.HSBtoRGB(hue, 1f, 1f));

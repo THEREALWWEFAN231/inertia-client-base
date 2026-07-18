@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.network.chat.Component;
 
 @AllArgsConstructor
 public class EntityLabelRenderEvent extends Event {
@@ -14,7 +13,5 @@ public class EntityLabelRenderEvent extends Event {
     private Entity entity;
     @Getter
     private EntityRenderState entityRenderState;
-    @Getter
-    private Component label;
 
 }

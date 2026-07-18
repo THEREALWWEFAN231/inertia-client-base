@@ -33,7 +33,7 @@ public class GenericStyle {
     }
 
     protected void applyTo(YogaNode yogaNode) {
-        yogaNode.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        yogaNode.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (!renderIf.get()) {
                 return;
             }

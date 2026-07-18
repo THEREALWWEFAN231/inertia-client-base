@@ -3,7 +3,7 @@ package com.inertiaclient.base.utils;
 import com.inertiaclient.base.InertiaBase;
 import io.github.humbleui.skija.Image;
 import lombok.AllArgsConstructor;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;

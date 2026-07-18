@@ -9,7 +9,7 @@ import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.utils.InputUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLScancode;
 
 public class KeyBindComponent extends YogaNode {
 
@@ -36,17 +36,17 @@ public class KeyBindComponent extends YogaNode {
 
         YogaBuilder.getFreshBuilder(this).setGap(GapGutter.COLUMN, 5).addChild(selectorButton).addChild(new DeleteButton(() -> keyWrapper.set(InputUtils.NO_KEY_BIND)));
 
-        this.setKeyPressedCallback((keyCode, scanCode, modifiers) -> {
+        this.setKeyPressedCallback((keyCode, scanCode, modifiers, minecraftEvent) -> {
             if (waitingForKeyPress) {
                 InputConstants.Key newKeybind = null;
-                if (keyCode == GLFW.GLFW_KEY_ESCAPE) {//no longer listen for a key, and don't bind the key
+                if (scanCode == SDLScancode.SDL_SCANCODE_ESCAPE) {//no longer listen for a key, and don't bind the key
                     waitingForKeyPress = false;
 
                     return true;
-                } else if (keyCode == GLFW.GLFW_KEY_DELETE) {
+                } else if (scanCode == SDLScancode.SDL_SCANCODE_DELETE) {
                     newKeybind = InputUtils.NO_KEY_BIND;//no keybind
                 } else {
-                    newKeybind = InputUtils.fromKeyCode(keyCode, scanCode);
+                    newKeybind = InputUtils.fromKeyCode(keyCode);
                 }
                 keyWrapper.set(newKeybind);
                 waitingForKeyPress = false;

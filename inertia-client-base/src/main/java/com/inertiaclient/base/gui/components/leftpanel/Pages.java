@@ -50,8 +50,8 @@ public class Pages extends YogaNode {
         editButton.styleSetAlignSelf(AlignItems.CENTER);
         editButton.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
             if (button == ButtonIdentifier.LEFT) {
-                HudEditorScreen.HUD_EDITOR_SCREEN.setParentScreen(InertiaBase.mc.screen);
-                InertiaBase.mc.setScreen(HudEditorScreen.HUD_EDITOR_SCREEN);
+                HudEditorScreen.HUD_EDITOR_SCREEN.setParentScreen(InertiaBase.mc.gui.screen());
+                InertiaBase.mc.gui.setScreen(HudEditorScreen.HUD_EDITOR_SCREEN);
                 return true;
             }
             return false;

@@ -7,9 +7,9 @@ import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.group.ValueGroup;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.*;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -70,7 +70,8 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
         entityColors.entrySet().forEach(entry -> {
             String entityId = entry.getKey();
 
-            var entityType = EntityType.byString(entityId);
+
+            var entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.tryParse(entityId));
             if (entityType.isPresent()) {
                 try {
                     WrappedColor wrappedColor = new WrappedColor(Color.white);
@@ -87,9 +88,9 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
         var color = new EntitiesColorWrapper();
         color.setPassiveColor(new WrappedColor(Color.green));
         color.setHostileColor(new WrappedColor(new Color(255, 255, 0)));
-        color.setEntityColor(EntityType.PLAYER, new WrappedColor(new Color(255, 0, 0)));
-        color.setEntityColor(EntityType.ITEM, new WrappedColor(new Color(0, 255, 255), true));
-        color.setEntityColor(EntityType.END_CRYSTAL, new WrappedColor(new Color(255, 0, 196)));
+        color.setEntityColor(EntityTypes.PLAYER, new WrappedColor(new Color(255, 0, 0)));
+        color.setEntityColor(EntityTypes.ITEM, new WrappedColor(new Color(0, 255, 255), true));
+        color.setEntityColor(EntityTypes.END_CRYSTAL, new WrappedColor(new Color(255, 0, 196)));
 
         return color;
     }

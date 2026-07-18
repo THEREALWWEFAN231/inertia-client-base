@@ -1,8 +1,7 @@
 package com.inertiaclient.base.utils;
 
 import lombok.AllArgsConstructor;
-import net.minecraft.client.Minecraft;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLMouse;
 
 import java.util.HashMap;
 
@@ -24,16 +23,17 @@ public class CursorUtils {
         if (cursors.containsKey(glfwCursor)) {
             cursor = cursors.get(glfwCursor);
         } else {
-            cursor = GLFW.glfwCreateStandardCursor(glfwCursor);
+            cursor = SDLMouse.SDL_CreateSystemCursor(glfwCursor);
             cursors.put(glfwCursor, cursor);
         }
-        GLFW.glfwSetCursor(Minecraft.getInstance().getWindow().getWindow(), cursor);
+        SDLMouse.SDL_SetCursor(cursor);
         currentCursor = glfwCursor;
     }
 
     @AllArgsConstructor
     public enum Cursor {
-        ARROW(GLFW.GLFW_ARROW_CURSOR), HAND(GLFW.GLFW_HAND_CURSOR), IBEAM(GLFW.GLFW_IBEAM_CURSOR), RESIZE_ALL(GLFW.GLFW_RESIZE_ALL_CURSOR);
+        //TODO: are these correct? from glfw -> sdl
+        ARROW(SDLMouse.SDL_SYSTEM_CURSOR_DEFAULT), HAND(SDLMouse.SDL_SYSTEM_CURSOR_POINTER), IBEAM(SDLMouse.SDL_SYSTEM_CURSOR_TEXT), RESIZE_ALL(SDLMouse.SDL_SYSTEM_CURSOR_MOVE);
 
         private final int glfwCursorId;
     }

@@ -11,6 +11,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import lombok.AllArgsConstructor;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 
@@ -23,7 +24,7 @@ public class FriendCommand extends Command {
     }
 
     @Override
-    public void buildArguments(LiteralArgumentBuilder<SharedSuggestionProvider> builder) {
+    public void buildArguments(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
 
         var addBuilder = this.literal("add").then(this.argument("player_name", new FriendArgumentType(true)).executes(this::add));
         builder.then(addBuilder);
@@ -35,7 +36,7 @@ public class FriendCommand extends Command {
 
     }
 
-    public int add(CommandContext<SharedSuggestionProvider> context) {
+    public int add(CommandContext<ClientSuggestionProvider> context) {
         String playerName = context.getArgument("player_name", String.class);
 
         var friendManager = InertiaBase.instance.getFriendManager();
@@ -44,11 +45,11 @@ public class FriendCommand extends Command {
             return com.mojang.brigadier.Command.SINGLE_SUCCESS;
         }
 
-        var onlineFoundPlayer = InertiaBase.mc.player.connection.getListedOnlinePlayers().stream().filter(playerInfo -> playerInfo.getProfile().getName().equalsIgnoreCase(playerName)).findFirst();
+        var onlineFoundPlayer = InertiaBase.mc.player.connection.getListedOnlinePlayers().stream().filter(playerInfo -> playerInfo.getProfile().name().equalsIgnoreCase(playerName)).findFirst();
 
         if (onlineFoundPlayer.isPresent()) {
             var player = onlineFoundPlayer.get();
-            friendManager.addFriend(new Friend(player.getProfile().getName(), player.getProfile().getId()));
+            friendManager.addFriend(new Friend(player.getProfile().name(), player.getProfile().id()));
         } else {
             friendManager.addFriend(new Friend(playerName, null));
         }
@@ -57,7 +58,7 @@ public class FriendCommand extends Command {
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
     }
 
-    public int remove(CommandContext<SharedSuggestionProvider> context) {
+    public int remove(CommandContext<ClientSuggestionProvider> context) {
         String playerName = context.getArgument("player_name", String.class);
 
         var friendManager = InertiaBase.instance.getFriendManager();
@@ -71,7 +72,7 @@ public class FriendCommand extends Command {
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
     }
 
-    public int list(CommandContext<SharedSuggestionProvider> context) {
+    public int list(CommandContext<ClientSuggestionProvider> context) {
 
         if (InertiaBase.instance.getFriendManager().getFriends().isEmpty()) {
             InertiaBase.sendChatMessage(Component.translatable("icb.command.friend.no_friends"));
@@ -106,8 +107,8 @@ public class FriendCommand extends Command {
                 });
 
                 return SharedSuggestionProvider.suggest(stream.map(playerInfo -> playerInfo.getProfile().getName()), builder);*/
-                var stream = InertiaBase.mc.player.connection.getListedOnlinePlayers().stream().filter(playerInfo -> !InertiaBase.instance.getFriendManager().isFriend(playerInfo.getProfile().getName()));
-                SharedSuggestionProvider.suggest(stream.map(playerInfo -> playerInfo.getProfile().getName()), builder);
+                var stream = InertiaBase.mc.player.connection.getListedOnlinePlayers().stream().filter(playerInfo -> !InertiaBase.instance.getFriendManager().isFriend(playerInfo.getProfile().name()));
+                SharedSuggestionProvider.suggest(stream.map(playerInfo -> playerInfo.getProfile().name()), builder);
             }
 
             return SharedSuggestionProvider.suggest(InertiaBase.instance.getFriendManager().getFriends().stream().map(Friend::getUsername), builder);

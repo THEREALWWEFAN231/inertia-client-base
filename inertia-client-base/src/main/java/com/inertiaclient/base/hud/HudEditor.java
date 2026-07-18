@@ -2,17 +2,18 @@ package com.inertiaclient.base.hud;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
-import com.inertiaclient.base.render.skia.SkiaOpenGLInstance;
 import com.inertiaclient.base.render.skia.SkiaUtils;
+import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
+import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.Rect;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -28,15 +29,15 @@ public class HudEditor {
     private HudGroup dragLinkedToComponent;//the component we are going to link to when the mouse is released
     private int dragLinkToGroupAtIndex = -1;
 
-    public void beforeRender(SkiaOpenGLInstance skiaInstance) {
+    public void beforeRender(SkiaVulkanInstance skiaInstance) {
         InertiaBase.instance.getHudManager().beforeRender(skiaInstance, true);
     }
 
-    public void render(GuiGraphics context, float mouseX, float mouseY, float delta, CanvasWrapper canvas) {
+    public void render(GuiGraphicsExtractor graphics, float mouseX, float mouseY, float delta, CanvasWrapper canvas) {
 
         if (draggingGroup != null) {
 
-            boolean isLeftShiftDown = InputUtils.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT);
+            boolean isLeftShiftDown = InputUtils.isScancodePressed(SDLKeycode.SDLK_LSHIFT);
 
             Color segmentsColor = new Color(255, 69, 69);
             try (Paint paint = SkiaUtils.createPaintForColor(segmentsColor)) {
@@ -165,12 +166,12 @@ public class HudEditor {
                 }
             }
         }
-        InertiaBase.instance.getHudManager().render(context, parentScreen.width, parentScreen.height, true);
+        InertiaBase.instance.getHudManager().render(graphics, parentScreen.width, parentScreen.height, true);
     }
 
-    public boolean mouseClicked(float mouseX, float mouseY, int button) {
+    public boolean mouseClicked(float mouseX, float mouseY, ButtonIdentifier button) {
 
-        if (button == 0) {
+        if (button == ButtonIdentifier.LEFT) {
             for (int i = InertiaBase.instance.getHudManager().getGroups().size() - 1; i >= 0; i--) {
                 HudGroup group = InertiaBase.instance.getHudManager().getGroups().get(i);
                 if (group.isHovered(mouseX, mouseY)) {
@@ -216,8 +217,8 @@ public class HudEditor {
         return false;
     }
 
-    public boolean mouseReleased(float mouseX, float mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseReleased(float mouseX, float mouseY, ButtonIdentifier button) {
+        if (button == ButtonIdentifier.LEFT) {
             if (dragLinkedToComponent != null) {
                 dragLinkedToComponent.addComponentsFromGroup(this.draggingGroup, this.dragLinkToGroupAtIndex);
                 InertiaBase.instance.getFileManager().getHudQueuedSave().queue();

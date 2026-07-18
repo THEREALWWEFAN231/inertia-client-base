@@ -9,21 +9,18 @@ import com.inertiaclient.base.utils.TimerUtil;
 import com.inertiaclient.base.utils.UIUtils;
 import io.github.humbleui.skija.Font;
 import io.github.humbleui.skija.Paint;
-import io.github.humbleui.skija.Path;
+import io.github.humbleui.skija.PathBuilder;
 import io.github.humbleui.types.Rect;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.InputQuirks;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import java.awt.Color;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static org.lwjgl.glfw.GLFW.GLFW_MOD_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_MOD_SUPER;
 
 //thank you chat gbt, heavily edited
 public class TextField {
@@ -138,7 +135,7 @@ public class TextField {
             cursorFlash.update();
             if (isFocused && cursorFlash.getTime() <= 500) {
                 float cursorX = textX + font.measureTextWidth(renderString.substring(0, cursorPos));
-                try (Path path = new Path(); Paint stroke = SkiaUtils.createStrokePaint(Color.white, .5f)) {
+                try (PathBuilder path = new PathBuilder(); Paint stroke = SkiaUtils.createStrokePaint(Color.white, .5f)) {
                     float yStart = font.getMetrics().getDescent();
                     float y = this.y + (this.height / 2);
                     float lineHeight = font.getMetrics().getHeight();
@@ -169,69 +166,68 @@ public class TextField {
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (isFocused) {
-            int SYSTEM_COMMAND_MOD = Minecraft.ON_OSX ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL;
-            boolean isControlDown = (modifiers & SYSTEM_COMMAND_MOD) != 0;
+            boolean isControlDown = (modifiers & InputQuirks.EDIT_SHORTCUT_KEY_MODIFIER) != 0;
             switch (keyCode) {
-                case GLFW.GLFW_KEY_LEFT -> {
+                case SDLKeycode.SDLK_LEFT -> {
                     if (isControlDown) {
-                        this.moveCursorWordLeft((modifiers & GLFW.GLFW_MOD_SHIFT) != 0);
+                        this.moveCursorWordLeft((modifiers & SDLKeycode.SDL_KMOD_SHIFT) != 0);
                     } else {
                         moveCursor(-1, modifiers);
                     }
                 }
-                case GLFW.GLFW_KEY_RIGHT -> {
+                case SDLKeycode.SDLK_RIGHT -> {
                     if (isControlDown) {
-                        this.moveCursorWordRight((modifiers & GLFW.GLFW_MOD_SHIFT) != 0);
+                        this.moveCursorWordRight((modifiers & SDLKeycode.SDL_KMOD_SHIFT) != 0);
                     } else {
                         moveCursor(1, modifiers);
                     }
                 }
-                case GLFW.GLFW_KEY_HOME -> {
+                case SDLKeycode.SDLK_HOME -> {
                     moveCursorToStart(modifiers);
                 }
-                case GLFW.GLFW_KEY_END -> {
+                case SDLKeycode.SDLK_END -> {
                     moveCursorToEnd(modifiers);
                 }
-                case GLFW.GLFW_KEY_BACKSPACE -> {
+                case SDLKeycode.SDLK_BACKSPACE -> {
                     if (isControlDown) {
                         deleteWordLeft();
                     } else {
                         backspace();
                     }
                 }
-                case GLFW.GLFW_KEY_DELETE -> {
+                case SDLKeycode.SDLK_DELETE -> {
                     if (isControlDown) {
                         deleteWordRight();
                     } else {
                         delete();
                     }
                 }
-                case GLFW.GLFW_KEY_A -> {
+                case SDLKeycode.SDLK_A -> {
                     if (isControlDown) {
                         selectAll();
                     }
                 }
-                case GLFW.GLFW_KEY_X -> {
+                case SDLKeycode.SDLK_X -> {
                     if (isControlDown) {
                         cut();
                     }
                 }
-                case GLFW.GLFW_KEY_C -> {
+                case SDLKeycode.SDLK_C -> {
                     if (isControlDown) {
                         copy();
                     }
                 }
-                case GLFW.GLFW_KEY_V -> {
+                case SDLKeycode.SDLK_V -> {
                     if (isControlDown) {
                         paste();
                     }
                 }
-                case GLFW.GLFW_KEY_ENTER -> {
+                case SDLKeycode.SDLK_KP_ENTER -> {
                     if (this.enterAction != null) {
                         this.enterAction.accept(this.text.toString());
                     }
                 }
-                case GLFW.GLFW_KEY_ESCAPE -> {
+                case SDLKeycode.SDLK_ESCAPE -> {
                     this.setFocused(false);
                     return false;
                 }
@@ -301,7 +297,7 @@ public class TextField {
     }
 
     private void moveCursor(int xDirection, int mods) {
-        if ((mods & GLFW.GLFW_MOD_SHIFT) != 0) {
+        if ((mods & SDLKeycode.SDL_KMOD_SHIFT) != 0) {
             if (!hasSelection()) {
                 selectionStart = cursorPos;
             }
@@ -402,7 +398,7 @@ public class TextField {
     }
 
     private void moveCursorToStart(int mods) {
-        if ((mods & GLFW.GLFW_MOD_SHIFT) != 0) {
+        if ((mods & SDLKeycode.SDL_KMOD_SHIFT) != 0) {
             if (!hasSelection())
                 selectionStart = cursorPos;
         } else {
@@ -413,7 +409,7 @@ public class TextField {
     }
 
     private void moveCursorToEnd(int mods) {
-        if ((mods & GLFW.GLFW_MOD_SHIFT) != 0) {
+        if ((mods & SDLKeycode.SDL_KMOD_SHIFT) != 0) {
             if (!hasSelection())
                 selectionStart = cursorPos;
         } else {

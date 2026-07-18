@@ -14,7 +14,7 @@ import com.inertiaclient.base.render.skia.SkiaUtils;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.Friend;
 import io.github.humbleui.skija.Paint;
-import io.github.humbleui.skija.Path;
+import io.github.humbleui.skija.PathBuilder;
 import net.minecraft.network.chat.Component;
 
 import java.util.UUID;
@@ -39,7 +39,7 @@ public class FriendAddRemoveButton extends YogaNode {
         this.setHoverCursorToIndicateClick();
 
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
-            try (Path path = new Path(); Paint stroke = SkiaUtils.createStrokePaint(MainFrame.s_unselectedTextColor.get(), MainFrame.s_lineWidth.get())) {
+            try (PathBuilder path = new PathBuilder(); Paint stroke = SkiaUtils.createStrokePaint(MainFrame.s_unselectedTextColor.get(), MainFrame.s_lineWidth.get())) {
                 if (friendStateAnimation.getValue() != 0) {
                     //up -> down
                     //path.moveTo(this.getWidth() / 2, 0);

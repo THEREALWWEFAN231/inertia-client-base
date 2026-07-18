@@ -7,7 +7,7 @@ import com.inertiaclient.base.value.group.ButtonValueGroup;
 import com.inertiaclient.base.value.group.ValueGroup;
 import com.inertiaclient.base.value.impl.*;
 import lombok.Getter;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLKeycode;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -85,7 +85,7 @@ public class Settings {
             this.translateAnimation = new BooleanValue("translate", valueGroup, false);
             this.animation = new AnimationValue("animation", valueGroup, Animations.easeOutQuart);
             this.animationDuration = new FloatValue("duration", valueGroup, .75f, 0.05f, 3);
-            this.keybind = new KeybindValue("keybind", valueGroup, InputUtils.fromKeyCode(GLFW.GLFW_KEY_RIGHT_SHIFT));
+            this.keybind = new KeybindValue("keybind", valueGroup, InputUtils.fromKeyCode(SDLKeycode.SDLK_RSHIFT));
 
             this.backgroundColor = new ColorValue("background_color", valueGroup, new Color(20, 20, 20, (int) (255 * .98f)));
             this.lineColor = new ColorValue("line_color", valueGroup, new Color(81, 81, 81));

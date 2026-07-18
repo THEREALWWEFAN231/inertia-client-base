@@ -1,49 +1,29 @@
 package com.inertiaclient.base.mixin.mixins;
 
 import com.inertiaclient.base.InertiaBase;
-import com.inertiaclient.base.event.EventManager;
-import com.inertiaclient.base.event.impl._2DEvent;
-import com.inertiaclient.base.hud.HudEditorScreen;
-import com.inertiaclient.base.render._2D3DRender;
-import com.inertiaclient.base.render.skia.SkiaOpenGLInstance;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.Gui;
+import com.inertiaclient.base.gui.ModernClickGui;
+import com.inertiaclient.base.render.animation.AnimationValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.resources.ResourceLocation;
-import org.spongepowered.asm.mixin.*;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
-public abstract class GuiMixin {
+public class GuiMixin {
 
-    @Shadow
-    @Final
-    private static ResourceLocation POWDER_SNOW_OUTLINE_LOCATION;
+    @Inject(method = "extractRenderState", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;screen:Lnet/minecraft/client/gui/screens/Screen;", ordinal = 0))
+    public void extractRenderState(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo callbackInfo, @Local GuiGraphicsExtractor graphics, @Local(ordinal = 0) int mouseX, @Local(ordinal = 1) int mouseY) {
+        if (InertiaBase.mc.gui.screen() != ModernClickGui.MODERN_CLICK_GUI && AnimationValue.tweenEngine.containsTarget(ModernClickGui.MODERN_CLICK_GUI.getMainFrame().getAnimationValue())) {
+            //ModernClickGui.MODERN_CLICK_GUI.render(drawContextLocalRef.get(), mouseXRef.get(), mouseYRef.get(), InertiaClient.mc.getLastFrameDuration());
 
-    @Shadow
-    public abstract void onDisconnected();
-
-    @Unique
-    private SkiaOpenGLInstance inertiaClient$skiaInstance;
-
-    @Inject(method = "render", at = @At("HEAD"))
-    private void render(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo callbackInfo) {
-        _2D3DRender.render(tickCounter.getGameTimeDeltaPartialTick(false), context.pose(), true);
-    }
-
-    @Inject(method = "renderHotbarAndDecorations", at = @At("HEAD"))
-    private void renderMainHud(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo callbackInfo) {
-        context.flush();//draw hud, cross hair and crap before we do our crap, this might mess stuff up?
-
-        EventManager.register(new _2DEvent(context, tickCounter.getGameTimeDeltaPartialTick(false)));
-        if (!(InertiaBase.mc.screen instanceof HudEditorScreen)) {
-            if (this.inertiaClient$skiaInstance == null) {
-                this.inertiaClient$skiaInstance = new SkiaOpenGLInstance();
-            }
-            InertiaBase.instance.getHudManager().beforeRender(this.inertiaClient$skiaInstance, false);
-            InertiaBase.instance.getHudManager().render(context, context.guiWidth(), context.guiHeight(), false);
+            ModernClickGui.MODERN_CLICK_GUI.betterRender(graphics, mouseX, mouseY, deltaTracker.getGameTimeDeltaTicks());
+            /*ModernClickGui.MODERN_CLICK_GUI.getSkiaInstance().setup(ModernClickGui.MODERN_CLICK_GUI.getCachedFrameBuffer(), () -> {
+                ModernClickGui.MODERN_CLICK_GUI.getMainFrame().draw(drawContextLocal, mouseX, mouseY, 0, 0, tickCounter.getLastDuration(), ModernClickGui.MODERN_CLICK_GUI.getSkiaInstance().getCanvasWrapper());
+            });*/
         }
     }
 

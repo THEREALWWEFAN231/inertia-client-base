@@ -10,7 +10,7 @@ import com.inertiaclient.base.render.yoga.layouts.*;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.util.Mth;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLScancode;
 
 import java.awt.Color;
 import java.util.function.Supplier;
@@ -102,9 +102,9 @@ public class MainFrame extends YogaNode {
                 canvas.translate(0, getHeight() - (getHeight() * animationProgress));
             }
 
-        }).setKeyPressedCallback((keyCode, scanCode, modifiers) -> {
-            if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-                InertiaBase.mc.setScreen(null);
+        }).setKeyPressedCallback((keyCode, scanCode, modifiers, minecraftEvent) -> {
+            if (scanCode == SDLScancode.SDL_SCANCODE_ESCAPE) {
+                InertiaBase.mc.gui.setScreen(null);
                 return true;
             }
             return false;

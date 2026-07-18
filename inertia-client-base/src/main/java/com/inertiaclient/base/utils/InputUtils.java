@@ -1,9 +1,7 @@
 package com.inertiaclient.base.utils;
 
+import com.inertiaclient.base.InertiaBase;
 import com.mojang.blaze3d.platform.InputConstants;
-import org.lwjgl.glfw.GLFW;
-
-import static com.inertiaclient.base.InertiaBase.mc;
 
 public class InputUtils {
 
@@ -38,30 +36,30 @@ public class InputUtils {
         return InputConstants.getKey(translationKey);
     }
 
-    public static InputConstants.Key fromKeyCode(int keyCode, int scanCode) {
-        return InputConstants.getKey(keyCode, scanCode);
+    public static InputConstants.Key fromKeyCode(int keyCode) {
+        return InputConstants.Type.KEYBOARD.getOrCreate(keyCode);
     }
 
     public static InputConstants.Key fromMouseButton(int mouseButton) {
         return InputConstants.Type.MOUSE.getOrCreate(mouseButton);
     }
 
-    public static InputConstants.Key fromKeyCode(int keyCode) {
-        return InputConstants.Type.KEYSYM.getOrCreate(keyCode);
-    }
-
-    public static boolean isKeyDown(InputConstants.Key input) {
-        if (input.getType() == InputConstants.Type.MOUSE) {
+    public static boolean isScancodePressed(InputConstants.Key input) {
+        /*if (input.getType() == InputConstants.Type.MOUSE) {
             return GLFW.glfwGetMouseButton(mc.getWindow().getWindow(), input.getValue()) == 1;
-        }
-        return GLFW.glfwGetKey(mc.getWindow().getWindow(), input.getValue()) == 1;
+        }*/
+        return InputConstants.isKeyDown(input.getValue());
     }
 
-    public static boolean isKeyDown(int keyCode) {
-        if (keyCode >= 0 && keyCode <= 7) {
+    public static boolean isScancodePressed(int scanCode) {
+        /*if (keyCode >= 0 && keyCode <= 7) {
             return GLFW.glfwGetMouseButton(mc.getWindow().getWindow(), keyCode) == 1;
-        }
-        return GLFW.glfwGetKey(mc.getWindow().getWindow(), keyCode) == 1;
+        }*/
+        return InputConstants.isKeyDown(scanCode);
+    }
+
+    public static boolean isShiftDown() {
+        return InertiaBase.mc.hasShiftDown();
     }
 
 }

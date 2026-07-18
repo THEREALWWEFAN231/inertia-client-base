@@ -4,9 +4,9 @@ import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.yoga.AbsoulteYogaNode;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.render.yoga.layouts.PositionType;
+import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.utils.TimerUtil;
 import lombok.Setter;
-import net.minecraft.client.gui.screens.Screen;
 
 public class Tooltip extends AbsoulteYogaNode {
 
@@ -34,7 +34,7 @@ public class Tooltip extends AbsoulteYogaNode {
             }
             lastTooltipNode = currentTooltipNode;
             this.showTimer.update();
-            if (!(this.showTimer.hasDelayRun(this.tooltipDisplayDelay) || Screen.hasShiftDown())) {
+            if (!(this.showTimer.hasDelayRun(this.tooltipDisplayDelay) || InputUtils.isShiftDown())) {
                 this.label = null;
             }
 

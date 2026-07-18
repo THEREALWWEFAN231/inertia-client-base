@@ -14,7 +14,7 @@ public class SkiaUtils {
 
     public static Typeface createFont(String assetLocation) throws IOException {
         try (var inputStream = SkiaUtils.class.getResourceAsStream("/assets/" + assetLocation)) {
-            return Typeface.makeFromData(Data.makeFromBytes(inputStream.readAllBytes()));
+            return FontMgr.getDefault().makeFromData(Data.makeFromBytes(inputStream.readAllBytes()));
         }
     }
 

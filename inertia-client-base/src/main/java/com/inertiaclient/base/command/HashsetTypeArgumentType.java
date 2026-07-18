@@ -11,7 +11,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import lombok.AllArgsConstructor;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -24,7 +24,7 @@ public class HashsetTypeArgumentType implements ArgumentType<Object> {
 
     @Override
     public Object parse(StringReader reader) throws CommandSyntaxException {
-        ResourceLocation identifier = ResourceLocation.read(reader);
+        Identifier identifier = Identifier.read(reader);
 
         Object type = hashsetValue.getEntryFromKey(identifier.toString());
         System.out.println(type);

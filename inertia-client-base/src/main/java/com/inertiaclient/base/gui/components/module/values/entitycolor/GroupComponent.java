@@ -52,7 +52,7 @@ public class GroupComponent extends YogaNode {
         this.addChild(colorDisplay);
         colorDisplay.styleSetWidth(10);
         colorDisplay.styleSetHeight(10);
-        colorDisplay.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        colorDisplay.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             canvas.drawRect(0, 0, colorDisplay.getWidth(), colorDisplay.getHeight(), entityTypeColorValue.getValue().getSpawnGroupColor(spawnGroup).getRenderColor());
             try (var stroke = SkiaUtils.createStrokePaint(Color.black, .3f)) {
                 canvas.drawRect(0, 0, colorDisplay.getWidth(), colorDisplay.getHeight(), stroke);

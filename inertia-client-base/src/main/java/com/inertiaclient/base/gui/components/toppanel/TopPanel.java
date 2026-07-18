@@ -6,7 +6,7 @@ import com.inertiaclient.base.render.yoga.*;
 import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.utils.CursorUtils;
 import io.github.humbleui.skija.Paint;
-import io.github.humbleui.skija.Path;
+import io.github.humbleui.skija.PathBuilder;
 
 public class TopPanel extends YogaNode {
 
@@ -24,7 +24,7 @@ public class TopPanel extends YogaNode {
         this.setHoverCursor(CursorUtils.Cursor.RESIZE_ALL);
 
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
-            try (Path path = new Path(); Paint stroke = SkiaUtils.createStrokePaint(MainFrame.s_lineColor.get(), MainFrame.s_lineWidth.get())) {
+            try (PathBuilder path = new PathBuilder(); Paint stroke = SkiaUtils.createStrokePaint(MainFrame.s_lineColor.get(), MainFrame.s_lineWidth.get())) {
                 path.moveTo(0, this.getHeight());
                 path.lineTo(this.getWidth(), this.getHeight());
                 canvas.drawPath(path, stroke);

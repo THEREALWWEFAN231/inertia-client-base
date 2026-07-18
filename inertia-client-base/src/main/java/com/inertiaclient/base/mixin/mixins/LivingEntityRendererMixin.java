@@ -2,14 +2,11 @@ package com.inertiaclient.base.mixin.mixins;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.Settings;
-import com.inertiaclient.base.mixin.custominterfaces.EntityRenderStateInterface;
 import com.inertiaclient.base.utils.RotationUtils;
 import com.inertiaclient.base.value.impl.ModeValue;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.Entity;
@@ -26,9 +23,9 @@ public class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingE
     private Entity currentRenderingEntity;
     private ModeValue clientRotationDisplay = InertiaBase.instance.getSettings().getClientRotationDisplay();
 
-    @Inject(method = "render", at = @At("HEAD"))
-    public void renderHead(S livingEntityRenderState, PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i, CallbackInfo callbackInfo) {
-        this.currentRenderingEntity = EntityRenderStateInterface.getEntity(livingEntityRenderState);
+    @Inject(method = "extractRenderState", at = @At("HEAD"))
+    public void extractRenderState(T entity, S state, float partialTicks, CallbackInfo callbackInfo) {
+        this.currentRenderingEntity = entity;
         RotationUtils.getRotationTimer().update();//TODO: put this in game renderer, so its not updated for every single living entity
     }
 

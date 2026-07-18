@@ -2,10 +2,11 @@ package com.inertiaclient.base.value.impl;
 
 import com.inertiaclient.base.value.RegistryHashsetValue;
 import com.inertiaclient.base.value.group.ValueGroup;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.Registry;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,23 +45,23 @@ public class BlockEntityValue extends RegistryHashsetValue<BlockEntityType<?>> {
     public static HashSet<BlockEntityType<?>> getStorageContainers() {
         HashSet<BlockEntityType<?>> blockEntityTypes = new HashSet<>();
 
-        blockEntityTypes.add(BlockEntityType.FURNACE);
-        blockEntityTypes.add(BlockEntityType.CHEST);
-        blockEntityTypes.add(BlockEntityType.TRAPPED_CHEST);
-        blockEntityTypes.add(BlockEntityType.ENDER_CHEST);
-        blockEntityTypes.add(BlockEntityType.DISPENSER);
-        blockEntityTypes.add(BlockEntityType.DROPPER);
-        blockEntityTypes.add(BlockEntityType.BREWING_STAND);
-        blockEntityTypes.add(BlockEntityType.ENCHANTING_TABLE);
-        blockEntityTypes.add(BlockEntityType.BEACON);
-        blockEntityTypes.add(BlockEntityType.HOPPER);
-        blockEntityTypes.add(BlockEntityType.SHULKER_BOX);
-        blockEntityTypes.add(BlockEntityType.BARREL);
-        blockEntityTypes.add(BlockEntityType.SMOKER);
-        blockEntityTypes.add(BlockEntityType.BLAST_FURNACE);
-        blockEntityTypes.add(BlockEntityType.CAMPFIRE);//idk if I want this as a storage container...
-        blockEntityTypes.add(BlockEntityType.DECORATED_POT);
-        blockEntityTypes.add(BlockEntityType.CRAFTER);
+        blockEntityTypes.add(BlockEntityTypes.FURNACE);
+        blockEntityTypes.add(BlockEntityTypes.CHEST);
+        blockEntityTypes.add(BlockEntityTypes.TRAPPED_CHEST);
+        blockEntityTypes.add(BlockEntityTypes.ENDER_CHEST);
+        blockEntityTypes.add(BlockEntityTypes.DISPENSER);
+        blockEntityTypes.add(BlockEntityTypes.DROPPER);
+        blockEntityTypes.add(BlockEntityTypes.BREWING_STAND);
+        blockEntityTypes.add(BlockEntityTypes.ENCHANTING_TABLE);
+        blockEntityTypes.add(BlockEntityTypes.BEACON);
+        blockEntityTypes.add(BlockEntityTypes.HOPPER);
+        blockEntityTypes.add(BlockEntityTypes.SHULKER_BOX);
+        blockEntityTypes.add(BlockEntityTypes.BARREL);
+        blockEntityTypes.add(BlockEntityTypes.SMOKER);
+        blockEntityTypes.add(BlockEntityTypes.BLAST_FURNACE);
+        blockEntityTypes.add(BlockEntityTypes.CAMPFIRE);//idk if I want this as a storage container...
+        blockEntityTypes.add(BlockEntityTypes.DECORATED_POT);
+        blockEntityTypes.add(BlockEntityTypes.CRAFTER);
 
         return blockEntityTypes;
     }

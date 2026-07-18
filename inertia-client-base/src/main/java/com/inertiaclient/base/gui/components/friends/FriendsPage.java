@@ -68,7 +68,7 @@ public class FriendsPage extends TabbedPage {
         yogaNode.styleSetGap(GapGutter.ROW, 2);
 
         this.onlineList = new VerticalListContainer();
-        InertiaBase.mc.player.connection.getListedOnlinePlayers().stream().filter(playerInfo -> !playerInfo.getProfile().getId().equals(InertiaBase.mc.getUser().getProfileId())).forEach(playerInfo -> {
+        InertiaBase.mc.player.connection.getListedOnlinePlayers().stream().filter(playerInfo -> !playerInfo.getProfile().id().equals(InertiaBase.mc.getUser().getProfileId())).forEach(playerInfo -> {
             this.onlineList.addToList(new OnlinePlayerComponent(playerInfo));
         });
         if (onlineList.listSize() == 0) {

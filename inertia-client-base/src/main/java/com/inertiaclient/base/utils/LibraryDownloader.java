@@ -1,13 +1,13 @@
 package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
-import net.minecraft.Util;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import net.minecraft.util.Util;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpEntity;
 
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 public class LibraryDownloader {
 
@@ -101,7 +102,7 @@ public class LibraryDownloader {
         URI url = new URI(librariesUrl + pathToFile);
         Files.createDirectories(libraryOutputFile.getParent());
 
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(7500).build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(7500, TimeUnit.MILLISECONDS).build();
         try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
             HttpGet getRequest = new HttpGet(url);
 

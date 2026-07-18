@@ -56,7 +56,7 @@ public abstract class InfoContainer<T> extends AbsoulteYogaNode {
 
         YogaNode label = new YogaNode();
         label.styleSetHeight(AbstractGroupContainer.valuesFontSize);
-        label.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
+        label.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             var text = CanvasWrapper.getFreshTextBuilder();
             text.basic(labelText.get(), 0, 0);
             text.setFontSize(AbstractGroupContainer.valuesFontSize);

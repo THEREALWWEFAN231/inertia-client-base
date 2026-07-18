@@ -1,11 +1,11 @@
 package com.inertiaclient.base.mixin.mixins;
 
 import com.inertiaclient.base.mixin.custominterfaces.BlockEntityRenderDispatcherInterface;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -13,13 +13,13 @@ import org.spongepowered.asm.mixin.Shadow;
 public abstract class BlockEntityRenderDispatcherMixin implements BlockEntityRenderDispatcherInterface {
 
     @Shadow
-    private static <T extends BlockEntity> void setupAndRender(BlockEntityRenderer<T> renderer, T blockEntity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
+    public <S extends BlockEntityRenderState> void submit(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
 
     }
 
     //for some reason using @Invoker on this causes hotswap to stop working(apparently because its static)... so we do this....
     @Override
-    public <T extends BlockEntity> void invokeRender(BlockEntityRenderer<T> renderer, T blockEntity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers) {
-        this.setupAndRender(renderer, blockEntity, tickDelta, matrices, vertexConsumers);
+    public <S extends BlockEntityRenderState> void invokeRender(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        this.submit(state, poseStack, submitNodeCollector, camera);
     }
 }
