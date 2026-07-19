@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public class MinecraftMixin {
 
-    @Inject(method = "resizeDisplay", at = @At("HEAD"))
-    public void resizeDisplay(CallbackInfo callbackInfo) {
+    @Inject(method = "resizeGui", at = @At("HEAD"))
+    public void resizeGui(CallbackInfo callbackInfo) {
         ModTemplate.LOGGER.info("window resized");
     }
 

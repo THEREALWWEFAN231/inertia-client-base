@@ -1,7 +1,4 @@
 accessWidener	v1	official
-accessible field com/mojang/renderpearl/backend/vulkan/VulkanGpuSurface swapchainImageFormat I
-accessible field com/mojang/renderpearl/frontend/FrontendGpuSurface backend Lcom/mojang/renderpearl/backend/api/GpuSurfaceBackend;
-accessible field com/mojang/renderpearl/frontend/FrontendGpuDevice backend Lcom/mojang/renderpearl/backend/api/GpuDeviceBackend;
 accessible field net/minecraft/client/input/InputQuirks ON_OSX Z
 
 accessible method net/minecraft/client/gui/GuiGraphicsExtractor innerBlit (Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lcom/mojang/renderpearl/api/textures/GpuTextureView;Lcom/mojang/renderpearl/api/textures/GpuSampler;IIIIFFFFI)V

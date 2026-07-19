@@ -17,9 +17,9 @@ public class AutoRespawn extends Module {
     }
 
     public void onEvent(PlayerUpdateEvent event) {
-        if (this.mc.screen instanceof DeathScreen && this.mc.player != null) {
+        if (this.mc.gui.screen() instanceof DeathScreen && this.mc.player != null) {
             this.mc.player.respawn();
-            this.mc.setScreen(null);
+            this.mc.gui.setScreen(null);
         }
     }
 

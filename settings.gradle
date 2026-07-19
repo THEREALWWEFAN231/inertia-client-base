@@ -13,4 +13,4 @@ rootProject.name = "inertia-client-workspace"
 
 include("inertia-client-base")
 //include("inertia-client")
-//include("mod-template")
+include("mod-template")

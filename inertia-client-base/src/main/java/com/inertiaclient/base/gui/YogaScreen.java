@@ -11,6 +11,7 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.sdl.SDLKeyboard;
 import org.lwjgl.util.yoga.Yoga;
 
 import static org.lwjgl.util.yoga.Yoga.YGDirectionLTR;
@@ -120,7 +121,7 @@ public abstract class YogaScreen extends BetterScreen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        boolean result = this.root.keyPressed(event.key(), event.keycode(), event.modifiers(), event);
+        boolean result = this.root.keyPressed(event.keycode(), event.key(), event.modifiers(), event);
         if (result) {
             return true;
         }
@@ -131,6 +132,22 @@ public abstract class YogaScreen extends BetterScreen {
     public boolean charTyped(CharacterEvent event) {
         this.root.charTyped((char) event.codepoint(), -1);
         return false;
+    }
+
+    @Override
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        //dont render background
+    }
+
+
+    public void added() {
+        super.added();
+        SDLKeyboard.SDL_StartTextInput(InertiaBase.mc.getWindow().handle());
+    }
+
+    public void removed() {
+        super.removed();
+        SDLKeyboard.SDL_StopTextInput(InertiaBase.mc.getWindow().handle());
     }
 
 }

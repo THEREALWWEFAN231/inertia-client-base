@@ -6,13 +6,13 @@ import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.EventTarget;
 import com.inertiaclient.base.event.impl.ResolutionChangeEvent;
 import com.inertiaclient.base.mixin.custominterfaces.VulkanDeviceInterface;
+import com.inertiaclient.base.mixin.mixins.accessors.FrontendGpuDeviceAccessor;
+import com.inertiaclient.base.mixin.mixins.accessors.FrontendGpuSurfaceAccessor;
+import com.inertiaclient.base.mixin.mixins.accessors.VulkanGpuSurfaceAccessor;
 import com.inertiaclient.base.render.CachedFrameBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.backend.vulkan.VulkanDevice;
-import com.mojang.renderpearl.backend.vulkan.VulkanGpuSurface;
 import com.mojang.renderpearl.backend.vulkan.VulkanGpuTexture;
-import com.mojang.renderpearl.frontend.FrontendGpuDevice;
-import com.mojang.renderpearl.frontend.FrontendGpuSurface;
 import io.github.humbleui.skija.*;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -60,11 +60,10 @@ public class SkiaVulkanInstance {
     }
 
     public void resize(int width, int height) {
-        if (!(((FrontendGpuDevice) RenderSystem.getDevice()).backend instanceof VulkanDevice)) {
+        if (!(((FrontendGpuDeviceAccessor) RenderSystem.getDevice()).getBackend() instanceof VulkanDevice)) {
             InertiaBase.LOGGER.error("Not using vulkan resize");
             return;
         }
-        VulkanGpuSurface vulkanGpuSurface = (VulkanGpuSurface) ((FrontendGpuSurface) InertiaBase.mc.windowSurface()).backend;
 
         this.width = width;
         this.height = height;
@@ -82,9 +81,10 @@ public class SkiaVulkanInstance {
         } else {
             this.frameBuffer.createFrameBufferIfNeeded(this.width, this.height, true, true);
         }
-        
+
+        VulkanGpuSurfaceAccessor vulkanGpuSurface = (VulkanGpuSurfaceAccessor) ((FrontendGpuSurfaceAccessor) InertiaBase.mc.windowSurface()).getBackend();
         ColorType colorType = ColorType.BGRA_8888;
-        if (vulkanGpuSurface.swapchainImageFormat == VK10.VK_FORMAT_R8G8B8A8_UNORM || vulkanGpuSurface.swapchainImageFormat == VK10.VK_FORMAT_R8G8B8A8_SRGB) {
+        if (vulkanGpuSurface.getSwapchainImageFormat() == VK10.VK_FORMAT_R8G8B8A8_UNORM || vulkanGpuSurface.getSwapchainImageFormat() == VK10.VK_FORMAT_R8G8B8A8_SRGB) {
             colorType = ColorType.RGBA_8888;
         }
 
@@ -121,7 +121,7 @@ public class SkiaVulkanInstance {
         long instanceProcAddr = VK.getFunctionProvider().getFunctionAddress("vkGetInstanceProcAddr");
         long deviceProcAddr = VK.getFunctionProvider().getFunctionAddress("vkGetDeviceProcAddr");
 
-        VulkanDevice vulkanDevice = (VulkanDevice) getFrontendDevice().backend;
+        VulkanDevice vulkanDevice = (VulkanDevice) getFrontendDevice().getBackend();
         var physicalDevice = ((VulkanDeviceInterface) vulkanDevice).getVulkanPhysicalDevice().vkPhysicalDevice();
         queueFamilyIndex = vulkanDevice.graphicsQueue().queueFamilyIndex();
         skiaDirectContext = DirectContext.makeVulkan(vulkanDevice.instance().vkInstance().address(), physicalDevice.address(), vulkanDevice.vkDevice().address(), vulkanDevice.graphicsQueue().vkQueue().address(), /*idk.firstInt()*/ queueFamilyIndex, instanceProcAddr, deviceProcAddr, VK11.VK_API_VERSION_1_1);
@@ -137,8 +137,8 @@ public class SkiaVulkanInstance {
         return (float) InertiaBase.mc.getWindow().getGuiScale();
     }
 
-    private static FrontendGpuDevice getFrontendDevice() {
-        return (FrontendGpuDevice) RenderSystem.getDevice();
+    private static FrontendGpuDeviceAccessor getFrontendDevice() {
+        return (FrontendGpuDeviceAccessor) RenderSystem.getDevice();
     }
 
 }

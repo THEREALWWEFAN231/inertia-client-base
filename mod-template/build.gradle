@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
     id 'com.gradleup.shadow' version '9.0.0-beta6'
 }
@@ -58,12 +58,11 @@ configurations {
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "maven.modrinth:fabric-language-kotlin:${fabric_kotlin_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "maven.modrinth:fabric-language-kotlin:${fabric_kotlin_version}"
 
 
     // Lombok
@@ -73,11 +72,11 @@ dependencies {
     //mixinextras
     //include(implementation(annotationProcessor("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.10")))
 
-    modImplementation "maven.modrinth:modmenu:${modmenu_version}"
+    //modImplementation "maven.modrinth:modmenu:${modmenu_version}"
     //modImplementation "maven.modrinth:sodium:mc1.20.1-0.5.2"
     //modImplementation "maven.modrinth:iris:1.6.8+1.20.1"
-    modCompileOnly("maven.modrinth:sodium:${sodium_version}") { transitive = false }
-    modCompileOnly("maven.modrinth:iris:${iris_version}") { transitive = false }
+    compileOnly("maven.modrinth:sodium:${sodium_version}") { transitive = false }
+    compileOnly("maven.modrinth:iris:${iris_version}") { transitive = false }
     //modCompileOnly("maven.modrinth:owo-lib:0.12.20+1.21.4") { transitive = false }
 
     //yoga, only use the newer version of yoga, not lwjgl, hopefully nothing breaks?!?!?!
@@ -95,7 +94,7 @@ dependencies {
     implementation("io.github.humbleui:skija-windows-x64:0.116.4")
     implementation("io.github.humbleui:types:0.2.0")
 
-    implementation project(path: ":inertia-client-base", configuration: "namedElements")
+    implementation(project(path: ":inertia-client-base"))
 }
 
 processResources {
@@ -107,7 +106,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
@@ -116,8 +115,8 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
@@ -151,11 +150,11 @@ shadowJar {
     //relocate 'com.google.gson', 'my.mod.shadow.gson'
 }
 
-remapJar {
+/*remapJar {
     dependsOn shadowJar
     inputFile.set(shadowJar.archiveFile)
     //archiveFileName.set("${archivesBaseName}-${version}.jar")
-}
+}*/
 
 
 // configure the maven publication
