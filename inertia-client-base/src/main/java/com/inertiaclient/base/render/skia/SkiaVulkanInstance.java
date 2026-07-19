@@ -79,7 +79,7 @@ public class SkiaVulkanInstance {
         if (this.frameBuffer.getFramebuffer() != null) {
             this.frameBuffer.resize(this.width, this.height);
         } else {
-            this.frameBuffer.createFrameBufferIfNeeded(this.width, this.height, true, true);
+            this.frameBuffer.createFrameBufferIfNeeded(this.width, this.height, false, false);
         }
 
         VulkanGpuSurfaceAccessor vulkanGpuSurface = (VulkanGpuSurfaceAccessor) ((FrontendGpuSurfaceAccessor) InertiaBase.mc.windowSurface()).getBackend();
@@ -106,7 +106,7 @@ public class SkiaVulkanInstance {
     public void setup(GuiGraphicsExtractor graphics, Runnable draw) {
 
         this.frameBuffer.setRenderer(() -> {
-            SkiaVulkanInstance.skiaDirectContext.resetGLAll();
+            SkiaVulkanInstance.skiaDirectContext.resetAll();
             this.canvas.clear(0x00000000);
             draw.run();
             SkiaVulkanInstance.skiaDirectContext.flush();

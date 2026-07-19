@@ -1,5 +1,6 @@
 package com.inertiaclient.base.render.skia;
 
+import com.inertiaclient.base.gui.components.MainFrame;
 import com.mojang.renderpearl.api.GpuFormat;
 import com.mojang.renderpearl.backend.vulkan.VulkanConst;
 import io.github.humbleui.skija.*;
@@ -223,12 +224,12 @@ public class CanvasWrapper {
     //yikes, this probably shouldn't be in this class but we will keep it for now
     public void drawTooltip(float x, float y, float width, float height, float borderRadius, float thumbCenterX, float thumbRadius) {
         //TODO: uncomment
-        /*try (Path path = this.getTooltipPath(x, y, width, height, borderRadius, thumbCenterX, thumbRadius)) {
+        try (Path path = this.getTooltipPath(x, y, width, height, borderRadius, thumbCenterX, thumbRadius)) {
             this.drawPath(path, MainFrame.s_selectorButtonSelectedColor.get());
             try (var stroke = SkiaUtils.createStrokePaint(MainFrame.s_lineColor.get(), MainFrame.s_lineWidth.get())) {
                 this.drawPath(path, stroke);
             }
-        }*/
+        }
     }
 
     @Accessors(chain = true)

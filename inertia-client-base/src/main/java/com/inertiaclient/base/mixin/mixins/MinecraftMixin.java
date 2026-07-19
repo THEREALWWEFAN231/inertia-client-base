@@ -58,7 +58,6 @@ public class MinecraftMixin {
         }
         SkiaVulkanInstance.makeDirectContext();
         Fonts.initFonts();
-
     }
 
 

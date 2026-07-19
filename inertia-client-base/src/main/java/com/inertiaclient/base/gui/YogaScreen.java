@@ -30,7 +30,6 @@ public abstract class YogaScreen extends BetterScreen {
 
         if (skiaInstance == null) {
             skiaInstance = new SkiaVulkanInstance();
-            //skiaInstance.setFps(() -> 120f);
         }
 
         Yoga.YGConfigSetUseWebDefaults(Yoga.YGConfigGetDefault(), true);

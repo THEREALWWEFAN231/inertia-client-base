@@ -2,6 +2,7 @@ package com.inertiaclient.base.render.skia;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.mixin.custominterfaces.GuiRendererInterface;
+import com.inertiaclient.base.mixin.mixins.accessors.RenderTargetAccessor;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.GpuFormat;
@@ -25,6 +26,7 @@ import java.util.function.Supplier;
 
 import static org.lwjgl.vulkan.VK10.VK_NULL_HANDLE;
 
+//TODO: implement manual clean up
 public class SkiaNativeRender {
 
     @Setter
@@ -71,15 +73,14 @@ public class SkiaNativeRender {
             frameBuffer = new TextureTarget(null, scaledWidth, scaledHeight, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
 
             if (this.autoCleanup) {
-                //TODO: vulkan, fux
-                /*final TextureTarget nonReferance = frameBuffer;
+                final TextureTarget nonReference = frameBuffer;
                 InertiaBase.CLEANER.register(this, () -> {
                     //framebuffer.delete must be called on main thread
                     InertiaBase.mc.executeIfPossible(() -> {
-                        System.out.println("deleted " + nonReferance.frameBufferId);
-                        nonReferance.destroyBuffers();
+                        InertiaBase.LOGGER.info("deleted SkiaNativeRender texture  {}", ((RenderTargetAccessor) nonReference).getLabel());
+                        nonReference.destroyBuffers();
                     });
-                });*/
+                });
             }
             this.setImage();
         }
@@ -123,6 +124,16 @@ public class SkiaNativeRender {
         var colorTexture = (VulkanGpuTexture) this.frameBuffer.getColorTexture();
         var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), 0, 0, VulkanConst.toVk(this.frameBuffer.getColorTexture().getFormat()), 15, 1, this.frameBuffer.getColorTexture().getMipLevels(), -1, false, 0);
         this.image = Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(this.frameBuffer.width, this.frameBuffer.height, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorAlphaType.PREMUL, null, null);
+
+        if (this.autoCleanup) {
+            final Image nonReference = image;
+            InertiaBase.CLEANER.register(this, () -> {
+                InertiaBase.mc.executeIfPossible(() -> {
+                    InertiaBase.LOGGER.info("deleted SkiaNativeRender skia image handle  {}", nonReference._ptr);
+                    nonReference.close();
+                });
+            });
+        }
     }
 
     public void delete() {

@@ -38,6 +38,7 @@
     "accessors.FrontendGpuSurfaceAccessor",
     "accessors.FrustumAccessor",
     "accessors.MultiPlayerGameModeAccessor",
+    "accessors.RenderTargetAccessor",
     "accessors.VulkanGpuSurfaceAccessor"
   ]
 }

@@ -25,13 +25,20 @@ public class CachedFrameBuffer {
     @Setter
     private Runnable renderer;
 
-    public void createFrameBufferIfNeeded(int width, int height, boolean stencil, boolean useDepth) {
+    public void createFrameBufferIfNeeded(int width, int height, boolean stencil, boolean depth) {
         if (this.framebuffer == null) {
-            if (stencil) {
-                this.framebuffer = new StencilFrameBuffer(null, width, height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
-            } else {
-                this.framebuffer = new TextureTarget(null, width, height, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
+            //dont really know if this is needed, we needed to enable stencil in  1.21.4 opengl, for the main gui tool tips to render, but they seem fine now without enabling stencil, at that I don't know if this "enables" stencil, think it just allocates room :shrug:
+
+            GpuFormat depthFormat = null;//no depth, no stencil
+            if (depth && !stencil) {
+                depthFormat = GpuFormat.D32_FLOAT;
+            } else if (depth && stencil) {
+                depthFormat = GpuFormat.D32_FLOAT_S8_UINT;
+            } else if (stencil && !depth) {
+                depthFormat = GpuFormat.S8_UINT;
             }
+            this.framebuffer = new TextureTarget(null, width, height, GpuFormat.RGBA8_UNORM, depthFormat);
+
             //should be zero, isn't controlled by the frame buffer anymore,gameRenderState.guiRenderState.clearColorOverride
             //framebuffer.setClearColor(0, 0, 0, 0);
             this.forceUpdate = true;

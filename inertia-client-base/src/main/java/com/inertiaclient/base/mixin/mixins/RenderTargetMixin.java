@@ -1,6 +1,5 @@
 package com.inertiaclient.base.mixin.mixins;
 
-import com.inertiaclient.base.mixin.custominterfaces.FrameBufferInterface;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -25,9 +24,5 @@ public class RenderTargetMixin {
             args.set(1, GL30.GL_DEPTH_STENCIL_ATTACHMENT);
         }
     }*/
-
-    private boolean shouldEnableStencil() {
-        return this instanceof FrameBufferInterface && ((FrameBufferInterface) this).shouldEnableStencil();
-    }
 
 }
