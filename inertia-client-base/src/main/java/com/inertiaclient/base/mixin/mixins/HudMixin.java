@@ -4,7 +4,6 @@ import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.impl._2DEvent;
 import com.inertiaclient.base.hud.HudEditorScreen;
-import com.inertiaclient.base.render._2D3DRender;
 import com.inertiaclient.base.render.skia.instances.SkiaInstance;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -20,12 +19,6 @@ public abstract class HudMixin {
 
     @Unique
     private SkiaInstance inertiaClient$skiaInstance;
-
-    //TODO: fix me
-    @Inject(method = "extractRenderState", at = @At("HEAD"))
-    private void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        _2D3DRender.render(deltaTracker.getGameTimeDeltaPartialTick(false));
-    }
 
     @Inject(method = "extractHotbarAndDecorations", at = @At("HEAD"))
     private void renderMainHud(final GuiGraphicsExtractor graphics, final DeltaTracker deltaTracker, CallbackInfo callbackInfo) {
