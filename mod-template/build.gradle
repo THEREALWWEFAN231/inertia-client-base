@@ -83,17 +83,17 @@ dependencies {
 
     //yoga, only use the newer version of yoga, not lwjgl, hopefully nothing breaks?!?!?!
     //so we can use gap
-    implementation("org.lwjgl:lwjgl-yoga:${lwjglVersion}") {
+    implementation("org.lwjgl:lwjgl-yoga:${lwjglYogaVersion}") {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
-    implementation("org.lwjgl:lwjgl-yoga::${lwjglNatives}") {
+    implementation("org.lwjgl:lwjgl-yoga::${getLWJGLNatives()}") {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
 
     //requires kotlin
     implementation "com.dorkbox:TweenEngine:9.2"
 
-    implementation("io.github.humbleui:skija-windows-x64:${skiaVersion}")
+    implementation("io.github.humbleui:${getSkiaArtifact()}:${skiaVersion}")
     implementation("io.github.humbleui:types:0.2.0")
 
     implementation(project(path: ":inertia-client-base"))

@@ -87,18 +87,18 @@ dependencies {
 
     //yoga, only use the newer version of yoga, not lwjgl, hopefully nothing breaks?!?!?!
     //so we can use gap
-    shadowImpl("org.lwjgl:lwjgl-yoga:${lwjglVersion}") {
+    implementation("org.lwjgl:lwjgl-yoga:${lwjglYogaVersion}") {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
-    shadowImpl("org.lwjgl:lwjgl-yoga::${lwjglNatives}") {
+    implementation("org.lwjgl:lwjgl-yoga::${getLWJGLNatives()}") {
         exclude group: 'org.lwjgl', module: 'lwjgl'
     }
 
     //requires kotlin
-    shadowImpl "com.dorkbox:TweenEngine:9.2"
+    implementation "com.dorkbox:TweenEngine:9.2"
 
-    shadowImpl("io.github.humbleui:skija-windows-x64:${skiaVersion}")
-    shadowImpl("io.github.humbleui:types:0.2.0")
+    implementation("io.github.humbleui:${getSkiaArtifact()}:${skiaVersion}")
+    implementation("io.github.humbleui:types:0.2.0")
     shadowImpl("org.apache.httpcomponents.client5:httpclient5:5.6.2")
 }
 

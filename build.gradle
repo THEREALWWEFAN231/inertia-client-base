@@ -1,0 +1,34 @@
+//thank you chat gbt
+def getSkiaArtifact() {
+    def os = org.gradle.internal.os.OperatingSystem.current()
+    def arch = System.getProperty("os.arch").toLowerCase()
+
+    boolean arm64 = arch in ["aarch64", "arm64"]
+
+    if (os.isWindows()) {
+        return arm64 ? "skija-windows-arm64" : "skija-windows-x64"
+    } else if (os.isLinux()) {
+        return arm64 ? "skija-linux-arm64" : "skija-linux-x64"
+    } else if (os.isMacOsX()) {
+        return arm64 ? "skija-macos-arm64" : "skija-macos-x64"
+    } else {
+        throw new GradleException("Unsupported platform: ${System.getProperty("os.name")} ${arch}")
+    }
+}
+
+def getLWJGLNatives() {
+    def os = org.gradle.internal.os.OperatingSystem.current()
+    def arch = System.getProperty("os.arch").toLowerCase()
+
+    boolean arm64 = arch in ["aarch64", "arm64"]
+
+    if (os.isWindows()) {
+        return arm64 ? "natives-windows-arm64" : "natives-windows"
+    } else if (os.isLinux()) {
+        return arm64 ? "natives-linux-arm64" : "natives-linux"
+    } else if (os.isMacOsX()) {
+        return arm64 ? "natives-macos-arm64" : "natives-macos"
+    } else {
+        throw new GradleException("Unsupported platform: ${System.getProperty("os.name")} ${arch}")
+    }
+}

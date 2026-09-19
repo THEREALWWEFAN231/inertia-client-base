@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class LibraryDownloader {
@@ -23,26 +24,53 @@ public class LibraryDownloader {
     public static final ClassLoader classLoader = LibraryDownloader.class.getClassLoader();
     private static Method addURLMethod;
 
+    private static final String INERTIA_LIBRARIES = InertiaBase.WEBSITE + "/libraries/";
+    private static final String MAVEN_LIBRARIES = "https://repo1.maven.org/maven2/";
+
+    public static final String YOGA_VERSION = "3.4.3";
+    public static final String SKIA_VERSION = "0.143.17";
+    public static final String SKIA_TYPES_VERSION = "0.2.0";
+
     public void main() throws NoSuchMethodException {
         var os = Util.getPlatform();
-        boolean isLinux = os != Util.OS.WINDOWS && os != Util.OS.OSX;
-        String osName = getLibraryNativeOsName(os);
+        var arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+        String osName = os == Util.OS.WINDOWS ? "windows" : os == Util.OS.OSX ? "macos" : "linux";//assume linux
+        boolean isArm = arch.equals("aarch64") || arch.equals("arm64");
 
-        this.downloadAndAddToClassLoaderIfNotExisting("assets/icb/fonts/Comfortaa-Regular.ttf", "inertia-client/fonts/02.zip");
-        this.downloadAndAddToClassLoaderIfNotExisting("org/lwjgl/util/yoga/Yoga.class", "yoga/lwjgl-yoga-3.3.4.jar", "yoga-natives/lwjgl-yoga-3.3.4-natives-" + osName + ".jar");
-        this.downloadAndAddToClassLoaderIfNotExisting("io/github/humbleui/skija/Paint.class", "skia/skija-shared-0.116.4.jar", "skia-natives/skija-" + osName + "-x64-0.116.4.jar");
-        this.downloadAndAddToClassLoaderIfNotExisting("io/github/humbleui/types/Rect.class", "skia/types-0.2.0.jar");
+        this.downloadAndAddToClassLoaderIfNotExisting(INERTIA_LIBRARIES, "assets/icb/fonts/Comfortaa-Regular.ttf", "inertia-client/fonts/02.zip");
+        this.downloadYoga(osName, isArm);
+        this.downloadSkia(osName, isArm);
 
-        this.downloadAndAddToClassLoaderIfNotExisting("dorkbox/collections/Intset.class", "dorkbox/Collections-2.7.jar");
-        this.downloadAndAddToClassLoaderIfNotExisting("dorkbox/objectPool/Pool.class", "dorkbox/ObjectPool-4.4.jar");
-        this.downloadAndAddToClassLoaderIfNotExisting("dorkbox/updates/Updates.class", "dorkbox/Updates-1.1.jar");
-        this.downloadAndAddToClassLoaderIfNotExisting("dorkbox/tweenEngine/TweenEngine.class", "dorkbox/TweenEngine-9.2.jar");
+        this.downloadAndAddToClassLoaderIfNotExisting(INERTIA_LIBRARIES, "dorkbox/collections/Intset.class", "dorkbox/Collections-2.7.jar");
+        this.downloadAndAddToClassLoaderIfNotExisting(INERTIA_LIBRARIES, "dorkbox/objectPool/Pool.class", "dorkbox/ObjectPool-4.4.jar");
+        this.downloadAndAddToClassLoaderIfNotExisting(INERTIA_LIBRARIES, "dorkbox/updates/Updates.class", "dorkbox/Updates-1.1.jar");
+        this.downloadAndAddToClassLoaderIfNotExisting(INERTIA_LIBRARIES, "dorkbox/tweenEngine/TweenEngine.class", "dorkbox/TweenEngine-9.2.jar");
     }
 
-    public void downloadAndAddToClassLoaderIfNotExisting(String classToCheck, String... pathsToFiles) {
+    private void downloadYoga(String osName, boolean isArm) {
+        String yogaJar = String.format("org/lwjgl/lwjgl-yoga/%s/lwjgl-yoga-%s.jar", YOGA_VERSION, YOGA_VERSION);
+        String nativesEXT = osName;
+        if (isArm) {
+            nativesEXT += "-arm64";
+        }
+        String nativesJar = String.format("org/lwjgl/lwjgl-yoga/%s/lwjgl-yoga-%s-natives-%s.jar", YOGA_VERSION, YOGA_VERSION, nativesEXT);
 
+        this.downloadAndAddToClassLoaderIfNotExisting(MAVEN_LIBRARIES, "org/lwjgl/util/yoga/Yoga.class", yogaJar, nativesJar);
+    }
+
+    private void downloadSkia(String osName, boolean isArm) {
+        String skiaJar = String.format("io/github/humbleui/skija-shared/%s/skija-shared-%s.jar", SKIA_VERSION, SKIA_VERSION);
+        String nativesEXT = isArm ? "arm64" : "x64";
+        String nativesJar = "io/github/humbleui/" + String.format("skija-%s-%s/%s/skija-%s-%s-%s.jar", osName, nativesEXT, SKIA_VERSION, osName, nativesEXT, SKIA_VERSION);
+        String typesJar = String.format("io/github/humbleui/types/%s/types-%s.jar", SKIA_TYPES_VERSION, SKIA_TYPES_VERSION);
+
+        this.downloadAndAddToClassLoaderIfNotExisting(MAVEN_LIBRARIES, "io/github/humbleui/skija/Paint.class", skiaJar, nativesJar);
+        this.downloadAndAddToClassLoaderIfNotExisting(MAVEN_LIBRARIES, "io/github/humbleui/types/Rect.class", typesJar);
+
+    }
+
+    public void downloadAndAddToClassLoaderIfNotExisting(String librariesWebsite, String classToCheck, String... pathsToFiles) {
         if (!this.isClassInClassLoader(classToCheck)) {
-            String librariesWebsite = InertiaBase.WEBSITE + "/libraries/";
             var librariesDirectory = InertiaBase.instance.getFileManager().getLibrariesDirectory();
 
             for (String pathToFile : pathsToFiles) {
@@ -50,11 +78,13 @@ public class LibraryDownloader {
                     Path libraryFile = librariesDirectory.resolve(pathToFile);
                     if (Files.notExists(libraryFile)) {
                         this.downloadURLToLibrariesFolder(librariesWebsite, pathToFile, libraryFile);
+                    } else {
+                        InertiaBase.LOGGER.info("Loading cached library {}", pathToFile);
                     }
 
                     this.addURL(libraryFile.toUri().toURL());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    InertiaBase.LOGGER.error("Failed to load library {}", pathToFile, e);
                 }
             }
 
@@ -72,17 +102,6 @@ public class LibraryDownloader {
         addURLMethod.invoke(LibraryDownloader.classLoader, url);
     }
 
-    public String getLibraryNativeOsName(Util.OS operatingSystem) {
-        if (operatingSystem == Util.OS.OSX) {
-            return "macos";
-        }
-
-        if (operatingSystem == Util.OS.SOLARIS) {
-            return Util.OS.LINUX.telemetryName();
-        }
-        return operatingSystem.telemetryName();
-    }
-
     public boolean isClassInClassLoader(String classToCheck) {
         //cant use Class.forName, or Launch.classLoader.findClass, mojang has some weird stuff...
         try {
@@ -98,6 +117,7 @@ public class LibraryDownloader {
     }
 
     private void downloadURLToLibrariesFolder(String librariesUrl, String pathToFile, Path libraryOutputFile) throws Exception {
+        InertiaBase.LOGGER.info("Downloading library {}", librariesUrl + pathToFile);
 
         URI url = new URI(librariesUrl + pathToFile);
         Files.createDirectories(libraryOutputFile.getParent());
