@@ -85,10 +85,18 @@ public class Module implements LanguageBaseKey, JsonState {
         this.enabledState = state;
         if (state) {
             EventManager.register(this);
-            this.onEnable();
+            try {
+                this.onEnable();
+            } catch (Exception e) {
+                InertiaBase.LOGGER.error("Failed enabling module {}", this.id, e);
+            }
         } else {
             EventManager.unregister(this);
-            this.onDisable();
+            try {
+                this.onDisable();
+            } catch (Exception e) {
+                InertiaBase.LOGGER.error("Failed disabling module {}", this.id, e);
+            }
         }
         EventManager.fire(new ModuleToggledEvent(this));
     }
