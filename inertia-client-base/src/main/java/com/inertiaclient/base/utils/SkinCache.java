@@ -3,9 +3,8 @@ package com.inertiaclient.base.utils;
 import com.inertiaclient.base.InertiaBase;
 import io.github.humbleui.skija.Image;
 import lombok.AllArgsConstructor;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
 
-import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -54,13 +53,8 @@ public class SkinCache {
     }
 
     private byte[] download(String urlString) {
-        return InertiaBase.createWebRequest(urlString, closeableHttpResponse -> {
-            try {
-                return EntityUtils.toByteArray(closeableHttpResponse.getEntity());
-            } catch (IOException e) {
-                return null;
-            }
+        return InertiaBase.createWebRequest(urlString, HttpResponse.BodyHandlers.ofByteArray(), httpResponse -> {
+            return httpResponse.body();
         });
-
     }
 }

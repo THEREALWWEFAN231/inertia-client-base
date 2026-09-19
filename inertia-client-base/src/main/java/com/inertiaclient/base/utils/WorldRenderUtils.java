@@ -236,12 +236,26 @@ public class WorldRenderUtils {
             double renderY = WorldRenderUtils.getEntityInterpolatedY(entity, delta);
             double renderZ = WorldRenderUtils.getEntityInterpolatedZ(entity, delta);
 
-            this.minX = entity.getBoundingBox().minX - entity.getX() + renderX;
-            this.minY = entity.getBoundingBox().minY - entity.getY() + renderY;
-            this.minZ = entity.getBoundingBox().minZ - entity.getZ() + renderZ;
-            this.maxX = entity.getBoundingBox().maxX - entity.getX() + renderX;
-            this.maxY = entity.getBoundingBox().maxY - entity.getY() + renderY;
-            this.maxZ = entity.getBoundingBox().maxZ - entity.getZ() + renderZ;
+            float minSize = 0.05f;
+            double xAdd = 0;
+            double yAdd = 0;
+            double zAdd = 0;
+            if (entity.getBoundingBox().getXsize() < minSize) {
+                xAdd = (minSize - entity.getBoundingBox().getXsize()) / 2;
+            }
+            if (entity.getBoundingBox().getYsize() < minSize) {
+                yAdd = (minSize - entity.getBoundingBox().getYsize()) / 2;
+            }
+            if (entity.getBoundingBox().getZsize() < minSize) {
+                zAdd = (minSize - entity.getBoundingBox().getZsize()) / 2;
+            }
+
+            this.minX = (entity.getBoundingBox().minX - xAdd) - entity.getX() + renderX;
+            this.minY = (entity.getBoundingBox().minY - yAdd) - entity.getY() + renderY;
+            this.minZ = (entity.getBoundingBox().minZ - zAdd) - entity.getZ() + renderZ;
+            this.maxX = (entity.getBoundingBox().maxX + xAdd) - entity.getX() + renderX;
+            this.maxY = (entity.getBoundingBox().maxY + yAdd) - entity.getY() + renderY;
+            this.maxZ = (entity.getBoundingBox().maxZ + zAdd) - entity.getZ() + renderZ;
             return this;
         }
 

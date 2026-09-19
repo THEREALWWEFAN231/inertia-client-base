@@ -14,11 +14,6 @@ import lombok.Setter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.*;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +21,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.ref.Cleaner;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.TimeUnit;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.function.Function;
 
 public class InertiaBase {
@@ -38,6 +36,7 @@ public class InertiaBase {
     public static final InertiaBase instance = new InertiaBase();
     public static final Logger LOGGER = LoggerFactory.getLogger("icb");
     public static final String WEBSITE = "https://inertiaclient.com";
+    public static final HttpClient HTTP_CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofMillis(7500)).build();
     public static final Cleaner CLEANER = Cleaner.create();
 
     @Getter
@@ -127,12 +126,13 @@ public class InertiaBase {
     /**
      *
      * @param urlString      url to go to
-     * @param responseAction what to do with the response from the website, usually {@link org.apache.hc.core5.http.io.entity.EntityUtils}.something
+     * @param bodyHandler    how to accept the body as an object, HttpResponse.BodyHandlers
+     * @param responseAction what to do with the response from the website, parsed as an object from bodyHandler
      * @param <R>            any object
      * @return can be {@link org.jetbrains.annotations.Nullable}
      */
     @Nullable
-    public static <R> R createWebRequest(String urlString, Function<CloseableHttpResponse, R> responseAction) {
+    public static <T, R> R createWebRequest(String urlString, HttpResponse.BodyHandler<T> bodyHandler, Function<HttpResponse<T>, R> responseAction) {
         URI url = null;
         try {
             url = new URI(urlString);
@@ -140,17 +140,18 @@ public class InertiaBase {
             LOGGER.error("Failed to parse url \"{}\"", urlString, e);
             return null;
         }
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(7500, TimeUnit.MILLISECONDS).build();
-        try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
-            HttpGet getRequest = new HttpGet(url);
+        try {
+            HttpRequest request = HttpRequest.newBuilder().uri(url).header("User-Agent", InertiaBase.getUserAgentForURL(url)).GET().build();
 
-            getRequest.setHeader("User-Agent", InertiaBase.getUserAgentForURL(url));
-
-            try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
+            HttpResponse<T> response = HTTP_CLIENT.send(request, bodyHandler);
+            try {
                 return responseAction.apply(response);
+            } catch (Exception e) {
+                LOGGER.error("Error during response action to url \"{}\"", urlString, e);
             }
+
         } catch (Exception e) {
-            LOGGER.error("Failed to web request to url \"{}\"", urlString, e);
+            LOGGER.error("Failed a web request to url \"{}\"", urlString, e);
         }
         return null;
     }

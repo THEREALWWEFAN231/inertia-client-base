@@ -2,22 +2,16 @@ package com.inertiaclient.base.utils;
 
 import com.inertiaclient.base.InertiaBase;
 import net.minecraft.util.Util;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpEntity;
 
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class LibraryDownloader {
 
@@ -122,21 +116,8 @@ public class LibraryDownloader {
         URI url = new URI(librariesUrl + pathToFile);
         Files.createDirectories(libraryOutputFile.getParent());
 
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(7500, TimeUnit.MILLISECONDS).build();
-        try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
-            HttpGet getRequest = new HttpGet(url);
-
-            getRequest.setHeader("User-Agent", InertiaBase.getUserAgentForURL(url));
-
-            try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    try (OutputStream outstream = Files.newOutputStream(libraryOutputFile)) {
-                        entity.writeTo(outstream);
-                    }
-                }
-            }
-        }
+        HttpRequest request = HttpRequest.newBuilder().uri(url).header("User-Agent", InertiaBase.getUserAgentForURL(url)).GET().build();
+        InertiaBase.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofFile(libraryOutputFile));
     }
 
 }
