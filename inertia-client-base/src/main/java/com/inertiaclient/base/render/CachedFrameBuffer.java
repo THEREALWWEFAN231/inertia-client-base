@@ -68,7 +68,7 @@ public class CachedFrameBuffer {
     }
 
     public void renderCachedImage(GuiGraphicsExtractor graphics) {
-        blitRenderTarget(graphics, this.framebuffer, false);
+        blitRenderTarget(graphics, this.framebuffer, true);
     }
 
     public boolean shouldUpdate() {

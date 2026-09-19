@@ -104,7 +104,7 @@ public class SkiaOpenGLInstance extends SkiaInstance {
 
         this.renderTarget = BackendRenderTarget.makeGL(width, height, 0, 8, fbo, FramebufferFormat.GR_GL_RGBA8);
         // TODO load monitor profile
-        this.surface = Surface.wrapBackendRenderTarget(SkiaOpenGLInstance.skiaDirectContext, this.renderTarget, SurfaceOrigin.TOP_LEFT, ColorType.RGBA_8888, ColorSpace.getDisplayP3(), new SurfaceProps(PixelGeometry.RGB_H));
+        this.surface = Surface.wrapBackendRenderTarget(SkiaOpenGLInstance.skiaDirectContext, this.renderTarget, SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorSpace.getDisplayP3(), new SurfaceProps(PixelGeometry.RGB_H));
         this.canvas = this.surface.getCanvas();
         this.canvasWrapper = new CanvasWrapper(this.canvas, this);
 

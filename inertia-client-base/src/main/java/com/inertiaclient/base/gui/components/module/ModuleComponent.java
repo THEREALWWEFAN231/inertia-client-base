@@ -23,7 +23,7 @@ import java.awt.Color;
 
 public class ModuleComponent extends YogaNode {
 
-    private static final boolean MUST_USE_BUTTONS = true;
+    private static final boolean MUST_USE_BUTTONS = false;
     private AnimationValue toggleAnimation;
     private AnimationValue descriptionAnimation;
 
@@ -73,6 +73,7 @@ public class ModuleComponent extends YogaNode {
         });
 
         if (!MUST_USE_BUTTONS) {
+            this.setHoverCursorToIndicateClick();
             this.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
                 if (button == ButtonIdentifier.LEFT) {
                     module.toggle();
@@ -104,8 +105,10 @@ public class ModuleComponent extends YogaNode {
             }
         });
         favoriteComponent.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
-            module.setFavorite(!module.isFavorite());
-            favoritesList.refresh();
+            if (button == ButtonIdentifier.LEFT) {
+                module.setFavorite(!module.isFavorite());
+                favoritesList.refresh();
+            }
             return true;
         });
 
@@ -116,7 +119,9 @@ public class ModuleComponent extends YogaNode {
         settingComponent.setHoverCursorToIndicateClick();
         settingComponent.setBlurRadius(() -> settingComponent.shouldShowHoveredEffects() ? 1f : 0);
         settingComponent.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
-            this.openSettings(module);
+            if (button == ButtonIdentifier.LEFT) {
+                this.openSettings(module);
+            }
             return true;
         });
 
@@ -137,9 +142,9 @@ public class ModuleComponent extends YogaNode {
         enabledSwitch.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
             if (button == ButtonIdentifier.LEFT) {
                 module.toggle();
-                return true;
+                //return true;
             }
-            return false;
+            return true;
         });
         this.addChild(enabledSwitch);
     }

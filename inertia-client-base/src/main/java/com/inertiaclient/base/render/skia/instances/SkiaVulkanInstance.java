@@ -93,14 +93,11 @@ public class SkiaVulkanInstance extends SkiaInstance {
         }
 
         VulkanGpuSurfaceAccessor vulkanGpuSurface = (VulkanGpuSurfaceAccessor) ((FrontendGpuSurfaceAccessor) InertiaBase.mc.windowSurface()).getBackend();
-        ColorType colorType = ColorType.BGRA_8888;
-        if (vulkanGpuSurface.getSwapchainImageFormat() == VK10.VK_FORMAT_R8G8B8A8_UNORM || vulkanGpuSurface.getSwapchainImageFormat() == VK10.VK_FORMAT_R8G8B8A8_SRGB) {
-            colorType = ColorType.RGBA_8888;
-        }
+        int format = vulkanGpuSurface.getSwapchainImageFormat();
 
-        this.renderTarget = BackendRenderTarget.makeVulkan(this.width, this.height, ((VulkanGpuTexture) this.frameBuffer.getFramebuffer().getColorTexture()).vkImage(), VK10.VK_IMAGE_TILING_OPTIMAL, VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK10.VK_FORMAT_R8G8B8A8_UNORM, VK10.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK10.VK_IMAGE_USAGE_SAMPLED_BIT | VK10.VK_IMAGE_USAGE_TRANSFER_SRC_BIT, 1, 1);
+        this.renderTarget = BackendRenderTarget.makeVulkan(this.width, this.height, ((VulkanGpuTexture) this.frameBuffer.getFramebuffer().getColorTexture()).vkImage(), VK10.VK_IMAGE_TILING_OPTIMAL, VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, format, VK10.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK10.VK_IMAGE_USAGE_SAMPLED_BIT | VK10.VK_IMAGE_USAGE_TRANSFER_SRC_BIT, 1, 1);
         // TODO load monitor profile
-        this.surface = Surface.wrapBackendRenderTarget(SkiaVulkanInstance.skiaDirectContext, this.renderTarget, SurfaceOrigin.TOP_LEFT, colorType, ColorSpace.getDisplayP3(), new SurfaceProps(PixelGeometry.RGB_H));
+        this.surface = Surface.wrapBackendRenderTarget(SkiaVulkanInstance.skiaDirectContext, this.renderTarget, SurfaceOrigin.BOTTOM_LEFT, SkiaVulkanInstance.getColorTypeFromImageFormat(format), ColorSpace.getDisplayP3(), new SurfaceProps(PixelGeometry.RGB_H));
         this.canvas = this.surface.getCanvas();
         this.canvasWrapper = new CanvasWrapper(this.canvas, this);
 
@@ -131,7 +128,15 @@ public class SkiaVulkanInstance extends SkiaInstance {
     public static Image createNativeImage(TextureTarget from) {
         var colorTexture = (VulkanGpuTexture) from.getColorTexture();
         var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), 0, 0, VulkanConst.toVk(from.getColorTexture().getFormat()), 15, 1, from.getColorTexture().getMipLevels(), -1, false, 0);
-        return Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(from.width, from.height, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorAlphaType.PREMUL, null, null);
+        return Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(from.width, from.height, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, SkiaVulkanInstance.getColorTypeFromImageFormat(VulkanConst.toVk(from.getColorTexture().getFormat())), ColorAlphaType.PREMUL, null, null);
+    }
+
+    private static ColorType getColorTypeFromImageFormat(int format) {
+        //VulkanGpuSurface.pickSwapchainSurfaceFormat only accepts format VK_FORMAT_R8G8B8A8_UNORM & VK_FORMAT_B8G8R8A8_UNORM
+        if (format == VK10.VK_FORMAT_R8G8B8A8_UNORM/* || format == VK10.VK_FORMAT_R8G8B8A8_SRGB*/) {
+            return ColorType.RGBA_8888;
+        }
+        return ColorType.BGRA_8888;
     }
 
     public void onEvent(ResolutionChangeEvent event) {
