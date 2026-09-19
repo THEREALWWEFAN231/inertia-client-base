@@ -1,6 +1,6 @@
 package com.inertiaclient.base.gui.components;
 
-import com.inertiaclient.base.render.skia.SkiaNativeRender;
+import com.inertiaclient.base.render.skia.instances.SkiaNativeRender;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 

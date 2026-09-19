@@ -5,10 +5,10 @@ import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.impl._3DCachedEvent;
 import com.inertiaclient.base.event.impl._3DEvent;
 import com.inertiaclient.base.mixin.custominterfaces.GameRendererInterface;
+import com.inertiaclient.base.render.CoordinateDimensionTranslator;
 import com.inertiaclient.base.render.ThreeDCacheFrameBuffer;
 import com.inertiaclient.base.render._2D3DRender;
 import com.inertiaclient.base.render.animation.AnimationValue;
-import com.inertiaclient.base.utils.opengl.CoordinateDimensionTranslator;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -112,7 +112,7 @@ public class GameRendererMixin implements GameRendererInterface {
         this.inertia$3DCache.drawWithRenderer(poseStack, worldPartialTicks);
 
         poseStack.pushPose();
-        _2D3DRender.render(worldPartialTicks, null, false);
+        _2D3DRender.render(worldPartialTicks);
         poseStack.popPose();
 
         modelViewStack.popMatrix();

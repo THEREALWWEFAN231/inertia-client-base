@@ -2,6 +2,9 @@ package com.inertiaclient.base.utils;
 
 
 import com.inertiaclient.base.InertiaBase;
+import com.inertiaclient.base.mixin.mixins.accessors.FrontendGpuDeviceAccessor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.backend.vulkan.VulkanDevice;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
@@ -141,5 +144,13 @@ public class UIUtils {
 
     public static void playButtonPressedSound() {
         InertiaBase.mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+    }
+
+    public static float getScaleFactor() {
+        return (float) InertiaBase.mc.getWindow().getGuiScale();
+    }
+
+    public static boolean isUsingVulkan() {
+        return ((FrontendGpuDeviceAccessor) RenderSystem.getDevice()).getBackend() instanceof VulkanDevice;
     }
 }

@@ -1,1 +1,17 @@
 accessWidener	v1	official
+accessible class com/mojang/renderpearl/backend/opengl/GlCommandEncoder
+accessible class com/mojang/renderpearl/backend/opengl/GlDevice
+accessible class com/mojang/renderpearl/backend/opengl/GlStateManager$BooleanState
+accessible field com/mojang/renderpearl/backend/opengl/GlStateManager CULL Lcom/mojang/renderpearl/backend/opengl/GlStateManager$CullState;
+accessible field com/mojang/renderpearl/backend/opengl/GlStateManager BLEND Lcom/mojang/renderpearl/backend/opengl/GlStateManager$BlendState;
+accessible field com/mojang/renderpearl/backend/opengl/GlStateManager DEPTH Lcom/mojang/renderpearl/backend/opengl/GlStateManager$DepthState;
+accessible field com/mojang/renderpearl/backend/opengl/GlStateManager SCISSOR Lcom/mojang/renderpearl/backend/opengl/GlStateManager$ScissorState;
+accessible field com/mojang/renderpearl/backend/opengl/GlStateManager TEXTURES [Lcom/mojang/renderpearl/backend/opengl/GlStateManager$TextureState;
+accessible field com/mojang/renderpearl/backend/opengl/GlStateManager activeTexture I
+accessible class com/mojang/renderpearl/backend/opengl/GlStateManager$BlendState
+accessible class com/mojang/renderpearl/backend/opengl/GlStateManager$DepthState
+accessible class com/mojang/renderpearl/backend/opengl/GlStateManager$TextureState
+accessible class com/mojang/renderpearl/backend/opengl/GlStateManager$ScissorState
+accessible class com/mojang/renderpearl/backend/opengl/GlStateManager$CullState
+accessible field com/mojang/renderpearl/backend/opengl/GlStateManager COLOR_MASK [I
+accessible field com/mojang/renderpearl/backend/opengl/GlStateManager BLEND_ENABLE [Z

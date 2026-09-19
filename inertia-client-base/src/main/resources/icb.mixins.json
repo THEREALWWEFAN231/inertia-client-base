@@ -18,6 +18,7 @@
   "client": [
     "AbstractBlockStateMixin",
     "BlockMixin",
+    "BooleanStateMixin",
     "ClientLevelMixin",
     "ClientPacketListenerMixin",
     "CommandSuggestionsMixin",

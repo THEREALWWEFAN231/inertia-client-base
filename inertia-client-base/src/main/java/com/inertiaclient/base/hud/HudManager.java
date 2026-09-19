@@ -1,7 +1,7 @@
 package com.inertiaclient.base.hud;
 
 import com.inertiaclient.base.InertiaBase;
-import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaInstance;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -15,7 +15,7 @@ public class HudManager {
     private ArrayList<HudComponent> components = new ArrayList<>();
     @Getter
     private ArrayList<HudGroup> groups = new ArrayList<>();
-    private SkiaVulkanInstance skiaInstance;
+    private SkiaInstance skiaInstance;
     @Nullable
     @Setter
     @Getter
@@ -112,7 +112,7 @@ public class HudManager {
         return group;
     }
 
-    public void beforeRender(SkiaVulkanInstance skiaInstance, boolean editor) {
+    public void beforeRender(SkiaInstance skiaInstance, boolean editor) {
         this.skiaInstance = skiaInstance;
         for (HudGroup hudGroup : this.groups) {
             hudGroup.doComponentsBeforeRender(0, 0, 0, editor, this.skiaInstance.getCanvasWrapper());

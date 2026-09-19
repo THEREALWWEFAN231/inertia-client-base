@@ -1,16 +1,17 @@
-package com.inertiaclient.base.render.skia;
+package com.inertiaclient.base.render.skia.instances;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.mixin.custominterfaces.GuiRendererInterface;
 import com.inertiaclient.base.mixin.mixins.accessors.GameRendererAccessor;
 import com.inertiaclient.base.mixin.mixins.accessors.RenderTargetAccessor;
+import com.inertiaclient.base.render.skia.CanvasWrapper;
+import com.inertiaclient.base.utils.UIUtils;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.GpuFormat;
-import com.mojang.renderpearl.backend.vulkan.VulkanConst;
-import com.mojang.renderpearl.backend.vulkan.VulkanGpuTexture;
-import io.github.humbleui.skija.*;
+import io.github.humbleui.skija.Image;
+import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.Rect;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +26,6 @@ import net.minecraft.client.renderer.state.GameRenderState;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static org.lwjgl.vulkan.VK10.VK_NULL_HANDLE;
 
 //TODO: implement manual clean up
 public class SkiaNativeRender {
@@ -67,8 +66,8 @@ public class SkiaNativeRender {
         this.cachedNativeWidth = this.nativeWidth.get();
         this.cachedNativeHeight = this.nativeHeight.get();
 
-        int scaledWidth = (int) (this.cachedNativeWidth * SkiaVulkanInstance.getScaleFactor());
-        int scaledHeight = (int) (this.cachedNativeHeight * SkiaVulkanInstance.getScaleFactor());
+        int scaledWidth = (int) (this.cachedNativeWidth * UIUtils.getScaleFactor());
+        int scaledHeight = (int) (this.cachedNativeHeight * UIUtils.getScaleFactor());
 
         if (frameBuffer == null) {
             frameBuffer = new TextureTarget(null, scaledWidth, scaledHeight, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
@@ -136,9 +135,11 @@ public class SkiaNativeRender {
             //this.image.close();
         }
 
-        var colorTexture = (VulkanGpuTexture) this.frameBuffer.getColorTexture();
-        var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), 0, 0, VulkanConst.toVk(this.frameBuffer.getColorTexture().getFormat()), 15, 1, this.frameBuffer.getColorTexture().getMipLevels(), -1, false, 0);
-        this.image = Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(this.frameBuffer.width, this.frameBuffer.height, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorAlphaType.PREMUL, null, null);
+        if (UIUtils.isUsingVulkan()) {
+            this.image = SkiaVulkanInstance.createNativeImage(this.frameBuffer);
+        } else {
+            this.image = SkiaOpenGLInstance.createNativeImage(this.frameBuffer);
+        }
 
         if (this.autoCleanup) {
             final Image nonReference = image;

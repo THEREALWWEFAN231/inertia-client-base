@@ -1,6 +1,6 @@
 package com.inertiaclient.base.mixin.mixins;
 
-import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaVulkanInstance;
 import com.mojang.renderpearl.backend.vulkan.VulkanCommandEncoder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

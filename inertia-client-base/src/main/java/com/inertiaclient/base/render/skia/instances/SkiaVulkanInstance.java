@@ -1,4 +1,4 @@
-package com.inertiaclient.base.render.skia;
+package com.inertiaclient.base.render.skia.instances;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.event.EventListener;
@@ -11,7 +11,11 @@ import com.inertiaclient.base.mixin.mixins.accessors.FrontendGpuSurfaceAccessor;
 import com.inertiaclient.base.mixin.mixins.accessors.VulkanGpuSurfaceAccessor;
 import com.inertiaclient.base.render.CachedFrameBuffer;
 import com.inertiaclient.base.render.GenericRender;
+import com.inertiaclient.base.render.skia.CanvasWrapper;
+import com.inertiaclient.base.utils.UIUtils;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.backend.vulkan.VulkanConst;
 import com.mojang.renderpearl.backend.vulkan.VulkanDevice;
 import com.mojang.renderpearl.backend.vulkan.VulkanGpuTexture;
 import io.github.humbleui.skija.*;
@@ -24,8 +28,10 @@ import org.lwjgl.vulkan.VK11;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
+import static org.lwjgl.vulkan.VK10.VK_NULL_HANDLE;
+
 //https://github.com/HumbleUI/Skija/blob/master/examples/vulkan/src/Main.java
-public class SkiaVulkanInstance {
+public class SkiaVulkanInstance extends SkiaInstance {
 
     @Getter
     private static DirectContext skiaDirectContext;
@@ -69,11 +75,6 @@ public class SkiaVulkanInstance {
     }
 
     public void resize(int width, int height) {
-        if (!(((FrontendGpuDeviceAccessor) RenderSystem.getDevice()).getBackend() instanceof VulkanDevice)) {
-            InertiaBase.LOGGER.error("Not using vulkan resize");
-            return;
-        }
-
         this.width = width;
         this.height = height;
 
@@ -103,7 +104,7 @@ public class SkiaVulkanInstance {
         this.canvas = this.surface.getCanvas();
         this.canvasWrapper = new CanvasWrapper(this.canvas, this);
 
-        float scale = SkiaVulkanInstance.getScaleFactor();
+        float scale = UIUtils.getScaleFactor();
         //this.canvas.scale(1/scale, 1/scale);
         this.canvas.scale(scale, scale);
     }
@@ -127,14 +128,16 @@ public class SkiaVulkanInstance {
         skiaDirectContext = DirectContext.makeVulkan(vulkanDevice.instance().vkInstance().address(), physicalDevice.address(), vulkanDevice.vkDevice().address(), vulkanDevice.graphicsQueue().vkQueue().address(), /*idk.firstInt()*/ queueFamilyIndex, instanceProcAddr, deviceProcAddr, VK11.VK_API_VERSION_1_1);
     }
 
+    public static Image createNativeImage(TextureTarget from) {
+        var colorTexture = (VulkanGpuTexture) from.getColorTexture();
+        var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), 0, 0, VulkanConst.toVk(from.getColorTexture().getFormat()), 15, 1, from.getColorTexture().getMipLevels(), -1, false, 0);
+        return Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(from.width, from.height, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorAlphaType.PREMUL, null, null);
+    }
+
     public void onEvent(ResolutionChangeEvent event) {
         if (event.getType() == ResolutionChangeEvent.Type.POST) {
             this.resize(InertiaBase.mc.getWindow().getWidth(), InertiaBase.mc.getWindow().getHeight());
         }
-    }
-
-    public static float getScaleFactor() {
-        return (float) InertiaBase.mc.getWindow().getGuiScale();
     }
 
     private static FrontendGpuDeviceAccessor getFrontendDevice() {

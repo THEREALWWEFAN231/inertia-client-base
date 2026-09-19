@@ -1,16 +1,14 @@
 package com.inertiaclient.base.mixin.mixins;
 
-import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.impl.ClientTickEvent;
 import com.inertiaclient.base.event.impl.ResolutionChangeEvent;
 import com.inertiaclient.base.event.impl.RightClickEvent;
-import com.inertiaclient.base.mixin.mixins.accessors.FrontendGpuDeviceAccessor;
 import com.inertiaclient.base.render.skia.Fonts;
-import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaOpenGLInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaVulkanInstance;
+import com.inertiaclient.base.utils.UIUtils;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.renderpearl.backend.vulkan.VulkanDevice;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -52,11 +50,11 @@ public class MinecraftMixin {
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;resizeGui()V"))
     public void initAfterWindow(CallbackInfo callbackInfo) {
-        if (!(((FrontendGpuDeviceAccessor) RenderSystem.getDevice()).getBackend() instanceof VulkanDevice)) {
-            InertiaBase.LOGGER.error("Not using vulkan init");
-            return;
+        if (UIUtils.isUsingVulkan()) {
+            SkiaVulkanInstance.makeDirectContext();
+        } else {
+            SkiaOpenGLInstance.makeDirectContext();
         }
-        SkiaVulkanInstance.makeDirectContext();
         Fonts.initFonts();
     }
 

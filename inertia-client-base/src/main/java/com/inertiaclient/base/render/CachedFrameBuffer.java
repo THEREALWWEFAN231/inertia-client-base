@@ -1,8 +1,8 @@
 package com.inertiaclient.base.render;
 
 import com.inertiaclient.base.mixin.mixins.accessors.GuiGraphicsExtractorAccessor;
-import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
 import com.inertiaclient.base.utils.TimerUtil;
+import com.inertiaclient.base.utils.UIUtils;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -62,7 +62,7 @@ public class CachedFrameBuffer {
 
     public static void blitRenderTarget(GuiGraphicsExtractor graphics, RenderTarget renderTarget, boolean flipY) {
         graphics.pose().pushMatrix();
-        graphics.pose().scale(1 / SkiaVulkanInstance.getScaleFactor(), 1 / SkiaVulkanInstance.getScaleFactor());
+        graphics.pose().scale(1 / UIUtils.getScaleFactor(), 1 / UIUtils.getScaleFactor());
         ((GuiGraphicsExtractorAccessor) graphics).callInnerBlit(RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA, renderTarget.getColorTextureView(), RenderSystem.getSamplerCache().getSampler(AddressMode.REPEAT, AddressMode.REPEAT, FilterMode.NEAREST, FilterMode.LINEAR, false), 0, 0, renderTarget.width, renderTarget.height, 0, 1, flipY ? 1 : 0, flipY ? 0 : 1, -1);
         graphics.pose().popMatrix();
     }

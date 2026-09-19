@@ -1,7 +1,7 @@
 package com.inertiaclient.base.gui.components.friends;
 
 import com.inertiaclient.base.gui.components.NativeRenderComponent;
-import com.inertiaclient.base.render.skia.SkiaNativeRender;
+import com.inertiaclient.base.render.skia.instances.SkiaNativeRender;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import net.minecraft.client.gui.components.PlayerFaceExtractor;
 import net.minecraft.client.multiplayer.PlayerInfo;

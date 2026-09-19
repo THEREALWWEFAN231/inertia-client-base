@@ -5,7 +5,7 @@ import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.impl._2DEvent;
 import com.inertiaclient.base.hud.HudEditorScreen;
 import com.inertiaclient.base.render._2D3DRender;
-import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaInstance;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Hud;
@@ -19,12 +19,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class HudMixin {
 
     @Unique
-    private SkiaVulkanInstance inertiaClient$skiaInstance;
+    private SkiaInstance inertiaClient$skiaInstance;
 
     //TODO: fix me
     @Inject(method = "extractRenderState", at = @At("HEAD"))
     private void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        _2D3DRender.render(deltaTracker.getGameTimeDeltaPartialTick(false), null, true);
+        _2D3DRender.render(deltaTracker.getGameTimeDeltaPartialTick(false));
     }
 
     @Inject(method = "extractHotbarAndDecorations", at = @At("HEAD"))
@@ -32,7 +32,7 @@ public abstract class HudMixin {
         EventManager.fire(new _2DEvent(graphics, deltaTracker));
         if (!(InertiaBase.mc.gui.screen() instanceof HudEditorScreen)) {
             if (this.inertiaClient$skiaInstance == null) {
-                this.inertiaClient$skiaInstance = new SkiaVulkanInstance((graphics1, mouseX, mouseY, delta) -> {
+                this.inertiaClient$skiaInstance = SkiaInstance.create((graphics1, mouseX, mouseY, delta) -> {
                     InertiaBase.instance.getHudManager().beforeRender(this.inertiaClient$skiaInstance, false);
                     InertiaBase.instance.getHudManager().renderGroups(graphics1, graphics.guiWidth(), graphics.guiHeight(), false);
                 });

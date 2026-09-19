@@ -3,7 +3,7 @@ package com.inertiaclient.base.hud;
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.skia.SkiaUtils;
-import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaInstance;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.utils.UIUtils;
@@ -29,7 +29,7 @@ public class HudEditor {
     private HudGroup dragLinkedToComponent;//the component we are going to link to when the mouse is released
     private int dragLinkToGroupAtIndex = -1;
 
-    public void beforeRender(SkiaVulkanInstance skiaInstance) {
+    public void beforeRender(SkiaInstance skiaInstance) {
         InertiaBase.instance.getHudManager().beforeRender(skiaInstance, true);
     }
 

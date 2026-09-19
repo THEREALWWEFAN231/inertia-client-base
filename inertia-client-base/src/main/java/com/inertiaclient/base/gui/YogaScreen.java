@@ -1,7 +1,7 @@
 package com.inertiaclient.base.gui;
 
 import com.inertiaclient.base.InertiaBase;
-import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaInstance;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.CursorUtils;
@@ -22,14 +22,14 @@ public abstract class YogaScreen extends BetterScreen {
     @Getter
     private YogaNode root;
 
-    private SkiaVulkanInstance skiaInstance;
+    private SkiaInstance skiaInstance;
 
 
     public YogaScreen(Component title) {
         super(title);
 
         if (skiaInstance == null) {
-            skiaInstance = new SkiaVulkanInstance((graphics, mouseX, mouseY, delta) -> {
+            skiaInstance = SkiaInstance.create((graphics, mouseX, mouseY, delta) -> {
                 //calculate "every" components width, then set their positions
                 root.beforeLayoutCalculations(graphics, mouseX, mouseY, delta, skiaInstance.getCanvasWrapper());
                 //TODO: only on window size change

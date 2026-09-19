@@ -1,7 +1,8 @@
 package com.inertiaclient.base.hud;
 
 import com.inertiaclient.base.gui.BetterScreen;
-import com.inertiaclient.base.render.skia.SkiaVulkanInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaVulkanInstance;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ public class HudEditorScreen extends BetterScreen {
     public static final HudEditorScreen HUD_EDITOR_SCREEN = new HudEditorScreen();
 
     @Getter
-    private SkiaVulkanInstance skiaInstance;
+    private SkiaInstance skiaInstance;
     private HudEditor hudEditor;
     @Setter
     private Screen parentScreen;

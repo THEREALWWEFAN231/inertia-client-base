@@ -1,6 +1,8 @@
 package com.inertiaclient.base.render.skia;
 
 import com.inertiaclient.base.gui.components.MainFrame;
+import com.inertiaclient.base.render.skia.instances.SkiaInstance;
+import com.inertiaclient.base.render.skia.instances.SkiaVulkanInstance;
 import com.mojang.renderpearl.api.GpuFormat;
 import com.mojang.renderpearl.backend.vulkan.VulkanConst;
 import io.github.humbleui.skija.*;
@@ -25,7 +27,7 @@ public class CanvasWrapper {
     @Getter
     private Canvas canvas;
     @Getter
-    private SkiaVulkanInstance skiaInstance;
+    private SkiaInstance skiaInstance;
 
     private static final TextBuilder TEXT_BUILDER = new TextBuilder();
 

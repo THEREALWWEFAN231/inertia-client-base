@@ -1,4 +1,4 @@
-package com.inertiaclient.base.utils.opengl;
+package com.inertiaclient.base.render;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.mixin.mixins.accessors.GameRendererAccessor;

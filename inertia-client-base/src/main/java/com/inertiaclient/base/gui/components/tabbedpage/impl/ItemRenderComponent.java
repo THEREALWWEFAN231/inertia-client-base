@@ -2,7 +2,7 @@ package com.inertiaclient.base.gui.components.tabbedpage.impl;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.gui.ModernClickGui;
-import com.inertiaclient.base.render.skia.SkiaNativeRender;
+import com.inertiaclient.base.render.skia.instances.SkiaNativeRender;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.registries.BuiltInRegistries;
