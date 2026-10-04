@@ -24,10 +24,6 @@ public class CachedHeadComponent extends YogaNode {
     public CachedHeadComponent(String uuidOrName) {
         this.uuidOrName = uuidOrName;
 
-        this.styleSetWidth(10f);
-        this.styleSetHeight(10f);
-        this.setShouldScissorChildren(true);
-
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (this.uuidOrName == null) {
                 this.renderSpinner(canvas);
@@ -37,7 +33,7 @@ public class CachedHeadComponent extends YogaNode {
             var skin = InertiaBase.instance.getFileManager().getSkinCache().load(this.uuidOrName);
             if (skin.isDone() && !skin.isCompletedExceptionally()) {
                 try {
-                    canvas.drawImageRect(skin.get(), Rect.makeXYWH(0, 0, 10, 10), null, this.blurRadius);
+                    canvas.drawImageRect(skin.get(), Rect.makeXYWH(0, 0, this.getWidth(), this.getHeight()), null, this.blurRadius);
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }

@@ -1,11 +1,11 @@
 package com.inertiaclient.base.gui.components.module.values.blockentitycolor;
 
 import com.inertiaclient.base.gui.ModernClickGui;
+import com.inertiaclient.base.gui.components.minecraftitems.ItemRenderComponent;
 import com.inertiaclient.base.gui.components.module.values.blockentity.BlockEntityTypePage;
 import com.inertiaclient.base.gui.components.module.values.color.ColorContainer;
 import com.inertiaclient.base.gui.components.module.values.color.ColorContainerInterface;
 import com.inertiaclient.base.gui.components.tabbedpage.WrappedListContainer;
-import com.inertiaclient.base.gui.components.tabbedpage.impl.ItemRenderComponent;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.value.WrappedColor;

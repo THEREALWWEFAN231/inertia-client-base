@@ -119,7 +119,7 @@ public class YogaNode {
     private MouseCallback globalClickCallback;
     @Accessors(chain = true)
     @Setter
-    private ScrollCallback scrollCallback;
+    private ScrollCallback scrolledCallback;
 
     @Accessors(chain = true)
     @Setter
@@ -859,12 +859,6 @@ public class YogaNode {
             }
         }
 
-        if (isHovered && scrollCallback != null) {
-            if (scrollCallback.handle(relativeMouseX, relativeMouseY, amount)) {
-                return true;
-            }
-        }
-
         for (int i = this.children.size() - 1; i >= 0; i--) {
             YogaNode child = this.children.get(i);
             if (child.mouseScrolled(mouseX, mouseY, amount)) {
@@ -924,6 +918,12 @@ public class YogaNode {
     protected void doRenderCallback(RenderCallback renderCallback, GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {
         if (renderCallback != null) {
             renderCallback.render(graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas);
+        }
+    }
+
+    public void executeScrolledCallback(ScrollReason scrollReason, ScrollDirection scrollDirection, float relativeMouseX, float relativeMouseY, float amount) {
+        if (this.scrolledCallback != null) {
+            this.scrolledCallback.handle(scrollReason, scrollDirection, relativeMouseX, relativeMouseY, amount);
         }
     }
 
@@ -1013,7 +1013,7 @@ public class YogaNode {
 
     public interface ScrollCallback {
 
-        boolean handle(float relativeMouseX, float relativeMouseY, float amount);
+        void handle(ScrollReason scrollReason, ScrollDirection scrollDirection, float relativeMouseX, float relativeMouseY, float amount);
     }
 
     public interface KeyPressedCallback {
@@ -1024,6 +1024,14 @@ public class YogaNode {
     public interface CharTypedCallback {
 
         boolean handle(char chr, int modifiers);
+    }
+
+    public enum ScrollReason {
+        MOUSE_WHEEL, DRAGGED
+    }
+
+    public enum ScrollDirection {
+        X, Y
     }
 
 }

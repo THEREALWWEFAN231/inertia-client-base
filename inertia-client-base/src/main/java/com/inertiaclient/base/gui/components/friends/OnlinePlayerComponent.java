@@ -19,15 +19,15 @@ public class OnlinePlayerComponent extends GenericFriendComponent {
     @Override
     public YogaNode createHeadDisplay(YogaNode headAndName) {
         SkiaNativeRender headRenderer = new SkiaNativeRender();
-        headRenderer.setNativeWidth(() -> 10f);
-        headRenderer.setNativeHeight(() -> 10f);
+        var component = new NativeRenderComponent(headRenderer);
+
         headRenderer.setBlurRadius(() -> headAndName.shouldShowHoveredEffects() ? 3f : 0f);
         headRenderer.setSetNativeRender(graphics -> {
             boolean showLayer = true;
             boolean upsideDown = false;
-            PlayerFaceExtractor.extractRenderState(graphics, playerInfo.getSkin().body().texturePath(), 0, 0, 10, showLayer, upsideDown, -1);
+            PlayerFaceExtractor.extractRenderState(graphics, playerInfo.getSkin().body().texturePath(), 0, 0, (int) component.getWidth(), showLayer, upsideDown, -1);
         });
 
-        return new NativeRenderComponent(headRenderer);
+        return component.styleSetWidth(10f).styleSetHeight(10f);
     }
 }

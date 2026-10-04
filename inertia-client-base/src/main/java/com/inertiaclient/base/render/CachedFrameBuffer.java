@@ -26,7 +26,7 @@ public class CachedFrameBuffer {
     private boolean forceUpdate = false;
 
 
-    public void createFrameBufferIfNeeded(int width, int height, boolean stencil, boolean depth) {
+    public boolean createFrameBufferIfNeeded(int width, int height, boolean stencil, boolean depth) {
         if (this.framebuffer == null) {
             //dont really know if this is needed, we needed to enable stencil in  1.21.4 opengl, for the main gui tool tips to render, but they seem fine now without enabling stencil, at that I don't know if this "enables" stencil, think it just allocates room :shrug:
 
@@ -43,7 +43,9 @@ public class CachedFrameBuffer {
             //should be zero, isn't controlled by the frame buffer anymore,gameRenderState.guiRenderState.clearColorOverride
             //framebuffer.setClearColor(0, 0, 0, 0);
             this.forceUpdate = true;
+            return true;
         }
+        return false;
     }
 
     public void resize(int width, int height) {
@@ -69,6 +71,10 @@ public class CachedFrameBuffer {
 
     public void renderCachedImage(GuiGraphicsExtractor graphics) {
         blitRenderTarget(graphics, this.framebuffer, true);
+    }
+
+    public void forceUpdateNextFrame() {
+        this.forceUpdate = true;
     }
 
     public boolean shouldUpdate() {

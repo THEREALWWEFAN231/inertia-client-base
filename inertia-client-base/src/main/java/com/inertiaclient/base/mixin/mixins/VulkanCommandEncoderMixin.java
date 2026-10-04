@@ -10,11 +10,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(VulkanCommandEncoder.class)
 public class VulkanCommandEncoderMixin {
 
-    @Inject(method = "submit", at = @At(value = "INVOKE", target = "Lcom/mojang/renderpearl/backend/vulkan/VulkanCommandEncoder;awaitSubmitCompletion(JJ)Z"))
+    @Inject(method = "submit", at = @At("RETURN"))
     public void submit(CallbackInfo callbackInfo) {
         if (SkiaVulkanInstance.getSkiaDirectContext() != null) {
             //changing syncCpu to true,  waits for work to be submitted and would cause more accurate rendering? but it slows  down rendering a lot, so we wont do that...
-            SkiaVulkanInstance.getSkiaDirectContext().submit(false);
+            if (SkiaVulkanInstance.TEST_SINGLE_SUBMIT) {
+                SkiaVulkanInstance.getSkiaDirectContext().submit(false);
+            }
         }
     }
 

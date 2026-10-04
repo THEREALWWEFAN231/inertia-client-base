@@ -1,8 +1,6 @@
 package com.inertiaclient.base.gui.components.tabbedpage.impl;
 
-import com.inertiaclient.base.gui.components.tabbedpage.Tab;
-import com.inertiaclient.base.gui.components.tabbedpage.TabbedPage;
-import com.inertiaclient.base.gui.components.tabbedpage.WrappedListContainer;
+import com.inertiaclient.base.gui.components.tabbedpage.*;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.value.HashsetValue;
@@ -21,12 +19,11 @@ public class HashsetPage<T> extends TabbedPage {
     public ArrayList<Tab> createTabs() {
         var tabs = new ArrayList<Tab>();
 
-        Tab<WrappedListContainer> add = new Tab(TabbedPage.getTextForPage("hashset", "add"), new WrappedListContainer());
-        Tab<WrappedListContainer> remove = new Tab(TabbedPage.getTextForPage("hashset", "remove"), new WrappedListContainer());
+        Tab<AbstractWrappedListContainer<?>> add = new Tab<>(TabbedPage.getTextForPage("hashset", "add"), this.createTabWrappedContainer());
+        Tab<AbstractWrappedListContainer<?>> remove = new Tab<>(TabbedPage.getTextForPage("hashset", "remove"), this.createTabWrappedContainer());
         tabs.add(add);
         tabs.add(remove);
-
-
+        
         for (T entry : hashsetValue.getAllPossibleEntries()) {
             YogaNode component = createComponentForEntryFunction.apply(entry);
             component.setHoverCursorToIndicateClick();
@@ -48,10 +45,12 @@ public class HashsetPage<T> extends TabbedPage {
                         hashsetValue.addHard(entry);
                         add.getYogaNode().getListNode().removeChild(component);
                         remove.getYogaNode().getListNode().insertChild(component, removeIndex);
+                        this.onModified(ModificationType.ADD, add);
                     } else {
                         hashsetValue.removeHard(entry);
                         remove.getYogaNode().getListNode().removeChild(component);
                         add.getYogaNode().getListNode().insertChild(component, addIndex);
+                        this.onModified(ModificationType.REMOVE, remove);
                     }
                     return true;
                 }
@@ -66,4 +65,17 @@ public class HashsetPage<T> extends TabbedPage {
         }
         return tabs;
     }
+
+    public AbstractWrappedListContainer<?> createTabWrappedContainer() {
+        return new WrappedListContainer();
+    }
+
+    public void onModified(ModificationType modificationType, Tab<AbstractWrappedListContainer<?>> tab) {
+
+    }
+
+    public enum ModificationType {
+        ADD, REMOVE;
+    }
+
 }

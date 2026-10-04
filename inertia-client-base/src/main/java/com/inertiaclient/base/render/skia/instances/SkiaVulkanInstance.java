@@ -33,6 +33,8 @@ import static org.lwjgl.vulkan.VK10.VK_NULL_HANDLE;
 //https://github.com/HumbleUI/Skija/blob/master/examples/vulkan/src/Main.java
 public class SkiaVulkanInstance extends SkiaInstance {
 
+    //xray blocks page, when enabled, scrolling(in blocks gui) fast looks/loads proper, name tags are behind a frame, when disabled name tags are not behind a frame, scrolling doesn't look/load proper
+    public static final boolean TEST_SINGLE_SUBMIT = false;
     @Getter
     private static DirectContext skiaDirectContext;
     @Getter
@@ -62,7 +64,14 @@ public class SkiaVulkanInstance extends SkiaInstance {
             SkiaVulkanInstance.skiaDirectContext.resetAll();
             this.canvas.clear(0x00000000);
             this.skiaDraw.render(minecraftGraphics, mouseX, mouseY, delta);
-            SkiaVulkanInstance.skiaDirectContext.flush();
+            if (TEST_SINGLE_SUBMIT) {
+                SkiaVulkanInstance.skiaDirectContext.flush();
+            } else {
+                RenderSystem.getDevice().createCommandEncoder().submit();
+                //changing syncCpu to true,  waits for work to be submitted and would cause more accurate rendering? but it slows  down rendering a lot, so we wont do that...
+                SkiaVulkanInstance.getSkiaDirectContext().flushAndSubmit(this.surface, false);
+                //RenderSystem.getDevice().createCommandEncoder().submit();
+            }
         });
         this.resize(width, height);
         this.skiaDraw = skiaDraw;
@@ -127,7 +136,15 @@ public class SkiaVulkanInstance extends SkiaInstance {
 
     public static Image createNativeImage(TextureTarget from) {
         var colorTexture = (VulkanGpuTexture) from.getColorTexture();
-        var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), 0, 0, VulkanConst.toVk(from.getColorTexture().getFormat()), 15, 1, from.getColorTexture().getMipLevels(), -1, false, 0);
+
+        //VulkanGpuTexture
+        int tiling = 0;
+        int sharing = 0;//VK_SHARING_MODE_EXCLUSIVE
+        int layout = 1;//VK_IMAGE_LAYOUT_PREINITIALIZED
+        int samples = 1;
+        int queueFamily = -1;
+
+        var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), tiling, layout, VulkanConst.toVk(from.getColorTexture().getFormat()), from.getColorTexture().usage(), samples, from.getColorTexture().getMipLevels(), queueFamily, false, sharing);
         return Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(from.width, from.height, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, SkiaVulkanInstance.getColorTypeFromImageFormat(VulkanConst.toVk(from.getColorTexture().getFormat())), ColorAlphaType.PREMUL, null, null);
     }
 
@@ -145,7 +162,7 @@ public class SkiaVulkanInstance extends SkiaInstance {
         }
     }
 
-    private static FrontendGpuDeviceAccessor getFrontendDevice() {
+    public static FrontendGpuDeviceAccessor getFrontendDevice() {
         return (FrontendGpuDeviceAccessor) RenderSystem.getDevice();
     }
 

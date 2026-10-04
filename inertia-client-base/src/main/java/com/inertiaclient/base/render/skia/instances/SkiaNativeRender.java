@@ -4,12 +4,11 @@ import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.mixin.custominterfaces.GuiRendererInterface;
 import com.inertiaclient.base.mixin.mixins.accessors.GameRendererAccessor;
 import com.inertiaclient.base.mixin.mixins.accessors.RenderTargetAccessor;
+import com.inertiaclient.base.render.CachedFrameBuffer;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.utils.UIUtils;
-import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.renderpearl.api.GpuFormat;
 import io.github.humbleui.skija.Image;
 import io.github.humbleui.skija.Paint;
 import io.github.humbleui.types.Rect;
@@ -45,7 +44,7 @@ public class SkiaNativeRender {
     private boolean autoCleanup = true;
 
     @Getter
-    private TextureTarget frameBuffer;
+    private CachedFrameBuffer frameBuffer = new CachedFrameBuffer();
     @Getter
     private Image image = null;
 
@@ -63,28 +62,33 @@ public class SkiaNativeRender {
             featureRenderDispatcher = new FeatureRenderDispatcher(InertiaBase.mc.gameRenderer.renderBuffers(), InertiaBase.mc.getModelManager(), InertiaBase.mc.getAtlasManager(), InertiaBase.mc.font, gameRenderState);
             guiRenderer = new GuiRenderer(gameRenderState.guiRenderState, featureRenderDispatcher, List.of(new GuiEntityRenderer(Minecraft.getInstance().getEntityRenderDispatcher()), new GuiSkinRenderer(), new GuiBookModelRenderer(), new GuiBannerResultRenderer(InertiaBase.mc.getAtlasManager()), new GuiProfilerChartRenderer()));
         }
+
+        if (!this.frameBuffer.shouldUpdate()) {
+            return;
+        }
+
         this.cachedNativeWidth = this.nativeWidth.get();
         this.cachedNativeHeight = this.nativeHeight.get();
 
         int scaledWidth = (int) (this.cachedNativeWidth * UIUtils.getScaleFactor());
         int scaledHeight = (int) (this.cachedNativeHeight * UIUtils.getScaleFactor());
 
-        if (frameBuffer == null) {
-            frameBuffer = new TextureTarget(null, scaledWidth, scaledHeight, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
-
+        boolean created = this.frameBuffer.createFrameBufferIfNeeded(scaledWidth, scaledHeight, false, true);
+        if (created) {
             if (this.autoCleanup) {
-                final TextureTarget nonReference = frameBuffer;
+                //TODO: check if this works after cached change
+                final CachedFrameBuffer nonReference = frameBuffer;
                 InertiaBase.CLEANER.register(this, () -> {
                     //framebuffer.delete must be called on main thread
                     InertiaBase.mc.executeIfPossible(() -> {
-                        InertiaBase.LOGGER.info("deleted SkiaNativeRender texture  {}", ((RenderTargetAccessor) nonReference).getLabel());
-                        nonReference.destroyBuffers();
+                        InertiaBase.LOGGER.info("deleted SkiaNativeRender texture  {}", ((RenderTargetAccessor) nonReference.getFramebuffer()).getLabel());
+                        nonReference.deleteFrameBuffer();
                     });
                 });
             }
             this.setImage();
         }
-        if (frameBuffer.width != scaledWidth || frameBuffer.height != scaledHeight) {
+        if (frameBuffer.getFramebuffer().width != scaledWidth || frameBuffer.getFramebuffer().height != scaledHeight) {
             frameBuffer.resize(scaledWidth, scaledHeight);
             this.setImage();
         }
@@ -96,12 +100,12 @@ public class SkiaNativeRender {
         var oldLighting = RenderSystem.getShaderLights();
 
         {
-            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(frameBuffer.getColorTexture(), this.gameRenderState.guiRenderState.clearColorOverride, frameBuffer.getDepthTexture(), 0, 0, 0, frameBuffer.width, frameBuffer.height, 0);
+            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(frameBuffer.getFramebuffer().getColorTexture(), this.gameRenderState.guiRenderState.clearColorOverride, frameBuffer.getFramebuffer().getDepthTexture(), 0, 0, 0, frameBuffer.getFramebuffer().width, frameBuffer.getFramebuffer().height, 0);
             gameRenderState.guiRenderState.reset();
 
             GuiGraphicsExtractor graphics = new GuiGraphicsExtractor(InertiaBase.mc, gameRenderState.guiRenderState, -999, -999);
             GuiRendererInterface guiRendererInterface = (GuiRendererInterface) guiRenderer;
-            guiRendererInterface.setRenderTargetOverride(this.frameBuffer);
+            guiRendererInterface.setRenderTargetOverride(this.frameBuffer.getFramebuffer());
             guiRendererInterface.setProjectionOverride(new float[]{this.cachedNativeWidth, this.cachedNativeHeight});
 
             setNativeRender.accept(graphics);
@@ -116,6 +120,10 @@ public class SkiaNativeRender {
             RenderSystem.setShaderLights(oldLighting);
 
             RenderSystem.getDynamicUniforms().writeTransform(Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState.cameraRenderState.projectionMatrix);
+        }
+
+        if (!SkiaVulkanInstance.TEST_SINGLE_SUBMIT) {
+            //RenderSystem.getDevice().createCommandEncoder().submit();
         }
         RenderSystem.setProjectionMatrix(oldProjectionMatrix, oldProjectionType);
     }
@@ -136,9 +144,9 @@ public class SkiaNativeRender {
         }
 
         if (UIUtils.isUsingVulkan()) {
-            this.image = SkiaVulkanInstance.createNativeImage(this.frameBuffer);
+            this.image = SkiaVulkanInstance.createNativeImage(this.frameBuffer.getFramebuffer());
         } else {
-            this.image = SkiaOpenGLInstance.createNativeImage(this.frameBuffer);
+            this.image = SkiaOpenGLInstance.createNativeImage(this.frameBuffer.getFramebuffer());
         }
 
         if (this.autoCleanup) {
@@ -153,7 +161,7 @@ public class SkiaNativeRender {
     }
 
     public void delete() {
-        this.frameBuffer.destroyBuffers();
+        this.frameBuffer.deleteFrameBuffer();
         //does this actually delete the image/backend handle
         image.close();
     }

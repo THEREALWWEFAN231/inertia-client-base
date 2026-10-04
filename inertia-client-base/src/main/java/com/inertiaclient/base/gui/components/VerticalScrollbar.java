@@ -116,7 +116,12 @@ public class VerticalScrollbar extends AbsoulteYogaNode {
         if (this.isBeingDragged) {
             float scrollOffset = this.getParent().getGlobalY() - globalMouseY + this.startBeingDraggedY;
             scrollOffset *= this.multiplier;
+            float difference = this.getParent().getChildrenScrollYOffset() - scrollOffset;
             this.setScrollOffset(scrollOffset);
+
+            if (difference != 0) {
+                this.getParent().executeScrolledCallback(ScrollReason.DRAGGED, ScrollDirection.Y, -1, -1, difference);
+            }
         } else {
             float scrollOffset = this.getParent().getChildrenScrollYOffset();
             this.setScrollOffset(scrollOffset);
@@ -150,7 +155,7 @@ public class VerticalScrollbar extends AbsoulteYogaNode {
         this.setY((scrollOffset * -1) / this.multiplier);
     }
 
-    public boolean scroll(float amount) {
+    public boolean scroll(float inputAmount) {
         if (!isAbleToScroll) {
             return false;
         }
@@ -160,7 +165,10 @@ public class VerticalScrollbar extends AbsoulteYogaNode {
         if (wasScrolledAllTheWay) {
             return false;
         }
-        this.setScrollOffset(scrollOffset + (amount * 75));
+        float amount = inputAmount * 75;
+        this.setScrollOffset(scrollOffset + amount);
+
+        this.getParent().executeScrolledCallback(ScrollReason.MOUSE_WHEEL, ScrollDirection.Y, -1, -1, amount);
         return true;
     }
 

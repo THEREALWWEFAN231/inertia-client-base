@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(VulkanDevice.class)
 public class VulkanDeviceMixin implements VulkanDeviceInterface {
-
+    
     @Unique
     private VulkanPhysicalDevice inertia$physicalDevice;
 
@@ -22,9 +22,9 @@ public class VulkanDeviceMixin implements VulkanDeviceInterface {
         return instance.vkPhysicalDeviceProperties();
     }
 
-
     @Override
     public VulkanPhysicalDevice getVulkanPhysicalDevice() {
         return this.inertia$physicalDevice;
     }
+
 }

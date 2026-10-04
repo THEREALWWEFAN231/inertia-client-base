@@ -78,6 +78,13 @@ public abstract class TabbedPage extends YogaNode {
         this.content.refreshSearch();
     }
 
+    public Tab getSelectedTab() {
+        if (this.tabs == null || this.tabs.isEmpty()) {
+            return null;
+        }
+        return this.tabs.get(this.selectedButtonIndex);
+    }
+
     public int defaultSelectedIndex() {
         return 0;
     }

@@ -60,7 +60,7 @@ public class SkiaOpenGLInstance extends SkiaInstance {
                 SkiaOpenGLInstance.skiaDirectContext.resetGLAll();
                 this.canvas.clear(0x00000000);
                 this.skiaDraw.render(minecraftGraphics, mouseX, mouseY, delta);
-                SkiaOpenGLInstance.skiaDirectContext.flush();
+                SkiaOpenGLInstance.skiaDirectContext.flush(this.surface);
                 GL33.glBindSampler(0, 0);
             }
         });

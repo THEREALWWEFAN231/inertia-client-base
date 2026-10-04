@@ -1,9 +1,9 @@
-package com.inertiaclient.base.gui.components.tabbedpage.impl;
+package com.inertiaclient.base.gui.components.minecraftitems;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.gui.ModernClickGui;
 import com.inertiaclient.base.render.skia.instances.SkiaNativeRender;
-import com.inertiaclient.base.render.yoga.YogaNode;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
@@ -12,38 +12,25 @@ import net.minecraft.world.item.ItemStack;
 
 import java.awt.Color;
 
-public class ItemRenderComponent extends YogaNode {
+public class ItemRenderComponent extends ItemReferenceNode {
+
+    private static final ItemStackRenderState ITEM_RENDER_STATE = new ItemStackRenderState();
 
     private SkiaNativeRender skiaNativeRender;
-    private static final ItemStackRenderState itemRenderState = new ItemStackRenderState();
 
     public ItemRenderComponent(Item item) {
-        String id = BuiltInRegistries.ITEM.wrapAsHolder(item).getRegisteredName();
-        this.setSearchContext(id);
-        this.setTooltip(() -> id);
-        this.setTooltipDelay(() -> 0L);
+        this(item, BuiltInRegistries.ITEM.wrapAsHolder(item).getRegisteredName());
+    }
 
+    public ItemRenderComponent(Item item, String id) {
+        super(item, id);
 
         skiaNativeRender = new SkiaNativeRender();
         skiaNativeRender.setNativeWidth(() -> 16f);
         skiaNativeRender.setNativeHeight(() -> 16f);
         skiaNativeRender.setSetNativeRender(graphics -> {
-            //TODO: fix
-            ItemStack itemStack = new ItemStack(item);
-            InertiaBase.mc.getItemModelResolver().updateForTopItem(itemRenderState, itemStack, ItemDisplayContext.GUI, null, null, 0);
-
-
-            if (itemRenderState.isEmpty()) {
-                graphics.blit(ModernClickGui.UNKNOWN_TEXTURE, 0, 0, (int) skiaNativeRender.getCachedNativeWidth(), (int) skiaNativeRender.getCachedNativeHeight(), 0, 1, 0, 1);
-            } else {
-                graphics.item(itemStack, 0, 0);
-            }
+            ItemRenderComponent.renderItemForGui(new ItemStack(item), graphics);
         });
-
-
-        this.styleSetHeight(16);
-        this.styleSetWidth(16);
-        //this.setDebug(true);
 
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
 
@@ -55,4 +42,21 @@ public class ItemRenderComponent extends YogaNode {
             skiaNativeRender.drawImageWithSkia(canvas, 0, 0);
         });
     }
+
+    /**
+     * Renders the item or UNKNOWN_TEXTURE at 0 0, width 16 height 16
+     *
+     * @param itemStack
+     * @param graphics
+     */
+    public static void renderItemForGui(ItemStack itemStack, GuiGraphicsExtractor graphics) {
+        InertiaBase.mc.getItemModelResolver().updateForTopItem(ITEM_RENDER_STATE, itemStack, ItemDisplayContext.GUI, null, null, 0);
+
+        if (ITEM_RENDER_STATE.isEmpty()) {
+            graphics.blit(ModernClickGui.UNKNOWN_TEXTURE, 0, 0, 16, 16, 0, 1, 0, 1);
+        } else {
+            graphics.item(itemStack, 0, 0);
+        }
+    }
+
 }

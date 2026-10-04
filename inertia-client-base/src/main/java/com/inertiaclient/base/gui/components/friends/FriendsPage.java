@@ -101,6 +101,8 @@ public class FriendsPage extends TabbedPage {
         YogaNode addNode = YogaBuilder.getFreshBuilder().setFlexGrow(0).setFlexShrink(0).setHeight(12).setAlignItems(AlignItems.CENTER).setJustifyContent(JustifyContent.CENTER).setGap(GapGutter.COLUMN, 2).build();
 
         this.addHeadComponent = new CachedHeadComponent();
+        this.addHeadComponent.styleSetWidth(10f);
+        this.addHeadComponent.styleSetHeight(10f);
         this.addHeadComponent.setHeadVisible(false);
 
         this.addNameField = new YogaTextField();

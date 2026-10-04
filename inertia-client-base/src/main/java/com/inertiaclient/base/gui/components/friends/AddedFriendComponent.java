@@ -13,6 +13,8 @@ public class AddedFriendComponent extends GenericFriendComponent {
     public YogaNode createHeadDisplay(YogaNode headAndName) {
         CachedHeadComponent headComponent = new CachedHeadComponent(this.uuid == null ? this.username : this.uuid.toString());
         headComponent.setBlurRadius(() -> headAndName.shouldShowHoveredEffects() ? 3f : 0f);
+        headComponent.styleSetWidth(10f);
+        headComponent.styleSetHeight(10f);
         return headComponent;
     }
 }

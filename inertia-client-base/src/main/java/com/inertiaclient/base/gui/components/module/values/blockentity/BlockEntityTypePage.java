@@ -1,7 +1,7 @@
 package com.inertiaclient.base.gui.components.module.values.blockentity;
 
+import com.inertiaclient.base.gui.components.minecraftitems.ItemRenderComponent;
 import com.inertiaclient.base.gui.components.tabbedpage.impl.HashsetPage;
-import com.inertiaclient.base.gui.components.tabbedpage.impl.ItemRenderComponent;
 import com.inertiaclient.base.value.HashsetValue;
 import net.fabricmc.fabric.mixin.lookup.BlockEntityTypeAccessor;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,11 +19,7 @@ public class BlockEntityTypePage extends HashsetPage<BlockEntityType<?>> {
         super(hashsetValue, blockEntityType -> {
             Block blockForBlockEntity = BlockEntityTypePage.getDisplayBlockForBlockEntity(blockEntityType);
             String id = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(blockEntityType).toLanguageKey();
-            var blockComponent = new ItemRenderComponent(blockForBlockEntity.asItem());
-
-            blockComponent.setSearchContext(id);
-            blockComponent.setTooltip(() -> id);
-            return blockComponent;
+            return new ItemRenderComponent(blockForBlockEntity.asItem(), id);
         });
     }
 
