@@ -9,6 +9,7 @@ import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.GapGutter;
 import com.inertiaclient.base.value.group.ButtonValueGroup;
 import com.inertiaclient.base.value.group.ValueGroup;
+import com.inertiaclient.base.value.group.ValueGroupParent;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +19,10 @@ public class ValuesPage extends YogaNode {
 
     @Getter
     private YogaNode allGroups;
+
+    public ValuesPage(ValueGroupParent valueGroupParent) {
+        this(valueGroupParent.getValueGroups());
+    }
 
     public ValuesPage(@Nullable List<ValueGroup> valueGroups) {
         this.styleSetFlexGrow(1);
@@ -32,7 +37,7 @@ public class ValuesPage extends YogaNode {
                     continue;
                 }
 
-                this.addGroupDirect(valueGroup);
+                this.addGroupAndChildren(valueGroup);
             }
         }
 
@@ -40,8 +45,15 @@ public class ValuesPage extends YogaNode {
         this.setShouldScissorChildren(true);
     }
 
-    public void addGroupDirect(ValueGroup valueGroup) {
+    private void addGroupDirect(ValueGroup valueGroup) {
         allGroups.addChild(new ValuesGroupContainer(valueGroup));
+    }
+
+    public void addGroupAndChildren(ValueGroup valueGroup) {
+        this.addGroupDirect(valueGroup);
+        if (valueGroup.getChildrenGroups() != null) {
+            valueGroup.getChildrenGroups().forEach(this::addGroupDirect);
+        }
     }
 
 }

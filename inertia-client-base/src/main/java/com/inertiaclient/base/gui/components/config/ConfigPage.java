@@ -134,7 +134,7 @@ public class ConfigPage extends TabbedPage {
         SelectButton loadButton = new SelectButton(configText("button.load"), () -> {
 
             for (Module module : InertiaBase.instance.getModuleManager().getModules()) {
-                for (ValueGroup valueGroup : module.getValueGroups()) {
+                for (ValueGroup valueGroup : module.getValueGroups().getValueGroups()) {
                     for (Value value : valueGroup.getValues()) {
                         value.setValue(value.getDefaultValue());
                     }
@@ -142,7 +142,7 @@ public class ConfigPage extends TabbedPage {
             }
 
             for (HudComponent hudElement : InertiaBase.instance.getHudManager().getComponents()) {
-                for (ValueGroup valueGroup : hudElement.getValueGroups()) {
+                for (ValueGroup valueGroup : hudElement.getValueGroups().getValueGroups()) {
                     for (Value value : valueGroup.getValues()) {
                         value.setValue(value.getDefaultValue());
                     }

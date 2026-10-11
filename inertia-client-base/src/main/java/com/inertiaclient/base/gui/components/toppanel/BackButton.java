@@ -17,6 +17,7 @@ public class BackButton extends YogaNode {
         this.styleSetWidth(16);
         this.styleSetHeight(16);
         this.setHoverCursorToIndicateClick();
+        this.setIsVisible(() -> MainFrame.pageHolder.canGoBack());
 
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             try (Paint paint = SkiaUtils.createPaintForColor(MainFrame.s_stringValuesBackgroundColor.get()); Paint stroke = SkiaUtils.createStrokePaint(MainFrame.s_selectorButtonOutlineColor.get(), MainFrame.s_lineWidth.get())) {
@@ -49,11 +50,6 @@ public class BackButton extends YogaNode {
             }
             return false;
         });
-    }
-
-    @Override
-    protected boolean implIsVisible() {
-        return MainFrame.pageHolder.canGoBack();
     }
 
 }

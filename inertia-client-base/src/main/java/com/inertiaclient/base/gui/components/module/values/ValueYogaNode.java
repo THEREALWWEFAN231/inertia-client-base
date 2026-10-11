@@ -19,6 +19,7 @@ public class ValueYogaNode<T extends Value<?>> extends YogaNode {
         this.setTooltip(() -> value.getDescriptionString());
         this.setShouldRenderTooltip(() -> this.showTooltip);
 
+        this.setIsVisible(() -> this.value.isVisible());
         this.setHoverCallback(startHover -> {
             if (startHover) {
                 showTooltip = true;
@@ -37,11 +38,7 @@ public class ValueYogaNode<T extends Value<?>> extends YogaNode {
             return false;
         });
     }
-
-    protected boolean implIsVisible() {
-        return this.value.isVisible();
-    }
-
+    
     public void _valueNodeSetShouldShowTooltip(boolean showTooltip) {
         this.showTooltip = showTooltip;
     }

@@ -5,17 +5,17 @@ import com.inertiaclient.base.utils.CursorUtils;
 import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.value.group.ButtonValueGroup;
 import com.inertiaclient.base.value.group.ValueGroup;
+import com.inertiaclient.base.value.group.ValueGroupParent;
 import com.inertiaclient.base.value.impl.*;
 import lombok.Getter;
 import org.lwjgl.sdl.SDLScancode;
 
 import java.awt.Color;
-import java.util.ArrayList;
 
 public class Settings {
 
     @Getter
-    private ArrayList<ValueGroup> allGroups = new ArrayList<>();
+    private ValueGroupParent valueGroups = new ValueGroupParent(() -> InertiaBase.instance.getFileManager().getSettingsQueuedSave().queue());
 
     private ValueGroup main;
     @Getter
@@ -33,21 +33,17 @@ public class Settings {
 
 
     public Settings() {
-        this.addGroup(main = new ValueGroup("main", ""));
+        this.valueGroups.addGroup(this.main = new ValueGroup("main", ""));
 
         this.clientRotationDisplay = new ModeValue("client_rotation_display", this.main, ClientRotationDisplay.WHOLE_BODY, ClientRotationDisplay.class);
 
-        this.addGroup(this.clickGuiButtonGroup = new ButtonValueGroup("click_gui", ""));
+        this.valueGroups.addGroup(this.clickGuiButtonGroup = new ButtonValueGroup("click_gui", ""));
         this.clickGuiSettings = new ClickGuiSettings(this.clickGuiButtonGroup);
 
-        this.addGroup(this.tpsButtonGroup = new ButtonValueGroup("tps", ""));
+        this.valueGroups.addGroup(this.tpsButtonGroup = new ButtonValueGroup("tps", ""));
         this.tpsSettings = new TPSSettings(this.tpsButtonGroup);
 
         this.worldEspFPS = new MaxFPSValue("world_esp_fps", this.main);
-    }
-
-    private void addGroup(ValueGroup valueGroup) {
-        this.allGroups.add(valueGroup);
     }
 
     public static class ClientRotationDisplay {
@@ -59,6 +55,8 @@ public class Settings {
 
     @Getter
     public class ClickGuiSettings {
+
+        private ValueGroup moduleRenderGroup;
 
         private BooleanValue customCursors;
         private BooleanValue scaleAnimation;
@@ -82,10 +80,14 @@ public class Settings {
         private FloatValue borderRadius;
         private FloatValue lineWidth;
 
+        private BooleanValue moduleSettingsIcon;
+        private BooleanValue moduleEnabledSwitch;
+
         private MaxFPSValue maxFPS;
 
         public ClickGuiSettings(ValueGroup valueGroup) {
-            this.customCursors = new BooleanValue("custon_cursors", valueGroup, true);
+            valueGroup.addGroup(this.moduleRenderGroup = new ValueGroup("module_render", valueGroup.getLanguageBaseKey()));
+            this.customCursors = new BooleanValue("custom_cursors", valueGroup, true);
             this.scaleAnimation = new BooleanValue("scale", valueGroup, true);
             this.opacityAnimation = new BooleanValue("opacity", valueGroup, false);
             this.translateAnimation = new BooleanValue("translate", valueGroup, false);
@@ -107,6 +109,9 @@ public class Settings {
             this.lineWidth = new FloatValue("line_width", valueGroup, .5f, 0, 3);
 
             this.maxFPS = new MaxFPSValue("max_fps", valueGroup, 90);
+
+            this.moduleSettingsIcon = new BooleanValue("setting_icon", this.moduleRenderGroup, false);
+            this.moduleEnabledSwitch = new BooleanValue("enabled_switch", this.moduleRenderGroup, false);
 
             this.customCursors.setChangeListener((oldValue, newValue) -> {
                 if (!newValue) {

@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -23,6 +24,9 @@ public class ValueGroup implements LanguageBaseKey, JsonState {
     private Supplier<Boolean> visibleWhen;
     @Getter
     private final ArrayList<Value> values = new ArrayList<>();
+    @Nullable
+    @Getter
+    private ArrayList<ValueGroup> childrenGroups;
     private String parentTranslationKey;
     @Getter
     private Component name;
@@ -39,6 +43,19 @@ public class ValueGroup implements LanguageBaseKey, JsonState {
 
     public void add(Value<?> value) {
         this.values.add(value);
+    }
+
+    public void addGroup(ValueGroup valueGroup) {
+        if (this.childrenGroups == null) {
+            this.childrenGroups = new ArrayList<>();
+        }
+        this.childrenGroups.add(valueGroup);
+        //don't set it to the current value, make it run whatever the parent currently is
+        valueGroup.setSaveHandler(() -> {
+            if (this.saveHandler != null) {
+                this.saveHandler.run();
+            }
+        });
     }
 
     public boolean isVisible() {
@@ -67,16 +84,26 @@ public class ValueGroup implements LanguageBaseKey, JsonState {
 
     @Override
     public JsonElement toJson() {
-        if (this.values.isEmpty()) {
+        if (this.values.isEmpty() && (this.childrenGroups == null || this.childrenGroups.isEmpty())) {
             return null;
         }
         JsonObject jsonObject = new JsonObject();
 
-        JsonObject values = new JsonObject();
-        for (Value<?> value : this.values) {
-            values.add(value.getId(), value.toJson());
+        if (!this.values.isEmpty()) {
+            JsonObject values = new JsonObject();
+            for (Value<?> value : this.values) {
+                values.add(value.getId(), value.toJson());
+            }
+            jsonObject.add("Values", values);
         }
-        jsonObject.add("Values", values);
+
+        if (this.childrenGroups != null && !this.childrenGroups.isEmpty()) {
+            JsonObject childrenGroups = new JsonObject();
+            for (ValueGroup valueGroup : this.childrenGroups) {
+                childrenGroups.add(valueGroup.getId(), valueGroup.toJson());
+            }
+            jsonObject.add("Children", childrenGroups);
+        }
 
         return jsonObject;
     }
@@ -85,16 +112,34 @@ public class ValueGroup implements LanguageBaseKey, JsonState {
     public void fromJson(JsonElement data) {
         JsonObject main = data.getAsJsonObject();
 
-        JsonObject valuesObject = main.get("Values").getAsJsonObject();
+        if (main.has("Values")) {
+            JsonObject valuesObject = main.get("Values").getAsJsonObject();
 
-        valuesObject.entrySet().forEach(entry -> {
-            try {
-                var foundValueOptional = this.values.stream().filter(value -> value.getId().equals(entry.getKey())).findFirst();
-                if (foundValueOptional.isPresent()) {
-                    foundValueOptional.get().fromJson(entry.getValue());
+            valuesObject.entrySet().forEach(entry -> {
+                try {
+                    var foundValueOptional = this.values.stream().filter(value -> value.getId().equals(entry.getKey())).findFirst();
+                    if (foundValueOptional.isPresent()) {
+                        foundValueOptional.get().fromJson(entry.getValue());
+                    }
+                } catch (Exception e) {
                 }
-            } catch (Exception e) {
-            }
-        });
+            });
+        }
+
+        if (main.has("Children")) {
+            JsonObject childrenObject = main.get("Children").getAsJsonObject();
+
+            childrenObject.entrySet().forEach(entry -> {
+                try {
+                    var foundChildOptional = this.childrenGroups.stream().filter(group -> group.getId().equals(entry.getKey())).findFirst();
+                    if (foundChildOptional.isPresent()) {
+                        foundChildOptional.get().fromJson(entry.getValue());
+                    }
+                } catch (Exception e) {
+                }
+            });
+        }
+
     }
+
 }

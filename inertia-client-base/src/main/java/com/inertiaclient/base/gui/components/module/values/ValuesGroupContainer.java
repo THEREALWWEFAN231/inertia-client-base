@@ -75,10 +75,8 @@ public class ValuesGroupContainer extends AbstractGroupContainer {
             }
         });
         this.valueGroup = valueGroup;
-    }
 
-    protected boolean implIsVisible() {
-        return this.valueGroup.isVisible();
+        this.setIsVisible(() -> this.valueGroup.isVisible());
     }
 
 }

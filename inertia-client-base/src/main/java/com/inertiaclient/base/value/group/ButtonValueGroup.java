@@ -5,4 +5,5 @@ public class ButtonValueGroup extends ValueGroup {
     public ButtonValueGroup(String id, String parentTranslationKey) {
         super(id, parentTranslationKey);
     }
+
 }

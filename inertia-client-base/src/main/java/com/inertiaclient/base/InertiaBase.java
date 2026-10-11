@@ -80,6 +80,7 @@ public class InertiaBase {
         this.tickRateCalculator = new TickRateCalculator();
         this.friendManager = new FriendManager();
 
+        this.fileManager.loadSettingsJson();
         this.fileManager.loadModulesJson();
         this.fileManager.loadHudJson();
         this.fileManager.loadFriendsJson();

@@ -33,7 +33,7 @@ public class Pages extends YogaNode {
         this.addChild(new PageButton("icb/textures/list.svg", "config", () -> new Page(createAction("config"), new ConfigPage()), getChildren().size()));
         this.addChild(new PageButton("icb/textures/friend.svg", "friends", () -> new Page(createAction("friends"), new FriendsPage()), getChildren().size()));
 
-        this.addChild(new PageButton("icb/textures/setting-gear.svg", "settings", () -> new Page(createAction("settings"), new ValuesPage(InertiaBase.instance.getSettings().getAllGroups())), getChildren().size()));
+        this.addChild(new PageButton("icb/textures/setting-gear.svg", "settings", () -> new Page(createAction("settings"), new ValuesPage(InertiaBase.instance.getSettings().getValueGroups())), getChildren().size()));
 
 
         PageButton hudPageButton = new PageButton("icb/textures/hud.svg", "hud", () -> new Page(createAction("hud"), new HudEditorPage()), getChildren().size());

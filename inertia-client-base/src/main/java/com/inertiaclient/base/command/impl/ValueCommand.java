@@ -40,7 +40,7 @@ public class ValueCommand extends Command {
 
             var moduleBuilder = this.literal(module.getId(), module.getDescription());
 
-            for (ValueGroup valueGroup : module.getValueGroups()) {
+            for (ValueGroup valueGroup : module.getValueGroups().getValueGroups()) {
                 var valueGroupBuilder = this.literal(valueGroup.getId());
 
                 for (Value value : valueGroup.getValues()) {

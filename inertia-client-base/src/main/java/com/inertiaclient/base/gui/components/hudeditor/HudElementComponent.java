@@ -54,7 +54,7 @@ public class HudElementComponent extends YogaNode {
                     return true;
                 }
                 if (button == ButtonIdentifier.RIGHT) {
-                    ArrayList<ValueGroup> groups = new ArrayList<>(hudElement.getValueGroups());
+                    ArrayList<ValueGroup> groups = new ArrayList<>(hudElement.getValueGroups().getValueGroups());
                     groups.add(hudElement.getGroup().getValuesGroup());
                     MainFrame.pageHolder.addPage(new Page(hudElement.getName(), new ValuesPage(groups)));
                     return true;

@@ -11,6 +11,7 @@ import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.utils.JsonState;
 import com.inertiaclient.base.utils.LanguageBaseKey;
 import com.inertiaclient.base.value.group.ValueGroup;
+import com.inertiaclient.base.value.group.ValueGroupParent;
 import com.mojang.blaze3d.platform.InputConstants;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,7 +19,6 @@ import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
 import java.util.function.Supplier;
 
 public class Module implements LanguageBaseKey, JsonState {
@@ -42,7 +42,7 @@ public class Module implements LanguageBaseKey, JsonState {
     @Getter
     private final ValueGroup mainGroup;
     @Getter
-    private ArrayList<ValueGroup> valueGroups;
+    private ValueGroupParent valueGroups;
     @Getter
     protected Supplier<Boolean> allowEnabled;
     protected boolean saveEnabledState = true;
@@ -61,8 +61,8 @@ public class Module implements LanguageBaseKey, JsonState {
         this.description = Component.translatableWithFallback(getLanguageBaseKey() + ".description", "no description");
         this.bind = bind;
         this.category = category;
-        this.valueGroups = new ArrayList();
-        this.addGroup(this.mainGroup = new ValueGroup("main", this.getLanguageBaseKey()));
+        this.valueGroups = new ValueGroupParent(() -> InertiaBase.instance.getFileManager().getModuleQueuedSave().queue());
+        this.valueGroups.addGroup(this.mainGroup = new ValueGroup("main", this.getLanguageBaseKey()));
 
         this.mc = InertiaBase.mc;
     }
@@ -132,13 +132,6 @@ public class Module implements LanguageBaseKey, JsonState {
         return description.getString();
     }
 
-    public ValueGroup addGroup(ValueGroup valueGroup) {
-        this.valueGroups.add(valueGroup);
-        valueGroup.setSaveHandler(() -> InertiaBase.instance.getFileManager().getModuleQueuedSave().queue());
-
-        return valueGroup;
-    }
-
     public YogaNode getGuiNode() {
         return null;
     }
@@ -162,16 +155,9 @@ public class Module implements LanguageBaseKey, JsonState {
         }
         jsonObject.addProperty("Visible", this.visible);
 
-        JsonObject groups = new JsonObject();
-        for (ValueGroup valueGroup : this.valueGroups) {
-            JsonElement valueGroupJson = valueGroup.toJson();
-
-            if (valueGroupJson != null) {
-                groups.add(valueGroup.getId(), valueGroupJson);
-            }
-        }
-        if (groups.size() > 0) {
-            jsonObject.add("Groups", groups);
+        JsonElement valueGroups = this.valueGroups.toJson();
+        if (valueGroups != null) {
+            jsonObject.add("Value Groups", valueGroups);
         }
 
         return jsonObject;
@@ -195,16 +181,7 @@ public class Module implements LanguageBaseKey, JsonState {
             this.setBind(InputUtils.fromTranslationKey(keyElement.getAsString()));
         }
 
-        JsonElement groups = main.get("Groups");
-        if (groups != null && groups.isJsonObject()) {
-            JsonObject groupsObject = groups.getAsJsonObject();
-            groupsObject.entrySet().forEach(entry -> {
-                try {
-                    var foundGroupOptional = this.valueGroups.stream().filter(valueGroup -> valueGroup.getId().equals(entry.getKey())).findFirst();
-                    foundGroupOptional.ifPresent(valueGroup -> valueGroup.fromJson(entry.getValue()));
-                } catch (Exception e) {
-                }
-            });
-        }
+        JsonElement groups = main.get("Value Groups");
+        this.valueGroups.fromJson(groups);
     }
 }

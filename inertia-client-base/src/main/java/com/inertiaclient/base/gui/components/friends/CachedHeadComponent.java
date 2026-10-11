@@ -23,6 +23,8 @@ public class CachedHeadComponent extends YogaNode {
 
     public CachedHeadComponent(String uuidOrName) {
         this.uuidOrName = uuidOrName;
+        
+        this.setIsVisible(() -> this.isHeadVisible);
 
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (this.uuidOrName == null) {
@@ -46,10 +48,6 @@ public class CachedHeadComponent extends YogaNode {
 
     public CachedHeadComponent() {
         this(null);
-    }
-
-    protected boolean implIsVisible() {
-        return this.isHeadVisible;
     }
 
     private void renderSpinner(CanvasWrapper canvas) {

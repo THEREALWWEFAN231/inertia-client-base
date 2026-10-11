@@ -9,6 +9,9 @@ import com.inertiaclient.base.render.yoga.layouts.AlignItems;
 import com.inertiaclient.base.render.yoga.layouts.FlexDirection;
 import com.inertiaclient.base.render.yoga.layouts.JustifyContent;
 import com.inertiaclient.base.value.group.ButtonValueGroup;
+import com.inertiaclient.base.value.group.ValueGroup;
+
+import java.util.List;
 
 public class ValueGroupButton extends YogaNode {
 
@@ -21,8 +24,9 @@ public class ValueGroupButton extends YogaNode {
         this.addChild(new ValueNameLabel(buttonValueGroup.getName()));
 
         this.addChild(new SelectButton(() -> "edit", () -> { //if we just pass buttonValueGroup to the values page we will get an infinte loop, values page will just recreate this button, but if we add it "directly" it will ignore this button
-            var valuesPage = new ValuesPage(null);
-            valuesPage.addGroupDirect(buttonValueGroup);
+            var valuesPage = new ValuesPage((List<ValueGroup>) null);
+            valuesPage.addGroupAndChildren(buttonValueGroup);
+
             MainFrame.pageHolder.addPage(new Page(buttonValueGroup.getName(), valuesPage));
         }));
     }

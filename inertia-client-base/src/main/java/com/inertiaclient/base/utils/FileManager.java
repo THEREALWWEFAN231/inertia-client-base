@@ -48,6 +48,12 @@ public class FileManager {
         this.saveHudJson();
     });
 
+    @Getter
+    private QueueSave settingsQueuedSave = new QueueSave(() -> {
+        InertiaBase.LOGGER.info("saved ICB settings json");
+        this.saveSettingsJson();
+    });
+
     @EventTarget
     private final EventListener<ClientTickEvent> clientTickListener = this::onEvent;
 
@@ -103,6 +109,38 @@ public class FileManager {
             Files.createDirectories(path);
         }
         return path;
+    }
+
+    public void saveSettingsJson() {
+        try {
+            Path file = this.mainDirectory.resolve("Settings.json");
+            if (Files.notExists(file)) {
+                Files.createFile(file);
+            }
+
+            JsonObject main = new JsonObject();
+            main.add("Value Groups", InertiaBase.instance.getSettings().getValueGroups().toJson());
+            FileUtils.writeToFile(file, this.formattedGson.toJson(main));
+        } catch (Exception e) {
+            InertiaBase.LOGGER.warn("Error saving ICB settings", e);
+        }
+    }
+
+    public void loadSettingsJson() {
+        try {
+            Path file = this.mainDirectory.resolve("Settings.json");
+            if (Files.notExists(file)) {
+                this.saveSettingsJson();
+                return;
+            }
+
+            JsonObject main = FileUtils.getJsonObjectFromFile(file);
+            JsonElement groups = main.get("Value Groups");
+            InertiaBase.instance.getSettings().getValueGroups().fromJson(groups);
+        } catch (Exception e) {
+            InertiaBase.LOGGER.warn("Failed to decode ICB settings json, saving instead", e);
+            this.saveSettingsJson();
+        }
     }
 
     public void saveModulesJson() {
@@ -350,6 +388,7 @@ public class FileManager {
     public void onEvent(ClientTickEvent event) {
         this.moduleQueuedSave.saveIfNecessary();
         this.hudQueuedSave.saveIfNecessary();
+        this.settingsQueuedSave.saveIfNecessary();
     }
 
     @RequiredArgsConstructor

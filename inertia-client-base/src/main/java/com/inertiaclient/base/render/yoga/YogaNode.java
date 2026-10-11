@@ -177,6 +177,8 @@ public class YogaNode {
     @Getter
     @Accessors(chain = true)
     private Supplier<Long> tooltipDelay;
+    @Setter
+    private Supplier<Boolean> isVisible;
 
     @Setter
     @Getter
@@ -911,8 +913,8 @@ public class YogaNode {
         return false;
     }
 
-    protected boolean implIsVisible() {
-        return true;
+    private boolean implIsVisible() {
+        return this.isVisible == null || this.isVisible.get();
     }
 
     protected void doRenderCallback(RenderCallback renderCallback, GuiGraphicsExtractor graphics, float globalMouseX, float globalMouseY, float relativeMouseX, float relativeMouseY, float delta, CanvasWrapper canvas) {

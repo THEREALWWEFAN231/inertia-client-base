@@ -1,5 +1,6 @@
 package com.inertiaclient.base.gui.components.module;
 
+import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.gui.components.MainFrame;
 import com.inertiaclient.base.gui.components.Page;
 import com.inertiaclient.base.gui.components.SvgComponent;
@@ -53,8 +54,16 @@ public class ModuleComponent extends YogaNode {
         this.styleSetGap(GapGutter.COLUMN, 5);
         this.styleSetBorder(YogaEdge.ALL, 7);
 
+        var clickGuiSettings = InertiaBase.instance.getSettings().getClickGuiSettings();
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
-            canvas.drawRRect(0, 0, this.getWidth(), this.getHeight(), 5, BACKGROUND_COLOR);
+            if (module.isEnabled() != oldModuleState) {
+                AnimationValue.tweenEngine.cancelTarget(toggleAnimation);
+                toggleAnimation.to(.75f).value(module.isEnabled() ? 1 : 0).ease(Animations.easeOutBack).start();
+                oldModuleState = module.isEnabled();
+            }
+
+            Color enabledColor = UIUtils.colorWithAlpha(clickGuiSettings.getPrimaryColor().getValue().getRenderColor(), .24f);
+            canvas.drawRRect(0, 0, this.getWidth(), this.getHeight(), 5, UIUtils.transitionColor(BACKGROUND_COLOR, enabledColor, Math.clamp(this.toggleAnimation.getValue(), 0, 1)));
 
             boolean showDescription = descriptionAnimation.getValue() != 0;
 
@@ -118,6 +127,7 @@ public class ModuleComponent extends YogaNode {
         settingComponent.styleSetHeight(16);
         settingComponent.setHoverCursorToIndicateClick();
         settingComponent.setBlurRadius(() -> settingComponent.shouldShowHoveredEffects() ? 1f : 0);
+        settingComponent.setIsVisible(() -> clickGuiSettings.getModuleSettingsIcon().getValue());
         settingComponent.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
             if (button == ButtonIdentifier.LEFT) {
                 this.openSettings(module);
@@ -129,15 +139,18 @@ public class ModuleComponent extends YogaNode {
         enabledSwitch.setHoverCursor(CursorUtils.Cursor.HAND);
         enabledSwitch.styleSetWidth(28);
         enabledSwitch.styleSetHeight(12);
+        enabledSwitch.setIsVisible(() -> clickGuiSettings.getModuleEnabledSwitch().getValue());
         enabledSwitch.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
-            if (module.isEnabled() != oldModuleState) {
-                AnimationValue.tweenEngine.cancelTarget(toggleAnimation);
-                toggleAnimation.to(.75f).value(module.isEnabled() ? 1 : 0).ease(Animations.easeOutBounce).start();
-                oldModuleState = module.isEnabled();
-            }
-
+            float switchWidth = 28;
             float switchHeight = 12;
-            drawSwitchAnimation(canvas, 0, 0, 28, switchHeight, toggleAnimation.getValue());
+            drawSwitchAnimation(canvas, 0, 0, switchWidth, switchHeight, toggleAnimation.getValue());
+
+            if (module.isEnabled() || toggleAnimation.getValue() != 0) {
+                CanvasWrapper.getFreshTextBuilder().basic("on", 3, switchHeight / 2f).setColor(UIUtils.colorWithAlpha(Color.white, Math.clamp(toggleAnimation.getValue(), 0, 1))).setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE).draw(canvas);
+            }
+            if (!module.isEnabled() || toggleAnimation.getValue() != 1) {
+                CanvasWrapper.getFreshTextBuilder().basic("off", switchWidth - 3, switchHeight / 2f).setColor(UIUtils.colorWithAlpha(Color.white, 1 - Math.clamp(toggleAnimation.getValue(), 0, 1))).setHorizontalAlignment(CanvasWrapper.TextBuilder.HorizontalAlignment.RIGHT).setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE).draw(canvas);
+            }
         });
         enabledSwitch.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
             if (button == ButtonIdentifier.LEFT) {
