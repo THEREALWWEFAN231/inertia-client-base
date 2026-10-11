@@ -37,6 +37,7 @@ public class OpenGLStateRestore implements AutoCloseable {
     private final int blendFunctionAlpha;
     private final boolean depthTestEnabled;
     private final boolean depthMaskFlag;
+    private final int depthFunc;
     private final boolean scissorTestEnabled;
     private final boolean colorMaskRed;
     private final boolean colorMaskGreen;
@@ -53,12 +54,12 @@ public class OpenGLStateRestore implements AutoCloseable {
     private final int unpackSkipRows;
     private final int unpackAlignment;
 
-    private float clearColorRed;
-    private float clearColorGreen;
-    private float clearColorBlue;
-    private float clearColorAlpha;
+    private final float clearColorRed;
+    private final float clearColorGreen;
+    private final float clearColorBlue;
+    private final float clearColorAlpha;
 
-    private float clearDepth;
+    private final float clearDepth;
 
     public OpenGLStateRestore() {
         this.program = glGetInteger(GL_CURRENT_PROGRAM);
@@ -74,6 +75,7 @@ public class OpenGLStateRestore implements AutoCloseable {
         this.blendFunctionAlpha = glGetInteger(GL20.GL_BLEND_EQUATION_ALPHA);
         this.depthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
         this.depthMaskFlag = glGetBoolean(GL_DEPTH_WRITEMASK);
+        this.depthFunc = glGetInteger(GL_DEPTH_FUNC);
         this.scissorTestEnabled = glIsEnabled(GL_SCISSOR_TEST);
         try (MemoryStack stack = MemoryStack.stackPush()) {
             ByteBuffer colorMaskTmp = stack.malloc(4);
@@ -130,6 +132,7 @@ public class OpenGLStateRestore implements AutoCloseable {
         GL33C.glBlendEquationSeparate(blendFunctionRGB, blendFunctionAlpha);
         ((CapabilityTrackerInterface) GlStateManager.DEPTH.mode).forceSetState(depthTestEnabled);
         forceSetDepthMask(depthMaskFlag);
+        forceSetDepthFunc(depthFunc);
         ((CapabilityTrackerInterface) GlStateManager.SCISSOR.mode).forceSetState(scissorTestEnabled);
         forceSetColorMask(colorMaskRed, colorMaskGreen, colorMaskBlue, colorMaskAlpha);
 
@@ -177,6 +180,11 @@ public class OpenGLStateRestore implements AutoCloseable {
     public static void forceSetDepthMask(boolean mask) {
         GlStateManager.DEPTH.mask = mask;
         GL11.glDepthMask(mask);
+    }
+
+    public static void forceSetDepthFunc(int func) {
+        GlStateManager.DEPTH.func = func;
+        GL11.glDepthFunc(func);
     }
 
     public static void forceSetColorMask(boolean red, boolean green, boolean blue, boolean alpha) {

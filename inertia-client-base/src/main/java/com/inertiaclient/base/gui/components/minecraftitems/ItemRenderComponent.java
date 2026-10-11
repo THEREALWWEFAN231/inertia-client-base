@@ -26,8 +26,8 @@ public class ItemRenderComponent extends ItemReferenceNode {
         super(item, id);
 
         skiaNativeRender = new SkiaNativeRender();
-        skiaNativeRender.setNativeWidth(() -> 16f);
-        skiaNativeRender.setNativeHeight(() -> 16f);
+        skiaNativeRender.setNativeWidth(this::getWidth);
+        skiaNativeRender.setNativeHeight(this::getHeight);
         skiaNativeRender.setSetNativeRender(graphics -> {
             ItemRenderComponent.renderItemForGui(new ItemStack(item), graphics);
         });

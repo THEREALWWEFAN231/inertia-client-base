@@ -128,7 +128,7 @@ public class SkiaOpenGLInstance extends SkiaInstance {
     public static Image createNativeImage(TextureTarget from) {
         int colorTextureId = ((FrameBufferAttachment) from.getColorTexture()).glId();
 
-        return Image.borrowTextureFrom(SkiaOpenGLInstance.getSkiaDirectContext(), BackendTexture.makeGL(from.width, from.height, from.getColorTexture().getMipLevels() > 0, new GLTextureInfo(GL11.GL_TEXTURE_2D, colorTextureId, GL11.GL_RGBA8)), SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorAlphaType.PREMUL, null, null);
+        return Image.borrowTextureFrom(SkiaOpenGLInstance.getSkiaDirectContext(), BackendTexture.makeGL(from.width, from.height, from.getColorTexture().getMipLevels() > 0, new GLTextureInfo(GL11.GL_TEXTURE_2D, colorTextureId, GL11.GL_RGBA8)), SurfaceOrigin.BOTTOM_LEFT, ColorType.RGBA_8888, ColorAlphaType.PREMUL, ColorSpace.getDisplayP3(), null);
     }
 
     public void onEvent(ResolutionChangeEvent event) {

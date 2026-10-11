@@ -2,6 +2,7 @@ package com.inertiaclient.base.gui.components.module.values.blocks;
 
 import com.inertiaclient.base.gui.components.NativeRenderComponent;
 import com.inertiaclient.base.gui.components.minecraftitems.BlockReferenceNode;
+import com.inertiaclient.base.gui.components.minecraftitems.ItemReferenceNode;
 import com.inertiaclient.base.gui.components.minecraftitems.ItemRenderComponent;
 import com.inertiaclient.base.gui.components.tabbedpage.AbstractWrappedListContainer;
 import com.inertiaclient.base.gui.components.tabbedpage.Tab;
@@ -40,7 +41,7 @@ public class BlocksValuePage extends HashsetPage<Block> {
         ((NativeBatchedNode) tab.getYogaNode()).getListNode().getSkiaNativeRender().getFrameBuffer().forceUpdateNextFrame();
     }
 
-    public static class NativeBatchedNode extends AbstractWrappedListContainer<NativeRenderComponent> {
+    public class NativeBatchedNode extends AbstractWrappedListContainer<NativeRenderComponent> {
 
         public NativeBatchedNode() {
             this.getListNode().setBeforeNativeRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
@@ -59,7 +60,7 @@ public class BlocksValuePage extends HashsetPage<Block> {
         public NativeRenderComponent createListNodeType() {
             SkiaNativeRender nativeRender = new SkiaNativeRender().setSetNativeRender(guiGraphicsExtractor -> {
                 this.getListNode().getChildren().forEach(yogaNode -> {
-                    if (yogaNode.getDisplay() == Display.FLEX && yogaNode instanceof BlockReferenceNode refNode && this.getListNode().isChildInRenderBounds(yogaNode)) {
+                    if (yogaNode.getDisplay() == Display.FLEX && yogaNode instanceof ItemReferenceNode refNode && this.getListNode().isChildInRenderBounds(yogaNode)) {
                         guiGraphicsExtractor.pose().pushMatrix();
                         guiGraphicsExtractor.pose().translate(yogaNode.getRelativeX(), yogaNode.getRelativeY());
                         ItemRenderComponent.renderItemForGui(new ItemStack(refNode.getItem()), guiGraphicsExtractor);

@@ -2,6 +2,7 @@ package com.inertiaclient.base.gui.components.minecraftitems;
 
 import com.inertiaclient.base.render.yoga.YogaNode;
 import lombok.Getter;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 
 public class ItemReferenceNode extends YogaNode {
@@ -18,6 +19,10 @@ public class ItemReferenceNode extends YogaNode {
 
         this.styleSetHeight(16);
         this.styleSetWidth(16);
+    }
+
+    public ItemReferenceNode(Item item) {
+        this(item, BuiltInRegistries.ITEM.wrapAsHolder(item).getRegisteredName());
     }
 
 }
