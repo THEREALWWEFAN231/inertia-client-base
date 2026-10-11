@@ -82,6 +82,8 @@ public class Settings {
         private FloatValue borderRadius;
         private FloatValue lineWidth;
 
+        private MaxFPSValue maxFPS;
+
         public ClickGuiSettings(ValueGroup valueGroup) {
             this.customCursors = new BooleanValue("custon_cursors", valueGroup, true);
             this.scaleAnimation = new BooleanValue("scale", valueGroup, true);
@@ -103,6 +105,8 @@ public class Settings {
 
             this.borderRadius = new FloatValue("border_radius", valueGroup, 5, 0, 20);
             this.lineWidth = new FloatValue("line_width", valueGroup, .5f, 0, 3);
+
+            this.maxFPS = new MaxFPSValue("max_fps", valueGroup, 90);
 
             this.customCursors.setChangeListener((oldValue, newValue) -> {
                 if (!newValue) {

@@ -62,6 +62,7 @@ public abstract class YogaScreen extends BetterScreen {
 
                 root.reset(mouseX, mouseY);
             });
+            this.skiaInstance.setFps(this::getSkiaFps);
         }
 
         Yoga.YGConfigSetUseWebDefaults(Yoga.YGConfigGetDefault(), true);
@@ -147,6 +148,10 @@ public abstract class YogaScreen extends BetterScreen {
     public void removed() {
         super.removed();
         SDLKeyboard.SDL_StopTextInput(InertiaBase.mc.getWindow().handle());
+    }
+
+    public int getSkiaFps() {
+        return -1;
     }
 
 }

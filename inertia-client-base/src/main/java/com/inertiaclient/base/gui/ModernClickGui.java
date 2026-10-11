@@ -56,5 +56,10 @@ public class ModernClickGui extends YogaScreen {
         return false;
     }
 
+    @Override
+    public int getSkiaFps() {
+        return InertiaBase.instance.getSettings().getClickGuiSettings().getMaxFPS().getFpsForCache();
+    }
+
 
 }
