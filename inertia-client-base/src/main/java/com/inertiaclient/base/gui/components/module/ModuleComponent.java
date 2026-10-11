@@ -28,14 +28,15 @@ public class ModuleComponent extends YogaNode {
     private AnimationValue toggleAnimation;
     private AnimationValue descriptionAnimation;
 
-    private boolean oldModuleState;
-    public static final Color BACKGROUND_COLOR = new Color(0, 0, 0, (int) (255 * .24f));
-    public static Color switchBackgroundColor = new Color(104, 104, 104);
+    private boolean oldEnabledState;
+    public static final float BACKGROUND_OPACITY = .24f;
+    public static final Color BACKGROUND_COLOR = new Color(0, 0, 0, (int) (255 * BACKGROUND_OPACITY));
+    public static final Color switchBackgroundColor = new Color(104, 104, 104);
     private static final SvgRenderer starStroke = new SvgRenderer("icb/textures/star-stroke.svg");
     private static final SvgRenderer starFill = new SvgRenderer("icb/textures/star-fill.svg");
 
     public ModuleComponent(Module module, ModulesPage.FavoritesList favoritesList) {
-        this.oldModuleState = module.isEnabled();
+        this.oldEnabledState = module.isEnabled();
         this.toggleAnimation = new AnimationValue();
         this.descriptionAnimation = new AnimationValue();
         this.toggleAnimation.setValue(module.isEnabled() ? 1 : 0);
@@ -56,13 +57,13 @@ public class ModuleComponent extends YogaNode {
 
         var clickGuiSettings = InertiaBase.instance.getSettings().getClickGuiSettings();
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
-            if (module.isEnabled() != oldModuleState) {
+            if (module.isEnabled() != oldEnabledState) {
                 AnimationValue.tweenEngine.cancelTarget(toggleAnimation);
                 toggleAnimation.to(.75f).value(module.isEnabled() ? 1 : 0).ease(Animations.easeOutBack).start();
-                oldModuleState = module.isEnabled();
+                oldEnabledState = module.isEnabled();
             }
 
-            Color enabledColor = UIUtils.colorWithAlpha(clickGuiSettings.getPrimaryColor().getValue().getRenderColor(), .24f);
+            Color enabledColor = UIUtils.colorWithAlpha(clickGuiSettings.getPrimaryColor().getValue().getRenderColor(), BACKGROUND_OPACITY);
             canvas.drawRRect(0, 0, this.getWidth(), this.getHeight(), 5, UIUtils.transitionColor(BACKGROUND_COLOR, enabledColor, Math.clamp(this.toggleAnimation.getValue(), 0, 1)));
 
             boolean showDescription = descriptionAnimation.getValue() != 0;
@@ -146,9 +147,11 @@ public class ModuleComponent extends YogaNode {
             drawSwitchAnimation(canvas, 0, 0, switchWidth, switchHeight, toggleAnimation.getValue());
 
             if (module.isEnabled() || toggleAnimation.getValue() != 0) {
+                // CanvasWrapper.getFreshTextBuilder().setBlurRadius(1.5f).basic("on", 3 + .5f, switchHeight / 2f + .5f).setColor(new Color(0.26f, 0.26f, 0.26f, Math.clamp(toggleAnimation.getValue(), 0, 1))).setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE).draw(canvas);
                 CanvasWrapper.getFreshTextBuilder().basic("on", 3, switchHeight / 2f).setColor(UIUtils.colorWithAlpha(Color.white, Math.clamp(toggleAnimation.getValue(), 0, 1))).setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE).draw(canvas);
             }
             if (!module.isEnabled() || toggleAnimation.getValue() != 1) {
+                //CanvasWrapper.getFreshTextBuilder().setBlurRadius(1.5f).basic("off", switchWidth - 3 + .5f, switchHeight / 2f + .5f).setColor(new Color(0.26f, 0.26f, 0.26f, 1 - Math.clamp(toggleAnimation.getValue(), 0, 1))).setHorizontalAlignment(CanvasWrapper.TextBuilder.HorizontalAlignment.RIGHT).setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE).draw(canvas);
                 CanvasWrapper.getFreshTextBuilder().basic("off", switchWidth - 3, switchHeight / 2f).setColor(UIUtils.colorWithAlpha(Color.white, 1 - Math.clamp(toggleAnimation.getValue(), 0, 1))).setHorizontalAlignment(CanvasWrapper.TextBuilder.HorizontalAlignment.RIGHT).setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE).draw(canvas);
             }
         });
