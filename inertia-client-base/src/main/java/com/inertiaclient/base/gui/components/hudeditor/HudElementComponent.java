@@ -41,7 +41,7 @@ public class HudElementComponent extends YogaNode {
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (hudElement.isEnabled() != oldEnabledState) {
                 AnimationValue.tweenEngine.cancelTarget(toggleAnimation);
-                toggleAnimation.to(.75f).value(hudElement.isEnabled() ? 1 : 0).ease(Animations.easeOutBack).start();
+                toggleAnimation.to(.75f).value(hudElement.isEnabled() ? 1 : 0).ease(Animations.easeOutExpo).start();
                 oldEnabledState = hudElement.isEnabled();
             }
 

@@ -2,6 +2,7 @@ package com.inertiaclient.base.gui.components.module.values.animation;
 
 import com.inertiaclient.base.gui.components.MainFrame;
 import com.inertiaclient.base.gui.components.module.values.AbstractGroupContainer;
+import com.inertiaclient.base.render.animation.Animations;
 import com.inertiaclient.base.render.animation.CustomTweenEquation;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
@@ -9,37 +10,35 @@ import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
 import com.inertiaclient.base.value.impl.AnimationValue;
 
-import java.awt.Color;
-
 public class AnimationValueComponent extends YogaNode {
 
-    private CustomTweenEquation interpolator;
-    AnimationComponent animationComponent;
-    AnimationValue animationValue;
+    private boolean wasSelected;
+    private com.inertiaclient.base.render.animation.AnimationValue animation;
 
-    public AnimationValueComponent(AnimationComponent stringComponent, AnimationValue animationValue, CustomTweenEquation interpolator) {
-        this.interpolator = interpolator;
-        this.animationComponent = stringComponent;
-        this.animationValue = animationValue;
+    public AnimationValueComponent(AnimationComponent animationComponent, AnimationValue animationValue, CustomTweenEquation interpolator) {
+        {
+            boolean isSelected = animationValue.getValue() == interpolator;
+            this.animation = new com.inertiaclient.base.render.animation.AnimationValue();
+            this.animation.setValue(isSelected ? 1 : 0);
+            this.wasSelected = isSelected;
+        }
 
         this.styleSetHeight(10);
-        //this.setDebug(true);
-        this.setDebugColor(UIUtils.colorWithAlpha(Color.red, 50));
+        this.setHoverCursorToIndicateClick();
 
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
-            boolean isSelected = animationValue.getValue() == interpolator;
-
-            var nameTextBuilder = CanvasWrapper.getFreshTextBuilder();
-            nameTextBuilder.basic(interpolator.name(), 1, this.getHeight() / 2, isSelected ? MainFrame.s_selectedTextColor.get() : MainFrame.s_unselectedTextColor.get());
-            nameTextBuilder.setFontSize(AbstractGroupContainer.valuesFontSize);
-            nameTextBuilder.setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE);
-            nameTextBuilder.draw(canvas);
+            var name = CanvasWrapper.getFreshTextBuilder();
+            name.basic(interpolator.name(), /*this.getWidth() / 2*/ 1, this.getHeight() / 2, UIUtils.transitionColor(MainFrame.s_unselectedTextColor.get(), MainFrame.s_selectedTextColor.get(), this.animation.getValue()));
+            name.setFontSize(AbstractGroupContainer.valuesFontSize);
+            name.setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE);
+            //name.setHorizontalAlignment(CanvasWrapper.TextBuilder.HorizontalAlignment.CENTER);
+            name.draw(canvas);
         });
 
         this.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
             if (button == ButtonIdentifier.LEFT) {
                 animationValue.setValue(interpolator);
-                stringComponent.updateAnimation();
+                animationComponent.updateAnimation();
                 return true;
             }
             return false;
@@ -55,6 +54,12 @@ public class AnimationValueComponent extends YogaNode {
             if (isSelected) {
                 animationComponent.setSelectedNode(this);
             }
+            if (isSelected != this.wasSelected) {
+                com.inertiaclient.base.render.animation.AnimationValue.tweenEngine.cancelTarget(this.animation);
+                this.animation.to(.75f).value(isSelected ? 1 : 0).ease(Animations.easeOutExpo).start();
+            }
+
+            this.wasSelected = isSelected;
         });
     }
 

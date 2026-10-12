@@ -59,7 +59,7 @@ public class ModuleComponent extends YogaNode {
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             if (module.isEnabled() != oldEnabledState) {
                 AnimationValue.tweenEngine.cancelTarget(toggleAnimation);
-                toggleAnimation.to(.75f).value(module.isEnabled() ? 1 : 0).ease(Animations.easeOutBack).start();
+                toggleAnimation.to(.75f).value(module.isEnabled() ? 1 : 0).ease(Animations.easeOutExpo).start();
                 oldEnabledState = module.isEnabled();
             }
 

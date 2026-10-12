@@ -6,6 +6,7 @@ import com.inertiaclient.base.hud.HudManager;
 import com.inertiaclient.base.mods.InertiaMod;
 import com.inertiaclient.base.mods.ModLoader;
 import com.inertiaclient.base.module.ModuleManager;
+import com.inertiaclient.base.render.yoga.YogaConfig;
 import com.inertiaclient.base.utils.FileManager;
 import com.inertiaclient.base.utils.LibraryDownloader;
 import com.inertiaclient.base.utils.TickRateCalculator;
@@ -84,6 +85,8 @@ public class InertiaBase {
         this.fileManager.loadModulesJson();
         this.fileManager.loadHudJson();
         this.fileManager.loadFriendsJson();
+
+        YogaConfig.initialize();
 
         this.modLoader.getMods().forEach(InertiaMod::initialize);
     }

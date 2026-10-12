@@ -41,6 +41,7 @@
     "PlayerTabOverlayMixin",
     "RenderTargetMixin",
     "VulkanCommandEncoderMixin",
-    "VulkanDeviceMixin"
+    "VulkanDeviceMixin",
+    "WindowMixin"
   ]
 }

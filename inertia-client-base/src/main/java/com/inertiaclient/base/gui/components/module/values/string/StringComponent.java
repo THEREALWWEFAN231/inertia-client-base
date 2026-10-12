@@ -10,10 +10,7 @@ import com.inertiaclient.base.render.yoga.layouts.*;
 import com.inertiaclient.base.utils.UIUtils;
 import com.inertiaclient.base.value.impl.ModeValue;
 import lombok.Setter;
-import org.lwjgl.util.yoga.Yoga;
 
-
-//TODO: fix overlapping, maybe yoga issue, remove gap, set debug on StringValueComponent and open kill aura you will see the issue
 public class StringComponent extends ValueYogaNode<ModeValue> {
 
     @Setter
@@ -35,14 +32,14 @@ public class StringComponent extends ValueYogaNode<ModeValue> {
 
         this.addChild(new ValueNameLabel(stringValue));
 
-        animation = new AnimationValue();
-        animation.setValue(1);
+        this.animation = new AnimationValue();
+        this.animation.setValue(1);
 
         YogaNode valuesContainer = new YogaNode();
         valuesContainer.styleSetFlexWrap(FlexWrap.WRAP);
         valuesContainer.styleSetJustifyContent(JustifyContent.SPACE_BETWEEN);
         valuesContainer.styleSetGap(GapGutter.COLUMN, 2);
-        Yoga.YGNodeStyleSetMaxWidthPercent(valuesContainer.getNativeNode(), 75);
+        valuesContainer.styleSetMaxWidth(75, ExactPercentAuto.PERCENTAGE);
         valuesContainer.styleSetFlexShrink(1);
         valuesContainer.setRenderCallback((graphics, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             canvas.drawRRect(0, 0, valuesContainer.getWidth(), valuesContainer.getHeight(), 1.5f, MainFrame.s_stringValuesBackgroundColor.get());
@@ -67,9 +64,9 @@ public class StringComponent extends ValueYogaNode<ModeValue> {
     }
 
     public void updateAnimation() {
-        AnimationValue.tweenEngine.cancelTarget(animation);
+        AnimationValue.tweenEngine.cancelTarget(this.animation);
         this.animation.setValue(0);
-        this.animation.to(.75f).value(1).ease(Animations.easeOutBounce).start();
+        this.animation.to(.75f).value(1).ease(Animations.easeOutExpo).start();
 
         fromX = selectedRenderX;
         fromY = selectedRenderY;

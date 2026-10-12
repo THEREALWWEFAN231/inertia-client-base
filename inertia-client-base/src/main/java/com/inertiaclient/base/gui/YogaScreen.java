@@ -12,7 +12,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.sdl.SDLKeyboard;
-import org.lwjgl.util.yoga.Yoga;
 
 import static org.lwjgl.util.yoga.Yoga.YGDirectionLTR;
 import static org.lwjgl.util.yoga.Yoga.YGNodeCalculateLayout;
@@ -64,8 +63,6 @@ public abstract class YogaScreen extends BetterScreen {
             });
             this.skiaInstance.setFps(this::getSkiaFps);
         }
-
-        Yoga.YGConfigSetUseWebDefaults(Yoga.YGConfigGetDefault(), true);
 
         this.root = new YogaNode();
         this.initRoot(this.root);

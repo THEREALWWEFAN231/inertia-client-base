@@ -86,7 +86,7 @@ public class BlockEntityColorsPage extends AbstractWrappedListContainer<NativeRe
             this.getListNode().getChildren().forEach(container -> {
 
                 var blockEntityDisplay = container.getChildAtIndex(0);
-                if (blockEntityDisplay.getDisplay() == Display.FLEX && blockEntityDisplay instanceof ItemReferenceNode refNode && (this.getListNode().isChildInRenderBounds(blockEntityDisplay) || true)) {
+                if (blockEntityDisplay.getDisplay() == Display.FLEX && blockEntityDisplay instanceof ItemReferenceNode refNode && this.getListNode().isChildInRenderBounds(blockEntityDisplay)) {
                     guiGraphicsExtractor.pose().pushMatrix();
                     guiGraphicsExtractor.pose().translate(container.getRelativeX(), container.getRelativeY());
                     guiGraphicsExtractor.pose().translate(blockEntityDisplay.getRelativeX(), blockEntityDisplay.getRelativeY());

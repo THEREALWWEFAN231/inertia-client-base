@@ -3,29 +3,29 @@ package com.inertiaclient.base.gui.components.module.values.string;
 import com.inertiaclient.base.gui.ModernClickGui;
 import com.inertiaclient.base.gui.components.MainFrame;
 import com.inertiaclient.base.gui.components.module.values.AbstractGroupContainer;
+import com.inertiaclient.base.render.animation.AnimationValue;
+import com.inertiaclient.base.render.animation.Animations;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.yoga.ButtonIdentifier;
 import com.inertiaclient.base.render.yoga.YogaNode;
 import com.inertiaclient.base.utils.UIUtils;
 import com.inertiaclient.base.value.impl.ModeValue;
 
-import java.awt.Color;
-
 public class StringValueComponent extends YogaNode {
 
-    private ModeValue.Mode stringIdentifier;
-    private StringComponent stringComponent;
-    private ModeValue stringValue;
+    private boolean wasSelected;
+    private AnimationValue animation;
 
     public StringValueComponent(StringComponent stringComponent, ModeValue stringValue, ModeValue.Mode stringIdentifier) {
-        this.stringIdentifier = stringIdentifier;
-        this.stringComponent = stringComponent;
-        this.stringValue = stringValue;
+        {
+            boolean isSelected = stringValue.getValue() == stringIdentifier;
+            this.animation = new AnimationValue();
+            this.animation.setValue(isSelected ? 1 : 0);
+            this.wasSelected = isSelected;
+        }
 
         this.styleSetHeight(10);
         this.setHoverCursorToIndicateClick();
-        //this.setDebug(true);
-        this.setDebugColor(UIUtils.colorWithAlpha(Color.red, 50));
 
         this.setBeforeRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
             boolean isHovered = isHoveredAndInsideParent(globalMouseX, globalMouseY);
@@ -34,13 +34,11 @@ public class StringValueComponent extends YogaNode {
             }
         });
         this.setRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {
-
-            boolean isSelected = stringValue.getValue() == stringIdentifier;
-
             var name = CanvasWrapper.getFreshTextBuilder();
-            name.basic(stringIdentifier.getName(), 1, this.getHeight() / 2, isSelected ? MainFrame.s_selectedTextColor.get() : MainFrame.s_unselectedTextColor.get());
+            name.basic(stringIdentifier.getName(), /*this.getWidth() / 2*/ 1, this.getHeight() / 2, UIUtils.transitionColor(MainFrame.s_unselectedTextColor.get(), MainFrame.s_selectedTextColor.get(), this.animation.getValue()));
             name.setFontSize(AbstractGroupContainer.valuesFontSize);
             name.setVerticalAlignment(CanvasWrapper.TextBuilder.VerticalAlignment.MIDDLE);
+            //name.setHorizontalAlignment(CanvasWrapper.TextBuilder.HorizontalAlignment.CENTER);
             name.draw(canvas);
         });
 
@@ -63,6 +61,12 @@ public class StringValueComponent extends YogaNode {
             if (isSelected) {
                 stringComponent.setSelectedNode(this);
             }
+            if (isSelected != this.wasSelected) {
+                AnimationValue.tweenEngine.cancelTarget(this.animation);
+                this.animation.to(.75f).value(isSelected ? 1 : 0).ease(Animations.easeOutExpo).start();
+            }
+
+            this.wasSelected = isSelected;
         });
     }
 
