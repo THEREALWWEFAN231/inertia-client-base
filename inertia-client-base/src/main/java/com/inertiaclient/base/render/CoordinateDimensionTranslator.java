@@ -12,6 +12,7 @@ import net.minecraft.client.gui.render.pip.*;
 import net.minecraft.client.renderer.Projection;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.client.renderer.state.GameRenderState;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -96,6 +97,7 @@ public class CoordinateDimensionTranslator {
         var oldProjectionType = RenderSystem.getProjectionType();
         boolean oldLightmap = gameRendererAccessor.getUseUiLightmap();
         var oldLighting = RenderSystem.getShaderLights();
+        var oldFog = RenderSystem.getShaderFog();
 
         gameRenderState.guiRenderState.reset();
         GuiGraphicsExtractor graphics = new GuiGraphicsExtractor(InertiaBase.mc, gameRenderState.guiRenderState, -999, -999);
@@ -104,11 +106,15 @@ public class CoordinateDimensionTranslator {
 
         InertiaBase.mc.gameRenderer.lighting().setupFor(Lighting.Entry.ITEMS_3D);
         gameRendererAccessor.setUseUiLightmap(true);
+        RenderSystem.setShaderFog(gameRendererAccessor.getFogRenderer().getBuffer(FogRenderer.FogMode.NONE));
         //this sets projection
         guiRenderer.render();
         guiRenderer.endFrame();
         gameRendererAccessor.setUseUiLightmap(oldLightmap);
         RenderSystem.setShaderLights(oldLighting);
+        RenderSystem.setShaderFog(oldFog);
+
+        //RenderSystem.getDynamicUniforms().writeTransform(Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState.cameraRenderState.projectionMatrix);
 
         RenderSystem.setProjectionMatrix(oldProjectionMatrix, oldProjectionType);
 

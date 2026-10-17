@@ -7,7 +7,7 @@ import com.inertiaclient.base.event.impl._3DEvent;
 import com.inertiaclient.base.mixin.custominterfaces.GameRendererInterface;
 import com.inertiaclient.base.render.CoordinateDimensionTranslator;
 import com.inertiaclient.base.render.ThreeDCacheFrameBuffer;
-import com.inertiaclient.base.render._2D3DRender;
+import com.inertiaclient.base.render._2DIn3DRender;
 import com.inertiaclient.base.render.animation.AnimationValue;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -97,8 +97,8 @@ public class GameRendererMixin implements GameRendererInterface {
         poseStack.popPose();
         try {
             var oldFog = RenderSystem.getShaderFog();
+            RenderSystem.setShaderFog(this.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
             try (FeatureRenderDispatcher.PreparedFrame frame = this.featureRenderDispatcher.prepareFrame(this.inertia$3dPassStorage); RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "inertia_3d_renderpass", this.mainRenderTarget.getColorTextureView(), Optional.empty(), this.mainRenderTarget.getDepthTextureView(), OptionalDouble.empty());) {
-                RenderSystem.setShaderFog(this.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
                 RenderSystem.bindDefaultUniforms(renderPass);
 
                 FeatureRenderDispatcher.renderAllFeatures(renderPass, frame);
@@ -111,11 +111,11 @@ public class GameRendererMixin implements GameRendererInterface {
         this.inertia$3DCache.createFrameBufferIfNeeded(InertiaBase.mc.getWindow().getWidth(), InertiaBase.mc.getWindow().getHeight(), false, true);
         this.inertia$3DCache.drawWithRenderer(poseStack, worldPartialTicks);
 
-        poseStack.pushPose();
-        _2D3DRender.render(worldPartialTicks);
-        poseStack.popPose();
-
         modelViewStack.popMatrix();
+
+        poseStack.pushPose();
+        _2DIn3DRender.render(worldPartialTicks);
+        poseStack.popPose();
     }
 
     @Inject(method = "resize", at = @At("HEAD"))

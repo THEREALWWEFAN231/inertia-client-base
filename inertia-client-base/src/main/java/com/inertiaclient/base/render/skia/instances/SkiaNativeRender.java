@@ -20,6 +20,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.*;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.client.renderer.state.GameRenderState;
 
 import java.util.List;
@@ -29,9 +30,11 @@ import java.util.function.Supplier;
 //TODO: implement manual clean up
 public class SkiaNativeRender {
 
+    @Getter
     @Setter
     @Accessors(chain = true)
     private Supplier<Float> nativeWidth;
+    @Getter
     @Setter
     @Accessors(chain = true)
     private Supplier<Float> nativeHeight;
@@ -98,7 +101,7 @@ public class SkiaNativeRender {
         var oldProjectionMatrix = RenderSystem.getProjectionMatrixBuffer();
         boolean oldLightmap = gameRendererAccessor.getUseUiLightmap();
         var oldLighting = RenderSystem.getShaderLights();
-
+        var oldFog = RenderSystem.getShaderFog();
         {
             RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(frameBuffer.getFramebuffer().getColorTexture(), this.gameRenderState.guiRenderState.clearColorOverride, frameBuffer.getFramebuffer().getDepthTexture(), 0, 0, 0, frameBuffer.getFramebuffer().width, frameBuffer.getFramebuffer().height, 0);
             gameRenderState.guiRenderState.reset();
@@ -112,12 +115,14 @@ public class SkiaNativeRender {
 
             InertiaBase.mc.gameRenderer.lighting().setupFor(Lighting.Entry.ITEMS_3D);
             gameRendererAccessor.setUseUiLightmap(true);
+            RenderSystem.setShaderFog(gameRendererAccessor.getFogRenderer().getBuffer(FogRenderer.FogMode.NONE));
             guiRenderer.render();
             guiRenderer.endFrame();
             guiRendererInterface.setRenderTargetOverride(null);
             guiRendererInterface.setProjectionOverride(null);
             gameRendererAccessor.setUseUiLightmap(oldLightmap);
             RenderSystem.setShaderLights(oldLighting);
+            RenderSystem.setShaderFog(oldFog);
 
             RenderSystem.getDynamicUniforms().writeTransform(Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState.cameraRenderState.projectionMatrix);
         }
@@ -133,6 +138,7 @@ public class SkiaNativeRender {
     }
 
     public void drawImageWithSkia(CanvasWrapper canvas, float x, float y, Paint paint) {
+        //canvas.drawRect(x, y, this.cachedNativeWidth, this.cachedNativeHeight, Color.RED);
         canvas.drawImageRect(this.image, Rect.makeXYWH(x, y, this.cachedNativeWidth, this.cachedNativeHeight), paint, this.blurRadius);
     }
 
@@ -153,7 +159,7 @@ public class SkiaNativeRender {
             final Image nonReference = image;
             InertiaBase.CLEANER.register(this, () -> {
                 InertiaBase.mc.executeIfPossible(() -> {
-                    InertiaBase.LOGGER.info("deleted SkiaNativeRender skia image handle  {}", nonReference._ptr);
+                    InertiaBase.LOGGER.info("Cleaner automatically deleted SkiaNativeRender skia image handle  {}", nonReference._ptr);
                     nonReference.close();
                 });
             });
@@ -161,6 +167,7 @@ public class SkiaNativeRender {
     }
 
     public void delete() {
+        InertiaBase.LOGGER.info("Manually deleted SkiaNativeRender skia image handle  {}", image._ptr);
         this.frameBuffer.deleteFrameBuffer();
         //does this actually delete the image/backend handle
         image.close();

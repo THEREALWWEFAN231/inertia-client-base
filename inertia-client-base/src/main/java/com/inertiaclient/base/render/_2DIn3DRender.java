@@ -2,13 +2,13 @@ package com.inertiaclient.base.render;
 
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.event.EventManager;
-import com.inertiaclient.base.event.impl.Skia2D3DEvent;
-import com.inertiaclient.base.event.impl._2D3DEvent;
+import com.inertiaclient.base.event.impl.Skia2DIn3DEvent;
+import com.inertiaclient.base.event.impl._2DIn3DEvent;
 import com.inertiaclient.base.mixin.custominterfaces.GameRendererInterface;
 import com.inertiaclient.base.render.skia.instances.SkiaInstance;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
-public class _2D3DRender {
+public class _2DIn3DRender {
 
     private static SkiaInstance skiaInstance;
 
@@ -22,11 +22,11 @@ public class _2D3DRender {
     private static void render(float tickDelta, GuiGraphicsExtractor graphics) {
         if (skiaInstance == null) {
             skiaInstance = SkiaInstance.create((graphics1, mouseX, mouseY, delta) -> {
-                EventManager.fire(new Skia2D3DEvent(skiaInstance.getCanvasWrapper(), graphics1, tickDelta));
+                EventManager.fire(new Skia2DIn3DEvent(skiaInstance.getCanvasWrapper(), graphics1, tickDelta));
             });
             skiaInstance.setFps(() -> InertiaBase.instance.getSettings().getWorldEspFPS().getFpsForCache());
         }
-        EventManager.fire(new _2D3DEvent(graphics, tickDelta));
+        EventManager.fire(new _2DIn3DEvent(graphics, tickDelta));
         ((GameRendererInterface) InertiaBase.mc.gameRenderer).get3DCachedFrameBuffer().renderCachedImage(graphics);
 
         skiaInstance.drawAndRender(graphics, -999, -999, tickDelta);

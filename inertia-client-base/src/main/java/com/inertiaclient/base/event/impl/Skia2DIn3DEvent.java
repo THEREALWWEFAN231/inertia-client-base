@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 //this allows our rendered lines to look like they were rendered in the 3d event, and makes it so our lines don't render over our held items
 @AllArgsConstructor
 @Getter
-public class Skia2D3DEvent extends Event {
+public class Skia2DIn3DEvent extends Event {
 
 
     private CanvasWrapper canvas;

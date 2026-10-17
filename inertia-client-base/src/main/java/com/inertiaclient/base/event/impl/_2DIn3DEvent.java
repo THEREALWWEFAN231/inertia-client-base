@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 @AllArgsConstructor
-public class _2D3DEvent extends Event {
+public class _2DIn3DEvent extends Event {
 
     @Getter
     private GuiGraphicsExtractor graphics;
