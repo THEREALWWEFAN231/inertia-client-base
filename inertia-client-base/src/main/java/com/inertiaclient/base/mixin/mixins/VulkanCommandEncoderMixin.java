@@ -15,7 +15,7 @@ public class VulkanCommandEncoderMixin {
         if (SkiaVulkanInstance.getSkiaDirectContext() != null) {
             //changing syncCpu to true,  waits for work to be submitted and would cause more accurate rendering? but it slows  down rendering a lot, so we wont do that...
             if (SkiaVulkanInstance.TEST_SINGLE_SUBMIT) {
-                SkiaVulkanInstance.getSkiaDirectContext().submit(false);
+                //SkiaVulkanInstance.getSkiaDirectContext().submit(false);
             }
         }
     }

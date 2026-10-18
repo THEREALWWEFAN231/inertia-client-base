@@ -34,7 +34,7 @@ import static org.lwjgl.vulkan.VK10.VK_NULL_HANDLE;
 public class SkiaVulkanInstance extends SkiaInstance {
 
     //xray blocks page, when enabled, scrolling(in blocks gui) fast looks/loads proper, name tags are behind a frame, when disabled name tags are not behind a frame, scrolling doesn't look/load proper
-    public static final boolean TEST_SINGLE_SUBMIT = false;
+    public static final boolean TEST_SINGLE_SUBMIT = true;
     @Getter
     private static DirectContext skiaDirectContext;
     @Getter
@@ -65,12 +65,9 @@ public class SkiaVulkanInstance extends SkiaInstance {
             this.canvas.clear(0x00000000);
             this.skiaDraw.render(minecraftGraphics, mouseX, mouseY, delta);
             if (TEST_SINGLE_SUBMIT) {
-                SkiaVulkanInstance.skiaDirectContext.flush();
-            } else {
-                RenderSystem.getDevice().createCommandEncoder().submit();
-                //changing syncCpu to true,  waits for work to be submitted and would cause more accurate rendering? but it slows  down rendering a lot, so we wont do that...
-                SkiaVulkanInstance.getSkiaDirectContext().flushAndSubmit(this.surface, false);
+                //the native renders need to submit their work to the graphics queue before skia submits,or else the skia will use the texture from the last frame, as it hasn't been updated yet
                 //RenderSystem.getDevice().createCommandEncoder().submit();
+                SkiaVulkanInstance.skiaDirectContext.flushAndSubmit(this.surface, false);
             }
         });
         this.resize(width, height);
