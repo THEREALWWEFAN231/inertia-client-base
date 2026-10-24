@@ -36,8 +36,8 @@ public class TextField {
     private float clickX;
     private TimerUtil cursorFlash = new TimerUtil();
 
-    @Setter
-    private Font font = Fonts.getDefault();
+    private Fonts.FontWrapper font;
+    private Font skiaFont;
 
     @Getter
     @Setter
@@ -83,10 +83,14 @@ public class TextField {
     @Setter
     private int maxTextLength = Integer.MAX_VALUE;
 
+    public TextField() {
+        this.setFont(Fonts.getDefault());
+    }
+
     public void render(CanvasWrapper canvas, float mouseX, float mouseY, float delta) {
-        float oldFontSize = this.font.getSize();
+        float oldFontSize = this.skiaFont.getSize();
         try {
-            this.font.setSize(this.fontSize);
+            this.skiaFont.setSize(this.fontSize);
 
             if (dragging && isFocused) {
                 cursorPos = getMouseCharIndex(mouseX);
@@ -112,7 +116,7 @@ public class TextField {
             }
 
             float textX = x + padding - scrollX;
-            float textY = y + height / 2 + font.getMetrics().getCapHeight() / 2;
+            float textY = y + height / 2 + this.skiaFont.getMetrics().getCapHeight() / 2;
 
             canvas.save();
             canvas.clipRect(Rect.makeXYWH(x + padding, y, width - (padding * 2), height));
@@ -121,24 +125,24 @@ public class TextField {
             if (hasSelection()) {
                 int selStart = Math.min(cursorPos, selectionStart);
                 int selEnd = Math.max(cursorPos, selectionStart);
-                float selStartX = textX + font.measureTextWidth(renderString.substring(0, selStart));
-                float selEndX = textX + font.measureTextWidth(renderString.substring(0, selEnd));
+                float selStartX = textX + this.skiaFont.measureTextWidth(renderString.substring(0, selStart));
+                float selEndX = textX + this.skiaFont.measureTextWidth(renderString.substring(0, selEnd));
                 canvas.drawRect(selStartX, y, selEndX - selStartX, height, this.selectionColor.get());
             }
 
             // Draw text
             try (Paint paint = SkiaUtils.createPaintForColor(textColor)) {
-                canvas.getCanvas().drawString(renderString, textX, textY, font, paint);
+                canvas.getCanvas().drawString(renderString, textX, textY, this.skiaFont, paint);
             }
 
             // Draw blinking cursor
             cursorFlash.update();
             if (isFocused && cursorFlash.getTime() <= 500) {
-                float cursorX = textX + font.measureTextWidth(renderString.substring(0, cursorPos));
+                float cursorX = textX + this.skiaFont.measureTextWidth(renderString.substring(0, cursorPos));
                 try (PathBuilder path = new PathBuilder(); Paint stroke = SkiaUtils.createStrokePaint(Color.white, .5f)) {
-                    float yStart = font.getMetrics().getDescent();
+                    float yStart = this.skiaFont.getMetrics().getDescent();
                     float y = this.y + (this.height / 2);
-                    float lineHeight = font.getMetrics().getHeight();
+                    float lineHeight = this.skiaFont.getMetrics().getHeight();
                     path.moveTo(cursorX, y - (lineHeight / 2));
                     path.lineTo(cursorX, y + (lineHeight / 2));
                     canvas.drawPath(path, stroke);
@@ -151,7 +155,7 @@ public class TextField {
 
             canvas.restore();
         } finally {
-            this.font.setSize(oldFontSize);
+            this.skiaFont.setSize(oldFontSize);
         }
     }
 
@@ -274,13 +278,13 @@ public class TextField {
     }
 
     private int getMouseCharIndex(float mouseX) {
-        float oldFontSize = this.font.getSize();
+        float oldFontSize = this.skiaFont.getSize();
         try {
-            this.font.setSize(this.fontSize);
+            this.skiaFont.setSize(this.fontSize);
             float relX = mouseX - (x + this.textPadding.get()) + scrollX;
             String str = text.toString();
             for (int i = 1; i <= str.length(); i++) {
-                float w = font.measureTextWidth(str.substring(0, i));
+                float w = this.skiaFont.measureTextWidth(str.substring(0, i));
                 if (w > relX) {
                     return i - 1;
                 }
@@ -288,7 +292,7 @@ public class TextField {
             return str.length();
 
         } finally {
-            this.font.setSize(oldFontSize);
+            this.skiaFont.setSize(oldFontSize);
         }
     }
 
@@ -530,12 +534,12 @@ public class TextField {
     }
 
     private void scrollCursorIntoView() {
-        float oldFontSize = this.font.getSize();
+        float oldFontSize = this.skiaFont.getSize();
         try {
-            this.font.setSize(this.fontSize);
+            this.skiaFont.setSize(this.fontSize);
 
             float padding = this.textPadding.get();
-            float cursorX = font.measureTextWidth(text.substring(0, cursorPos));
+            float cursorX = this.skiaFont.measureTextWidth(text.substring(0, cursorPos));
             float visibleStart = scrollX;
             float visibleEnd = scrollX + (width - 2 * padding);
 
@@ -545,10 +549,10 @@ public class TextField {
                 scrollX = cursorX - (width - 2 * padding);
             }
 
-            float maxScroll = Math.max(0, font.measureTextWidth(text.toString()) - (width - 2 * padding));
+            float maxScroll = Math.max(0, this.skiaFont.measureTextWidth(text.toString()) - (width - 2 * padding));
             scrollX = Math.max(0, Math.min(scrollX, maxScroll));
         } finally {
-            this.font.setSize(oldFontSize);
+            this.skiaFont.setSize(oldFontSize);
         }
     }
 
@@ -563,5 +567,10 @@ public class TextField {
             this.width = width;
             this.scrollCursorIntoView();
         }
+    }
+
+    public void setFont(Fonts.FontWrapper font) {
+        this.font = font;
+        this.skiaFont = font.getSkiaFont();
     }
 }

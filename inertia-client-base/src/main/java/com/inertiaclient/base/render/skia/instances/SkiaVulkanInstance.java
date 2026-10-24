@@ -66,7 +66,7 @@ public class SkiaVulkanInstance extends SkiaInstance {
             this.skiaDraw.render(minecraftGraphics, mouseX, mouseY, delta);
             if (TEST_SINGLE_SUBMIT) {
                 //the native renders need to submit their work to the graphics queue before skia submits,or else the skia will use the texture from the last frame, as it hasn't been updated yet
-                //RenderSystem.getDevice().createCommandEncoder().submit();
+                RenderSystem.getDevice().createCommandEncoder().submit();
                 SkiaVulkanInstance.skiaDirectContext.flushAndSubmit(this.surface, false);
             }
         });

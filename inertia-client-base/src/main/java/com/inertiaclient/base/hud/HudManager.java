@@ -121,25 +121,11 @@ public class HudManager {
 
     public void renderGroups(GuiGraphicsExtractor graphics, float screenWidth, float screenHeight, boolean editor) {
         for (HudGroup hudGroup : this.groups) {
-            hudGroup.doStuff(0, 0, 0);
+            hudGroup.prepareForRender(0, 0, 0, editor);
         }
 
         for (HudGroup hudGroup : this.groups) {
-            if (hudGroup.getComponentsXAlignmentState() == HudGroup.XAlignment.LEFT) {
-                hudGroup.setX(hudGroup.getLeftAlignmentPercentage() * screenWidth);
-            } else if (hudGroup.getComponentsXAlignmentState() == HudGroup.XAlignment.MIDDLE) {
-                hudGroup.setX((hudGroup.getMiddleXAlignmentPercentage() * screenWidth) - (hudGroup.getScaledWidth() / 2f));
-            } else if (hudGroup.getComponentsXAlignmentState() == HudGroup.XAlignment.RIGHT) {
-                hudGroup.setX((hudGroup.getRightAlignmentPercentage() * screenWidth) - hudGroup.getScaledWidth());
-            }
-
-            if (hudGroup.getComponentsYAlignmentState() == HudGroup.YAlignment.TOP) {
-                hudGroup.setY(hudGroup.getTopAlignmentPercentage() * screenHeight);
-            } else if (hudGroup.getComponentsYAlignmentState() == HudGroup.YAlignment.MIDDLE) {
-                hudGroup.setY((hudGroup.getMiddleYAlignmentPercentage() * screenHeight) - (hudGroup.getScaledHeight() / 2f));
-            } else if (hudGroup.getComponentsYAlignmentState() == HudGroup.YAlignment.BOTTOM) {
-                hudGroup.setY((hudGroup.getBottomAlignmentPercentage() * screenHeight) - hudGroup.getScaledHeight());
-            }
+            hudGroup.setPositionBasedOfScreen(screenWidth, screenHeight);
         }
 
         this.skiaInstance.getCanvas().save();

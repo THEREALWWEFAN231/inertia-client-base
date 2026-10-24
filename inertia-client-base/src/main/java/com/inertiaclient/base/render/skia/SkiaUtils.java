@@ -61,20 +61,20 @@ public class SkiaUtils {
     }
 
     //for some reason skia renders text from bottom alignment, not top, so if y = 0, the text will be off screen
-    private static float getAdjustedTextYPosition(float y, Font font) {
-        return y - font.getMetrics().getAscent();
+    private static float getAdjustedTextYPosition(float y, Fonts.FontWrapper font) {
+        return y - font.getSkiaFont().getMetrics().getAscent() + font.getYOffset();
     }
 
-    public static void drawString(Canvas canvas, String text, float x, float y, Font font, Paint paint) {
+    public static void drawString(Canvas canvas, String text, float x, float y, Fonts.FontWrapper font, Paint paint) {
         y = getAdjustedTextYPosition(y, font);
-        canvas.drawString(text, x, y, font, paint);
+        canvas.drawString(text, x, y, font.getSkiaFont(), paint);
     }
 
     public static void drawStringForMinecraft(CanvasWrapper canvas, String text, float x, float y, Paint paint) {
         SkiaUtils.drawStringForMinecraft(canvas, text, x, y, Fonts.getDefault(), paint, true);
     }
 
-    public static void drawStringForMinecraft(CanvasWrapper canvas, String text, float x, float y, Font font, Paint paint, boolean shadow) {
+    public static void drawStringForMinecraft(CanvasWrapper canvas, String text, float x, float y, Fonts.FontWrapper font, Paint paint, boolean shadow) {
         if (shadow) {
             float shadowMultiplier = .25f;
             float shadowDrop = .75f;

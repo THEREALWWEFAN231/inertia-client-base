@@ -16,8 +16,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
-import java.util.function.Supplier;
-
 public abstract class HudComponent implements LanguageBaseKey, JsonState {
 
     @Setter
@@ -34,17 +32,10 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
 
     @Setter
     @Getter
-    private Supplier<Float> width;
+    private float width;
     @Setter
     @Getter
-    private Supplier<Float> height;
-
-    @Setter
-    @Getter
-    private float cachedWidth;
-    @Setter
-    @Getter
-    private float cachedHeight;
+    private float height;
 
     @Setter
     @Getter
@@ -80,7 +71,7 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
         this.mc = InertiaBase.mc;
     }
 
-    public void beforeRender(boolean editor, CanvasWrapper canvas) {
+    public void beforeRender(boolean preview, boolean editor, CanvasWrapper canvas) {
 
     }
 
@@ -100,11 +91,11 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
 
     protected final float getXOffset(float componentWidth) {
         if (this.getGroup().getComponentsXAlignmentState() == HudGroup.XAlignment.RIGHT) {
-            return this.getCachedWidth() - componentWidth;
+            return this.getWidth() - componentWidth;
         }
 
         if (this.getGroup().getComponentsXAlignmentState() == HudGroup.XAlignment.MIDDLE) {
-            return (this.getCachedWidth() - componentWidth) / 2;
+            return (this.getWidth() - componentWidth) / 2;
         }
 
         return 0;
@@ -186,6 +177,11 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
 
         JsonElement groups = main.get("Value Groups");
         this.valueGroups.fromJson(groups);
+    }
+
+    public interface WidthHeightValue {
+
+        float getValue(boolean editor);
     }
 
 

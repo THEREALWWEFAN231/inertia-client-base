@@ -60,9 +60,9 @@ public class HudGroup implements LanguageBaseKey, JsonState {
 
 
     @Getter
-    private ArrayList<HudComponent> components = new ArrayList<HudComponent>();
+    protected ArrayList<HudComponent> components = new ArrayList<HudComponent>();
     @Getter
-    private ArrayList<HudComponent> enabledComponents = new ArrayList<HudComponent>();
+    protected ArrayList<HudComponent> enabledComponents = new ArrayList<HudComponent>();
 
     @Getter
     private HudValueGroup valuesGroup = new HudValueGroup("values_group");
@@ -144,11 +144,11 @@ public class HudGroup implements LanguageBaseKey, JsonState {
         }
 
         for (HudComponent component : this.enabledComponents) {
-            component.beforeRender(editor, canvas);
+            component.beforeRender(false, editor, canvas);
         }
     }
 
-    public void doStuff(float mouseX, float mouseY, float tickDelta) {
+    public void prepareForRender(float mouseX, float mouseY, float tickDelta, boolean editor) {
         this.width = 0;
         this.height = 0;
         this.scaledWidth = 0;
@@ -162,12 +162,10 @@ public class HudGroup implements LanguageBaseKey, JsonState {
             boolean isLastComponent = i == this.components.size() - 1;
 
             float componentScale = component.getScale().getValue();
-            float componentWidth = component.getWidth().get();
-            float componentHeight = component.getHeight().get();
+            float componentWidth = component.getWidth();
+            float componentHeight = component.getHeight();
             float componentScaledWidth = componentWidth * componentScale;
             float componentScaledHeight = componentHeight * componentScale;
-            component.setCachedWidth(componentWidth);
-            component.setCachedHeight(componentHeight);
             component.setScaledWidth(componentScaledWidth);
             component.setScaledHeight(componentScaledHeight);
 
@@ -221,7 +219,7 @@ public class HudGroup implements LanguageBaseKey, JsonState {
             component.render(graphics, editor, canvas);
             //render over, for stuff, like inventory that is almost not transparent
             if (InertiaBase.instance.getHudManager().getHighlightedComponent() == component) {
-                canvas.drawRect(0, 0, component.getCachedWidth(), component.getCachedHeight(), new Color(255, 255, 255, 150));
+                canvas.drawRect(0, 0, component.getWidth(), component.getHeight(), new Color(255, 255, 255, 150));
             }
             canvas.restore();
 
@@ -356,6 +354,24 @@ public class HudGroup implements LanguageBaseKey, JsonState {
         }
 
         return height;
+    }
+
+    public void setPositionBasedOfScreen(float screenWidth, float screenHeight) {
+        if (this.getComponentsXAlignmentState() == HudGroup.XAlignment.LEFT) {
+            this.setX(this.getLeftAlignmentPercentage() * screenWidth);
+        } else if (this.getComponentsXAlignmentState() == HudGroup.XAlignment.MIDDLE) {
+            this.setX((this.getMiddleXAlignmentPercentage() * screenWidth) - (this.getScaledWidth() / 2f));
+        } else if (this.getComponentsXAlignmentState() == HudGroup.XAlignment.RIGHT) {
+            this.setX((this.getRightAlignmentPercentage() * screenWidth) - this.getScaledWidth());
+        }
+
+        if (this.getComponentsYAlignmentState() == HudGroup.YAlignment.TOP) {
+            this.setY(this.getTopAlignmentPercentage() * screenHeight);
+        } else if (this.getComponentsYAlignmentState() == HudGroup.YAlignment.MIDDLE) {
+            this.setY((this.getMiddleYAlignmentPercentage() * screenHeight) - (this.getScaledHeight() / 2f));
+        } else if (this.getComponentsYAlignmentState() == HudGroup.YAlignment.BOTTOM) {
+            this.setY((this.getBottomAlignmentPercentage() * screenHeight) - this.getScaledHeight());
+        }
     }
 
     @Override

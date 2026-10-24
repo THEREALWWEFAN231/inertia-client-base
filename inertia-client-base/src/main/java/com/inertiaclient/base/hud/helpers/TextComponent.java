@@ -3,8 +3,6 @@ package com.inertiaclient.base.hud.helpers;
 import com.inertiaclient.base.hud.HudComponent;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.skia.Fonts;
-import com.inertiaclient.base.render.skia.SkiaUtils;
-import io.github.humbleui.skija.Paint;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,15 +15,13 @@ public abstract class TextComponent extends HudComponent {
 
     public TextComponent(String name) {
         super(name);
-
-        this.setWidth(() -> this.renderedText != null ? Fonts.getDefault().measureTextWidth(this.renderedText) : 0);
-        this.setHeight(() -> 9f);
     }
 
     @Override
-    public void beforeRender(boolean editor, CanvasWrapper canvas) {
+    public void beforeRender(boolean preview, boolean editor, CanvasWrapper canvas) {
         this.renderedText = this.getRenderedText(editor);
-
+        this.setWidth(this.renderedText != null ? CanvasWrapper.getFreshTextBuilder().setText(this.renderedText).getTextWidth() : 0);
+        this.setHeight(Fonts.DEFAULT_SIZE);
     }
 
     @Override
@@ -34,13 +30,11 @@ public abstract class TextComponent extends HudComponent {
             return;
         }
 
-        try (Paint paint = SkiaUtils.createPaintForColor(getColor())) {
-            SkiaUtils.drawStringForMinecraft(canvas, this.renderedText, 0, 0, paint);
-        }
+        CanvasWrapper.getFreshTextBuilder().basic(this.renderedText, 0, 0, this.getColor()).setShadow(this.drawShadow()).draw(canvas);
     }
 
     @Nullable
-    public abstract String getRenderedText(boolean preview);
+    public abstract String getRenderedText(boolean editor);
 
     public Color getColor() {
         return Color.white;

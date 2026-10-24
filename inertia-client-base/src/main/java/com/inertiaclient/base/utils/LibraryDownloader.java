@@ -31,7 +31,7 @@ public class LibraryDownloader {
         String osName = os == Util.OS.WINDOWS ? "windows" : os == Util.OS.OSX ? "macos" : "linux";//assume linux
         boolean isArm = arch.equals("aarch64") || arch.equals("arm64");
 
-        this.downloadAndAddToClassLoaderIfNotExisting(INERTIA_LIBRARIES, "assets/icb/fonts/Comfortaa-Regular.ttf", "inertia-client/fonts/02.zip");
+        this.downloadAndAddToClassLoaderIfNotExisting(INERTIA_LIBRARIES, "assets/icb/fonts/Comfortaa-Regular.ttf", "inertia-client/fonts/03.zip");
         this.downloadYoga(osName, isArm);
         this.downloadSkia(osName, isArm);
 

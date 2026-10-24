@@ -3,7 +3,6 @@ package com.inertiaclient.base.gui;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.yoga.AbsoulteYogaNode;
 import com.inertiaclient.base.render.yoga.YogaNode;
-import com.inertiaclient.base.render.yoga.layouts.PositionType;
 import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.utils.TimerUtil;
 import lombok.Setter;
@@ -24,7 +23,6 @@ public class Tooltip extends AbsoulteYogaNode {
     private long tooltipDisplayDelay;
 
     public Tooltip() {
-        this.styleSetPositionType(PositionType.ABSOLUTE);
         this.setHeight(12);
 
         this.setBeforeRenderCallback((context, globalMouseX, globalMouseY, relativeMouseX, relativeMouseY, delta, canvas) -> {

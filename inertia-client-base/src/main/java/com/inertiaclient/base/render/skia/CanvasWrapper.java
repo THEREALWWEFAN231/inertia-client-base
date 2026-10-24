@@ -189,24 +189,24 @@ public class CanvasWrapper {
         this.canvas.drawRRect(rect, paint);
     }
 
-    public void drawString(String text, float x, float y, Font font, Color color) {
+    public void drawString(String text, float x, float y, Fonts.FontWrapper font, Color color) {
         try (Paint paint = SkiaUtils.createPaintForColor(color)) {
             this.drawString(text, x, y, font, paint);
         }
     }
 
-    public void drawString(String text, float x, float y, Font font, Paint paint) {
+    public void drawString(String text, float x, float y, Fonts.FontWrapper font, Paint paint) {
         SkiaUtils.drawString(this.canvas, text, x, y, font, paint);
     }
 
-    public void drawString(String text, float x, float y, Font font, Color color, boolean shadow) {
+    public void drawString(String text, float x, float y, Fonts.FontWrapper font, Color color, boolean shadow) {
         try (Paint paint = SkiaUtils.createPaintForColor(color)) {
             this.drawString(text, x, y, font, paint, shadow);
         }
     }
 
 
-    public void drawString(String text, float x, float y, Font font, Paint paint, boolean shadow) {
+    public void drawString(String text, float x, float y, Fonts.FontWrapper font, Paint paint, boolean shadow) {
         SkiaUtils.drawStringForMinecraft(this, text, x, y, font, paint, shadow);
     }
 
@@ -238,7 +238,7 @@ public class CanvasWrapper {
     public static class TextBuilder {
 
         @Setter
-        private Font font;
+        private Fonts.FontWrapper font;
         @Setter
         private String text;
         @Setter
@@ -306,9 +306,9 @@ public class CanvasWrapper {
         }
 
         public void draw(CanvasWrapper canvas) {
-            this.font.setSize(this.fontSize);
+            this.font.getSkiaFont().setSize(this.fontSize);
 
-            float textWidth = this.font.measureTextWidth(this.text);
+            float textWidth = this.font.getSkiaFont().measureTextWidth(this.text);
             float xOffset = switch (this.horizontalAlignment) {
                 case CENTER -> textWidth / 2f;
                 case RIGHT -> textWidth;
@@ -335,27 +335,27 @@ public class CanvasWrapper {
                 canvas.drawString(this.text, this.x - xOffset, this.y - yOffset, this.font, this.color, this.shadow);
             }
 
-            this.font.setSize(Fonts.DEFAULT_SIZE);
+            this.font.getSkiaFont().setSize(Fonts.DEFAULT_SIZE);
         }
 
         public float getTextWidth() {
-            this.font.setSize(this.fontSize);
-            float width = this.font.measureTextWidth(this.text);
-            this.font.setSize(Fonts.DEFAULT_SIZE);
+            this.font.getSkiaFont().setSize(this.fontSize);
+            float width = this.font.getSkiaFont().measureTextWidth(this.text);
+            this.font.getSkiaFont().setSize(Fonts.DEFAULT_SIZE);
             return width;
         }
 
         public Rect measureText() {
-            this.font.setSize(this.fontSize);
-            Rect bounds = this.font.measureText(this.text);
-            this.font.setSize(Fonts.DEFAULT_SIZE);
+            this.font.getSkiaFont().setSize(this.fontSize);
+            Rect bounds = this.font.getSkiaFont().measureText(this.text);
+            this.font.getSkiaFont().setSize(Fonts.DEFAULT_SIZE);
             return bounds;
         }
 
         public Rect[] getGlyphBounds() {
-            this.font.setSize(this.fontSize);
-            Rect[] bounds = this.font.getBounds(this.font.getStringGlyphs(this.text));
-            this.font.setSize(Fonts.DEFAULT_SIZE);
+            this.font.getSkiaFont().setSize(this.fontSize);
+            Rect[] bounds = this.font.getSkiaFont().getBounds(this.font.getSkiaFont().getStringGlyphs(this.text));
+            this.font.getSkiaFont().setSize(Fonts.DEFAULT_SIZE);
             return bounds;
         }
 

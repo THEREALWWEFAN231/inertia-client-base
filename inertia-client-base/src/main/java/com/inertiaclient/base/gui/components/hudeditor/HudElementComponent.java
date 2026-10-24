@@ -3,6 +3,7 @@ package com.inertiaclient.base.gui.components.hudeditor;
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.gui.components.MainFrame;
 import com.inertiaclient.base.gui.components.Page;
+import com.inertiaclient.base.gui.components.SvgComponent;
 import com.inertiaclient.base.gui.components.helpers.ValuesPage;
 import com.inertiaclient.base.gui.components.module.ModuleComponent;
 import com.inertiaclient.base.hud.HudComponent;
@@ -24,7 +25,7 @@ public class HudElementComponent extends YogaNode {
     private AnimationValue toggleAnimation;
     private boolean oldEnabledState;
 
-    public HudElementComponent(HudComponent hudElement) {
+    public HudElementComponent(HudEditorPage hudEditorPage, HudComponent hudElement) {
         this.oldEnabledState = hudElement.isEnabled();
         this.toggleAnimation = new AnimationValue();
         this.toggleAnimation.setValue(hudElement.isEnabled() ? 1 : 0);
@@ -80,6 +81,20 @@ public class HudElementComponent extends YogaNode {
                 return true;
             }
             return false;
+        });
+
+        SvgComponent previewIcon = new SvgComponent("icb/textures/eye.svg");
+        this.addChild(previewIcon);
+        previewIcon.styleSetWidth(8);
+        previewIcon.styleSetHeight(8);
+        previewIcon.setHoverCursorToIndicateClick();
+        previewIcon.setBlurRadius(() -> previewIcon.shouldShowHoveredEffects() ? 1f : 0);
+        previewIcon.setHoverCallback(hovered -> {
+            if (hovered) {
+                hudEditorPage.setPreviewingComponent(hudElement);
+            } else {
+                hudEditorPage.setPreviewingComponent(null);
+            }
         });
 
         YogaNode enabledSwitch = new YogaNode();

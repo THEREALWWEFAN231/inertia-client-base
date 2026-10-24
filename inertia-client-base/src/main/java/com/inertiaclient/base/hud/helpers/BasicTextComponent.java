@@ -13,7 +13,7 @@ public abstract class BasicTextComponent extends TextComponent {
     public BasicTextComponent(String name, Color defaultColor, boolean defaultRainbow) {
         super(name);
 
-        this.shadow = new BooleanValue("shadow", this.getMainGroup(), false);
+        this.shadow = new BooleanValue("shadow", this.getMainGroup(), true);
         this.colorValue = new ColorValue("color", this.getMainGroup(), defaultColor, defaultRainbow);
     }
 

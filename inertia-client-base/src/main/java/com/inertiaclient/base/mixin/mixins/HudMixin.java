@@ -29,6 +29,7 @@ public abstract class HudMixin {
                     InertiaBase.instance.getHudManager().beforeRender(this.inertiaClient$skiaInstance, false);
                     InertiaBase.instance.getHudManager().renderGroups(graphics1, graphics.guiWidth(), graphics.guiHeight(), false);
                 });
+                this.inertiaClient$skiaInstance.setFps(() -> 90);
             }
 
             this.inertiaClient$skiaInstance.drawAndRender(graphics, -999, -999, deltaTracker.getGameTimeDeltaPartialTick(false));
