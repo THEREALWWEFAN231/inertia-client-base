@@ -69,20 +69,23 @@ public class HudElementComponent extends YogaNode {
             }
         });
 
-        this.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
-            if (button == ButtonIdentifier.LEFT) {
-                hudElement.setEnabled(!hudElement.isEnabled());
-                return true;
-            }
-            if (button == ButtonIdentifier.RIGHT) {
-                ArrayList<ValueGroup> groups = new ArrayList<>(hudElement.getValueGroups().getValueGroups());
-                groups.add(hudElement.getGroup().getValuesGroup());
-                MainFrame.pageHolder.addPage(new Page(hudElement.getName(), new ValuesPage(groups)));
-                return true;
-            }
-            return false;
-        });
-
+        if (!ModuleComponent.MUST_USE_BUTTONS) {
+            this.setHoverCursorToIndicateClick();
+            this.setReleaseClickCallback((relativeMouseX, relativeMouseY, button, clickType) -> {
+                if (button == ButtonIdentifier.LEFT) {
+                    hudElement.setEnabled(!hudElement.isEnabled());
+                    return true;
+                }
+                if (button == ButtonIdentifier.RIGHT) {
+                    ArrayList<ValueGroup> groups = new ArrayList<>(hudElement.getValueGroups().getValueGroups());
+                    groups.add(hudElement.getGroup().getValuesGroup());
+                    MainFrame.pageHolder.addPage(new Page(hudElement.getName(), new ValuesPage(groups)));
+                    return true;
+                }
+                return false;
+            });
+        }
+        
         SvgComponent previewIcon = new SvgComponent("icb/textures/eye.svg");
         this.addChild(previewIcon);
         previewIcon.styleSetWidth(8);

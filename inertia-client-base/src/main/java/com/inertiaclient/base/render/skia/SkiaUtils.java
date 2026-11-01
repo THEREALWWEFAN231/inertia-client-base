@@ -114,4 +114,20 @@ public class SkiaUtils {
         paint.setImageFilter(ImageFilter.makeBlur(xRadius, yRadius, FilterTileMode.DECAL));
     }
 
+    public static ColorFilter makeColorMultiplierFilter(int color) {
+        return ColorFilter.makeLighting(color, 0);
+    }
+
+    public static ColorFilter makeColorMultiplierFilter(java.awt.Color color) {
+        return makeColorMultiplierFilter(color.getRGB());
+    }
+
+    public static void addColorMultiplierToPaint(Paint paint) {
+        paint.setColorFilter(makeColorMultiplierFilter(paint.getColor()));
+    }
+
+    public static void addColorMultiplierToPaint(Paint paint, java.awt.Color color) {
+        paint.setColorFilter(makeColorMultiplierFilter(color.getRGB()));
+    }
+
 }

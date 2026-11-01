@@ -12,7 +12,8 @@ import java.io.IOException;
 public class SvgRenderer {
 
     private SVGDOM svgdom;
-    private Picture rasteredSvg;
+    private Picture svg;
+    //private CachedRender cachedRender = new CachedRender();
 
     public SvgRenderer(String svgLocation) {
         try {
@@ -36,24 +37,28 @@ public class SvgRenderer {
 
     public void render(CanvasWrapper canvas, float x, float y, float width, float height, @Nullable Paint paint) {
         if (paint != null) {
-            paint.setColorFilter(ColorFilter.makeLighting(paint.getColor(), 0));
+            SkiaUtils.addColorMultiplierToPaint(paint);
         }
         this.renderRawPaint(canvas, x, y, width, height, paint);
     }
 
-
     public void renderRawPaint(CanvasWrapper canvas, float x, float y, float width, float height, @Nullable Paint paint) {
-        if (this.rasteredSvg == null) {
-            this.rasteredSvg = this.rasterSvg(width, height);
+        if (this.svg == null) {
+            this.svg = this.recordSvgCommands(width, height);
         }
 
         canvas.save();
         canvas.translate(x, y);
-        canvas.drawPicture(this.rasteredSvg, null, paint);
+
+        /*cachedRender.render(width, height, canvasWrapper -> {
+            canvasWrapper.drawPicture(this.svg, null, null);
+        }, canvas, paint);*/
+        canvas.drawPicture(this.svg, null, paint);
+
         canvas.restore();
     }
 
-    private Picture rasterSvg(float width, float height) {
+    private Picture recordSvgCommands(float width, float height) {
         try (SVGSVG root = svgdom.getRoot()) {
             root.setWidth(new SVGLength(width)).setHeight(new SVGLength(height));
 

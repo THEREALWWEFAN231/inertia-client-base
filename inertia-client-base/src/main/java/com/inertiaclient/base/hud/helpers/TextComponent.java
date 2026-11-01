@@ -41,7 +41,7 @@ public abstract class TextComponent extends HudComponent {
     }
 
     public boolean drawShadow() {
-        return false;
+        return true;
     }
 
 }

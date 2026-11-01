@@ -121,6 +121,20 @@ public class SkiaVulkanInstance extends SkiaInstance {
         this.frameBuffer.renderCachedImage(graphics);
     }
 
+    /**
+     * Surface needs to be closed
+     *
+     * @param width
+     * @param height
+     * @return
+     */
+    public static Surface createGPUSurface(int width, int height) {
+        VulkanGpuSurfaceAccessor vulkanGpuSurface = (VulkanGpuSurfaceAccessor) ((FrontendGpuSurfaceAccessor) InertiaBase.mc.windowSurface()).getBackend();
+        int format = vulkanGpuSurface.getSwapchainImageFormat();
+
+        return Surface.makeRenderTarget(SkiaVulkanInstance.skiaDirectContext, false, new ImageInfo(width, height, SkiaVulkanInstance.getColorTypeFromImageFormat(format), ColorAlphaType.PREMUL, ColorSpace.getDisplayP3()));
+    }
+
     public static void makeDirectContext() {
         long instanceProcAddr = VK.getFunctionProvider().getFunctionAddress("vkGetInstanceProcAddr");
         long deviceProcAddr = VK.getFunctionProvider().getFunctionAddress("vkGetDeviceProcAddr");
@@ -136,14 +150,38 @@ public class SkiaVulkanInstance extends SkiaInstance {
 
         //VulkanGpuTexture
         int tiling = 0;
-        int sharing = 0;//VK_SHARING_MODE_EXCLUSIVE
         int layout = 1;//VK_IMAGE_LAYOUT_PREINITIALIZED
+        int format = VulkanConst.toVk(colorTexture.getFormat());
+        int usage = VulkanConst.textureUsageToVk(colorTexture.usage(), colorTexture.getFormat());
         int samples = 1;
-        int queueFamily = -1;
+        int queueFamily = -1;//VK_QUEUE_FAMILY_IGNORED
+        int sharing = 0;//VK_SHARING_MODE_EXCLUSIVE
+        if (sharing == VK10.VK_SHARING_MODE_EXCLUSIVE) {
+            queueFamily = queueFamilyIndex;
+        }
+        var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), tiling, layout, format, usage, samples, colorTexture.getMipLevels(), queueFamily, false, sharing);
 
-        var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), tiling, layout, VulkanConst.toVk(from.getColorTexture().getFormat()), from.getColorTexture().usage(), samples, from.getColorTexture().getMipLevels(), queueFamily, false, sharing);
         return Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(from.width, from.height, skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, SkiaVulkanInstance.getColorTypeFromImageFormat(VulkanConst.toVk(from.getColorTexture().getFormat())), ColorAlphaType.PREMUL, null, null);
     }
+
+    /*public static Image createNativeImage(GpuTexture from) {
+        var colorTexture = (VulkanGpuTexture) from;
+
+        //VulkanGpuTexture
+        int tiling = 0;
+        int layout = 1;//VK_IMAGE_LAYOUT_PREINITIALIZED
+        int format = VulkanConst.toVk(from.getFormat());
+        int usage = VulkanConst.textureUsageToVk(from.usage(), from.getFormat());
+        int samples = 1;
+        int queueFamily = -1;//VK_QUEUE_FAMILY_IGNORED
+        int sharing = 0;//VK_SHARING_MODE_EXCLUSIVE
+        if (sharing == VK10.VK_SHARING_MODE_EXCLUSIVE) {
+            queueFamily = queueFamilyIndex;
+        }
+        var skiaImageInfo = new VkImageInfo(colorTexture.vkImage(), new VulkanAlloc(VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE, VK_NULL_HANDLE), tiling, layout, format, usage, samples, from.getMipLevels(), queueFamily, false, sharing);
+
+        return Image.borrowTextureFrom(SkiaVulkanInstance.getSkiaDirectContext(), BackendTexture.makeVulkan(from.getWidth(0), from.getHeight(0), skiaImageInfo), SurfaceOrigin.BOTTOM_LEFT, SkiaVulkanInstance.getColorTypeFromImageFormat(format), ColorAlphaType.PREMUL, null, null);
+    }*/
 
     private static ColorType getColorTypeFromImageFormat(int format) {
         //VulkanGpuSurface.pickSwapchainSurfaceFormat only accepts format VK_FORMAT_R8G8B8A8_UNORM & VK_FORMAT_B8G8R8A8_UNORM

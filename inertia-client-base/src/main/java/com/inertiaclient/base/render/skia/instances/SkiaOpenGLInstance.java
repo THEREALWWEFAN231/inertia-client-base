@@ -121,6 +121,17 @@ public class SkiaOpenGLInstance extends SkiaInstance {
         this.frameBuffer.renderCachedImage(graphics);
     }
 
+    /**
+     * Surface needs to be closed
+     *
+     * @param width
+     * @param height
+     * @return
+     */
+    public static Surface createGPUSurface(int width, int height) {
+        return Surface.makeRenderTarget(SkiaOpenGLInstance.skiaDirectContext, false, new ImageInfo(width, height, ColorType.RGBA_8888, ColorAlphaType.PREMUL, ColorSpace.getDisplayP3()));
+    }
+
     public static void makeDirectContext() {
         skiaDirectContext = DirectContext.makeGL();
     }

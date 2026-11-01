@@ -219,7 +219,7 @@ public class HudGroup implements LanguageBaseKey, JsonState {
             component.render(graphics, editor, canvas);
             //render over, for stuff, like inventory that is almost not transparent
             if (InertiaBase.instance.getHudManager().getHighlightedComponent() == component) {
-                canvas.drawRect(0, 0, component.getWidth(), component.getHeight(), new Color(255, 255, 255, 150));
+                canvas.drawRect(0, 0, component.shouldDoScaleOnRender() ? component.getWidth() : component.getScaledWidth(), component.shouldDoScaleOnRender() ? component.getHeight() : component.getScaledHeight(), new Color(255, 255, 255, 150));
             }
             canvas.restore();
 

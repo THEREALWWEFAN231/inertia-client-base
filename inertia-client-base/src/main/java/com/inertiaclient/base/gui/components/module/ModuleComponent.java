@@ -24,7 +24,7 @@ import java.awt.Color;
 
 public class ModuleComponent extends YogaNode {
 
-    private static final boolean MUST_USE_BUTTONS = false;
+    public static final boolean MUST_USE_BUTTONS = false;
     private AnimationValue toggleAnimation;
     private AnimationValue descriptionAnimation;
 
