@@ -7,6 +7,7 @@ import com.inertiaclient.base.hud.HudGroup;
 import com.inertiaclient.base.hud.HudManager;
 import com.inertiaclient.base.module.Module;
 import com.inertiaclient.base.module.ModuleManager;
+import com.inertiaclient.base.utils.FileManager;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,9 @@ public abstract class InertiaMod {
     @Getter
     @Setter(AccessLevel.PROTECTED)
     private String version;
+
+    @Getter
+    private FileManager.ModSave modSave = new FileManager.ModSave(this);
 
     public abstract void initialize();
 

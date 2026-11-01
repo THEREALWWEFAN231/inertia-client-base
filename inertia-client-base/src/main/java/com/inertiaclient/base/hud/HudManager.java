@@ -1,6 +1,7 @@
 package com.inertiaclient.base.hud;
 
 import com.inertiaclient.base.InertiaBase;
+import com.inertiaclient.base.mods.InertiaMod;
 import com.inertiaclient.base.render.skia.instances.SkiaInstance;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +9,16 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class HudManager {
 
     @Getter
     private ArrayList<HudComponent> components = new ArrayList<>();
+    @Getter
+    private final HashMap<String, HudComponent> idCachedComponentsMap = new HashMap<>();
+    @Getter
+    private HashMap<InertiaMod, ArrayList<HudComponent>> componentsByMods = new HashMap<InertiaMod, ArrayList<HudComponent>>();
     @Getter
     private ArrayList<HudGroup> groups = new ArrayList<>();
     private SkiaInstance skiaInstance;
@@ -45,8 +51,21 @@ public class HudManager {
 
             inertiaMod.initializeHudComponents(modsComponents, modsGroups, this);
 
+            modsComponents.forEach(hudComponent -> {
+                hudComponent.setMod(inertiaMod);
+
+                if (idCachedComponentsMap.containsKey(hudComponent.getId())) {
+                    HudComponent alreadyRegistered = idCachedComponentsMap.get(hudComponent.getId());
+                    hudComponent.setId(inertiaMod.getId() + "_" + hudComponent.getId());
+
+                    InertiaBase.LOGGER.warn("Hud Component with id {} was already registered by {}, prefixing one of them with their mod id", alreadyRegistered.getId(), alreadyRegistered.getMod().getName());
+                }
+            });
+
             this.groups.addAll(modsGroups);
             this.components.addAll(modsComponents);
+            this.componentsByMods.put(inertiaMod, modsComponents);
+            modsComponents.forEach(hudComponent -> this.idCachedComponentsMap.put(hudComponent.getId(), hudComponent));
         });
 
 

@@ -61,7 +61,7 @@ public class Module implements LanguageBaseKey, JsonState {
         this.description = Component.translatableWithFallback(getLanguageBaseKey() + ".description", "no description");
         this.bind = bind;
         this.category = category;
-        this.valueGroups = new ValueGroupParent(() -> InertiaBase.instance.getFileManager().getModuleQueuedSave().queue());
+        this.valueGroups = new ValueGroupParent(() -> this.mod.getModSave().getModuleQueuedSave().queue());
         this.valueGroups.addGroup(this.mainGroup = new ValueGroup("main", this.getLanguageBaseKey()));
 
         this.mc = InertiaBase.mc;
@@ -108,7 +108,7 @@ public class Module implements LanguageBaseKey, JsonState {
     public void toggle(boolean save) {
         this.setState(!this.enabledState);
         if (save) {
-            InertiaBase.instance.getFileManager().getModuleQueuedSave().queue();
+            this.mod.getModSave().getModuleQueuedSave().queue();
         }
     }
 

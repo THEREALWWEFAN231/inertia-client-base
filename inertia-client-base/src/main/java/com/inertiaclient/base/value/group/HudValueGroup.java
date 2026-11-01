@@ -7,7 +7,7 @@ public class HudValueGroup extends ValueGroup {
     public HudValueGroup(String id) {
         super(id, null);
 
-        this.setSaveHandler(() -> InertiaBase.instance.getFileManager().getHudQueuedSave().queue());
+        this.setSaveHandler(() -> InertiaBase.instance.getFileManager().getHudGroupQueuedSave().queue());
     }
 
     @Override

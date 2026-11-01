@@ -6,6 +6,7 @@ import com.inertiaclient.base.event.EventListener;
 import com.inertiaclient.base.event.EventManager;
 import com.inertiaclient.base.event.EventTarget;
 import com.inertiaclient.base.event.impl.ClientTickEvent;
+import com.inertiaclient.base.hud.HudComponent;
 import com.inertiaclient.base.hud.HudGroup;
 import com.inertiaclient.base.mods.InertiaMod;
 import com.inertiaclient.base.module.Module;
@@ -37,15 +38,9 @@ public class FileManager {
     private SkinCache skinCache;
 
     @Getter
-    private QueueSave moduleQueuedSave = new QueueSave(() -> {
-        this.saveModulesJson();
-        InertiaBase.LOGGER.info("saved module json");
-    });
-
-    @Getter
-    private QueueSave hudQueuedSave = new QueueSave(() -> {
-        InertiaBase.LOGGER.info("saved hud json");
-        this.saveHudJson();
+    private QueueSave hudGroupQueuedSave = new QueueSave(() -> {
+        InertiaBase.LOGGER.info("saved hud group json");
+        this.saveHudGroupsJson();
     });
 
     @Getter
@@ -111,6 +106,14 @@ public class FileManager {
         return path;
     }
 
+    public void clientLoaded() {
+        this.loadSettingsJson();
+        this.loadAllModsModulesJson();
+        this.loadAllModsHudComponentsJson();
+        this.loadHudGroupsJson();
+        this.loadFriendsJson();
+    }
+
     public void saveSettingsJson() {
         try {
             Path file = this.mainDirectory.resolve("Settings.json");
@@ -148,51 +151,53 @@ public class FileManager {
     }
 
     private void saveModulesJson(Path rootFolder) {
+        for (InertiaMod mod : InertiaBase.instance.getModLoader().getMods()) {
+            this.saveModsModulesJson(rootFolder, mod);
+        }
+    }
+
+    private boolean saveModsModulesJson(Path rootFolder, InertiaMod mod) {
         try {
-            for (InertiaMod mod : InertiaBase.instance.getModLoader().getMods()) {
-                this.saveModsModulesJson(rootFolder, mod);
+            ArrayList<Module> modulesAddedByMod = InertiaBase.instance.getModuleManager().getModulesByMods().get(mod);
+
+            Path file = this.getSaveFolderForMod(rootFolder, mod).resolve("Modules.json");
+            if (Files.notExists(file)) {
+                Files.createFile(file);
             }
+
+            JsonObject main = new JsonObject();
+            for (Module module : modulesAddedByMod) {
+                try {
+                    main.add(module.getId(), module.toJson());
+                } catch (Exception e) {
+                    InertiaBase.LOGGER.warn("Failed to encode Module {} to json", module.getId(), e);
+                }
+            }
+            FileUtils.writeToFile(file, this.formattedGson.toJson(main));
         } catch (Exception e) {
-            InertiaBase.LOGGER.warn("Failed to save modules json", e);
+            InertiaBase.LOGGER.warn("Failed to save {} modules json", mod.getId(), e);
+            return false;
         }
+        return true;
     }
 
-    private void saveModsModulesJson(Path rootFolder, InertiaMod mod) throws Exception {
-        ArrayList<Module> modulesAddByMod = InertiaBase.instance.getModuleManager().getModulesByMods().get(mod);
-
-        Path file = this.getSaveFolderForMod(rootFolder, mod).resolve("Modules.json");
-        if (Files.notExists(file)) {
-            Files.createFile(file);
-        }
-
-        JsonObject main = new JsonObject();
-        for (Module module : modulesAddByMod) {
-            try {
-                main.add(module.getId(), module.toJson());
-            } catch (Exception e) {
-                InertiaBase.LOGGER.warn("Failed to encode Module {} to json", module.getId(), e);
-            }
-        }
-        FileUtils.writeToFile(file, this.formattedGson.toJson(main));
+    public void loadAllModsModulesJson() {
+        this.loadAllModsModulesJson(this.mainDirectory);
     }
 
-    public void loadModulesJson() {
-        this.loadModulesJson(this.mainDirectory);
-    }
-
-    private void loadModulesJson(Path rootFolder) {
+    private void loadAllModsModulesJson(Path rootFolder) {
         try {
 
             for (InertiaMod mod : InertiaBase.instance.getModLoader().getMods()) {
-                this.loadModsModulesJson(rootFolder, mod);
+                this.loadModulesJsonByMod(rootFolder, mod);
             }
         } catch (Exception e) {
             InertiaBase.LOGGER.warn("Failed to decode modules json, saving instead", e);
-            this.saveModulesJson();
+            this.saveModulesJson(rootFolder);
         }
     }
 
-    private void loadModsModulesJson(Path rootFolder, InertiaMod mod) throws Exception {
+    private void loadModulesJsonByMod(Path rootFolder, InertiaMod mod) throws Exception {
         Path modFolder = this.getSaveFolderForMod(rootFolder, mod);
         if (Files.notExists(modFolder)) {
             return;
@@ -200,7 +205,7 @@ public class FileManager {
 
         Path file = modFolder.resolve("Modules.json");
         if (Files.notExists(file)) {
-            this.saveModulesJson();
+            this.saveModsModulesJson(rootFolder, mod);
             return;
         }
 
@@ -218,14 +223,14 @@ public class FileManager {
         });
     }
 
-    public void saveHudJson() {
-        this.saveHudJson(this.mainDirectory);
+    public void saveHudGroupsJson() {
+        this.saveHudGroupsJson(this.mainDirectory);
     }
 
-    private void saveHudJson(Path rootFolder) {
+    private void saveHudGroupsJson(Path rootFolder) {
         try {
 
-            Path file = rootFolder.resolve("Hud.json");
+            Path file = rootFolder.resolve("Hud Groups.json");
             if (Files.notExists(file)) {
                 Files.createFile(file);
             }
@@ -243,15 +248,15 @@ public class FileManager {
         }
     }
 
-    public void loadHudJson() {
-        this.loadHudJson(this.mainDirectory);
+    public void loadHudGroupsJson() {
+        this.loadHudGroupsJson(this.mainDirectory);
     }
 
-    private void loadHudJson(Path rootFolder) {
+    private void loadHudGroupsJson(Path rootFolder) {
         try {
-            Path file = rootFolder.resolve("Hud.json");
+            Path file = rootFolder.resolve("Hud Groups.json");
             if (Files.notExists(file)) {
-                this.saveHudJson();
+                this.saveHudGroupsJson();
             }
 
             JsonArray jsonArray = FileUtils.getJsonArrayFromFile(file);
@@ -268,8 +273,85 @@ public class FileManager {
             //InertiaClient.instance.getHudManager().getGroups().removeIf(hudGroup -> hudGroup.getElements().isEmpty());
         } catch (Exception e) {
             InertiaBase.LOGGER.warn("Failed to decode hud json, saving instead", e);
-            this.saveHudJson();
+            this.saveHudGroupsJson();
         }
+    }
+
+    public void saveHudComponentsJson() {
+        this.saveHudComponentsJson(this.mainDirectory);
+    }
+
+    private void saveHudComponentsJson(Path rootFolder) {
+        for (InertiaMod mod : InertiaBase.instance.getModLoader().getMods()) {
+            this.saveModsHudComponentJson(rootFolder, mod);
+        }
+    }
+
+    private boolean saveModsHudComponentJson(Path rootFolder, InertiaMod mod) {
+        try {
+            ArrayList<HudComponent> componentsAddedByMod = InertiaBase.instance.getHudManager().getComponentsByMods().get(mod);
+
+            Path file = this.getSaveFolderForMod(rootFolder, mod).resolve("Hud Components.json");
+            if (Files.notExists(file)) {
+                Files.createFile(file);
+            }
+
+            JsonObject main = new JsonObject();
+            for (HudComponent hudComponent : componentsAddedByMod) {
+                try {
+                    main.add(hudComponent.getId(), hudComponent.toJson());
+                } catch (Exception e) {
+                    InertiaBase.LOGGER.warn("Failed to encode Hud Component {} to json", hudComponent.getId(), e);
+                }
+            }
+            FileUtils.writeToFile(file, this.formattedGson.toJson(main));
+        } catch (Exception e) {
+            InertiaBase.LOGGER.warn("Failed to save hud component json", e);
+            return false;
+        }
+        return true;
+    }
+
+    public void loadAllModsHudComponentsJson() {
+        this.loadAllModsHudComponentsJson(this.mainDirectory);
+    }
+
+    private void loadAllModsHudComponentsJson(Path rootFolder) {
+        try {
+
+            for (InertiaMod mod : InertiaBase.instance.getModLoader().getMods()) {
+                this.loadHudComponentsJsonByMod(rootFolder, mod);
+            }
+        } catch (Exception e) {
+            InertiaBase.LOGGER.warn("Failed to decode hud components json, saving instead", e);
+            this.saveHudComponentsJson(rootFolder);
+        }
+    }
+
+    private void loadHudComponentsJsonByMod(Path rootFolder, InertiaMod mod) throws Exception {
+        Path modFolder = this.getSaveFolderForMod(rootFolder, mod);
+        if (Files.notExists(modFolder)) {
+            return;
+        }
+        
+        Path file = modFolder.resolve("Hud Components.json");
+        if (Files.notExists(file)) {
+            this.saveModsHudComponentJson(rootFolder, mod);
+            return;
+        }
+
+        JsonObject jsonObject = FileUtils.getJsonObjectFromFile(file);
+        jsonObject.entrySet().forEach(entry -> {
+
+            HudComponent hudComponent = InertiaBase.instance.getHudManager().getIdCachedComponentsMap().get(entry.getKey());
+            if (hudComponent != null) {
+                try {
+                    hudComponent.fromJson(entry.getValue());
+                } catch (Exception e) {
+                    InertiaBase.LOGGER.warn("Failed to decode Hud Component {} from json", hudComponent.getId(), e);
+                }
+            }
+        });
     }
 
     public boolean saveConfig(String name, boolean module, boolean hud, boolean settings) {
@@ -288,7 +370,7 @@ public class FileManager {
                 this.saveModulesJson(configFolder);
             }
             if (hud) {
-                this.saveHudJson(configFolder);
+                this.saveHudGroupsJson(configFolder);
             }
             InertiaBase.instance.getModLoader().getMods().forEach(inertiaMod -> {
                 inertiaMod.onConfigSaved(configFolder);
@@ -303,8 +385,8 @@ public class FileManager {
 
     public boolean loadConfig(Path configFolder) {
         try {
-            this.loadModulesJson(configFolder);
-            this.loadHudJson(configFolder);
+            this.loadAllModsModulesJson(configFolder);
+            this.loadHudGroupsJson(configFolder);
             InertiaBase.instance.getModLoader().getMods().forEach(inertiaMod -> {
                 inertiaMod.onConfigLoaded(configFolder);
             });
@@ -386,13 +468,17 @@ public class FileManager {
     }
 
     public void onEvent(ClientTickEvent event) {
-        this.moduleQueuedSave.saveIfNecessary();
-        this.hudQueuedSave.saveIfNecessary();
+        this.hudGroupQueuedSave.saveIfNecessary();
         this.settingsQueuedSave.saveIfNecessary();
+
+        InertiaBase.instance.getModLoader().getMods().forEach(inertiaMod -> {
+            inertiaMod.getModSave().getModuleQueuedSave().saveIfNecessary();
+            inertiaMod.getModSave().getHudComponentQueuedSave().saveIfNecessary();
+        });
     }
 
     @RequiredArgsConstructor
-    public class QueueSave {
+    public static class QueueSave {
 
         @Setter
         private boolean shouldSaveFile;
@@ -417,6 +503,31 @@ public class FileManager {
         }
 
 
+    }
+
+    public static class ModSave {
+
+        @Getter
+        private QueueSave moduleQueuedSave;
+
+        @Getter
+        private QueueSave hudComponentQueuedSave;
+
+        public ModSave(InertiaMod mod) {
+            this.moduleQueuedSave = new QueueSave(() -> {
+                FileManager fileManager = InertiaBase.instance.getFileManager();
+                if (fileManager.saveModsModulesJson(fileManager.mainDirectory, mod)) {
+                    InertiaBase.LOGGER.info("saved {} modules json", mod.getId());
+                }
+            });
+
+            this.hudComponentQueuedSave = new QueueSave(() -> {
+                FileManager fileManager = InertiaBase.instance.getFileManager();
+                if (fileManager.saveModsHudComponentJson(fileManager.mainDirectory, mod)) {
+                    InertiaBase.LOGGER.info("saved {} hud components json", mod.getId());
+                }
+            });
+        }
     }
 
 }

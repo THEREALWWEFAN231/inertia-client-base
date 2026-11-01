@@ -4,12 +4,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.event.EventManager;
+import com.inertiaclient.base.mods.InertiaMod;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.utils.JsonState;
 import com.inertiaclient.base.utils.LanguageBaseKey;
 import com.inertiaclient.base.value.group.ValueGroup;
 import com.inertiaclient.base.value.group.ValueGroupParent;
 import com.inertiaclient.base.value.impl.FloatValue;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
@@ -23,6 +25,7 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
     private HudGroup group;
 
     @Getter
+    @Setter(AccessLevel.PROTECTED)
     private String id;
     @Getter
     private Component name;
@@ -54,6 +57,10 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
     private FloatValue topPadding;
     @Getter
     private FloatValue bottomPadding;
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    protected InertiaMod mod;
+
     protected final Minecraft mc;
 
 
@@ -61,7 +68,7 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
         this.id = id;
         this.name = Component.translatableWithFallback(getLanguageBaseKey() + ".name", this.getId());
 
-        this.valueGroups = new ValueGroupParent(() -> InertiaBase.instance.getFileManager().getHudQueuedSave().queue());
+        this.valueGroups = new ValueGroupParent(() -> this.mod.getModSave().getHudComponentQueuedSave().queue());
         this.valueGroups.addGroup(this.mainGroup = new ValueGroup("main", this.getLanguageBaseKey()));
 
         this.scale = new FloatValue("Scale", this.mainGroup, this.defaultScale(), 0.1f, 5);
@@ -137,7 +144,7 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
             this.onDisable();
         }
         if (save) {
-            InertiaBase.instance.getFileManager().getHudQueuedSave().queue();
+            this.mod.getModSave().getHudComponentQueuedSave().queue();
         }
         return this;
     }

@@ -1,5 +1,6 @@
 package com.inertiaclient.base.hud;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.inertiaclient.base.InertiaBase;
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class HudGroup implements LanguageBaseKey, JsonState {
 
@@ -401,10 +401,10 @@ public class HudGroup implements LanguageBaseKey, JsonState {
 
         jsonObject.add("Values Group", this.valuesGroup.toJson());
 
-        JsonObject components = new JsonObject();
+        JsonArray components = new JsonArray();
         jsonObject.add("Components", components);
         for (HudComponent hudComponent : this.components) {
-            components.add(hudComponent.getId(), hudComponent.toJson());
+            components.add(hudComponent.getId());
         }
 
         return jsonObject;
@@ -429,17 +429,15 @@ public class HudGroup implements LanguageBaseKey, JsonState {
 
         this.valuesGroup.fromJson(main.getAsJsonObject("Values Group"));
 
-        JsonObject components = main.getAsJsonObject("Components");
-        for (Map.Entry<String, JsonElement> entry : components.asMap().entrySet()) {
-            String componentId = entry.getKey();
+        JsonArray components = main.getAsJsonArray("Components");
+        for (JsonElement entry : components.asList()) {
+            String componentId = entry.getAsString();
 
-            var foundComponentOptional = InertiaBase.instance.getHudManager().getComponents().stream().filter(hudComponent -> hudComponent.getId().equals(componentId)).findFirst();
-            foundComponentOptional.ifPresent(hudComponent -> {
-                this.addComponent(hudComponent);
-                hudComponent.fromJson(entry.getValue());
-            });
+            var foundComponent = InertiaBase.instance.getHudManager().getIdCachedComponentsMap().get(componentId);
+            if (foundComponent != null) {
+                this.addComponent(foundComponent);
+            }
         }
-
     }
 
     public static class XAlignment {

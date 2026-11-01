@@ -167,10 +167,12 @@ public class SkiaNativeRender {
     }
 
     public void delete() {
-        InertiaBase.LOGGER.info("Manually deleted SkiaNativeRender skia image handle  {}", image._ptr);
         this.frameBuffer.deleteFrameBuffer();
         //does this actually delete the image/backend handle
-        image.close();
+        if (this.image != null) {
+            InertiaBase.LOGGER.info("Manually deleted SkiaNativeRender skia image handle  {}", image._ptr);
+            this.image.close();
+        }
     }
 
 }
