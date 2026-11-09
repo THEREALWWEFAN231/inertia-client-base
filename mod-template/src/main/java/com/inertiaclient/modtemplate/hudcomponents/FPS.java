@@ -10,7 +10,7 @@ public class FPS extends BasicTextComponent {
     }
 
     @Override
-    public String getRenderedText(boolean preview) {
+    public String getRenderedText(boolean preview, boolean editor) {
         return String.format("FPS %s", Minecraft.getInstance().getFps());
     }
 }

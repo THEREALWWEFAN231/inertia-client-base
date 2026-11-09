@@ -1,5 +1,6 @@
 package com.inertiaclient.base.hud.helpers;
 
+import com.inertiaclient.base.InertiaBase;
 import com.inertiaclient.base.hud.HudComponent;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.render.skia.Fonts;
@@ -19,7 +20,13 @@ public abstract class TextComponent extends HudComponent {
 
     @Override
     public void beforeRender(boolean preview, boolean editor, CanvasWrapper canvas) {
-        this.renderedText = this.getRenderedText(editor);
+        try {
+            this.renderedText = this.getRenderedText(preview, editor);
+        } catch (Exception e) {
+            this.renderedText = "Error getting text";
+            InertiaBase.LOGGER.error("Error getting text for TextComponent {}", this.getClass().getName(), e);
+        }
+
         this.setWidth(this.renderedText != null ? CanvasWrapper.getFreshTextBuilder().setText(this.renderedText).getTextWidth() : 0);
         this.setHeight(Fonts.DEFAULT_SIZE);
     }
@@ -34,7 +41,7 @@ public abstract class TextComponent extends HudComponent {
     }
 
     @Nullable
-    public abstract String getRenderedText(boolean editor);
+    public abstract String getRenderedText(boolean preview, boolean editor);
 
     public Color getColor() {
         return Color.white;

@@ -76,7 +76,11 @@ public abstract class Value<T> implements LanguageBaseKey, JsonState { //T is va
         if (parent == null) {
             return this.id;
         }
-        return this.parent.getLanguageBaseKey() + ".value." + this.id;
+        return this.parentBaseKey() + ".value." + this.id;
+    }
+
+    protected String parentBaseKey() {
+        return this.parent.getLanguageBaseKey();
     }
 
     public String getNameString() {

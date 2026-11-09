@@ -1,6 +1,7 @@
 package com.inertiaclient.base.value.group;
 
 import com.inertiaclient.base.InertiaBase;
+import com.inertiaclient.base.utils.LanguageConstants;
 
 public class HudValueGroup extends ValueGroup {
 
@@ -12,7 +13,7 @@ public class HudValueGroup extends ValueGroup {
 
     @Override
     public String getLanguageBaseKey() {
-        return "icb.hudgroup.values_group";
+        return LanguageConstants.GLOBAL_HUD_GROUP_KEY + "." + this.getId();
     }
 
 }

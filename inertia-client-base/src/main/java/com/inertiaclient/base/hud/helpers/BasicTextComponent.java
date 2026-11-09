@@ -1,5 +1,6 @@
 package com.inertiaclient.base.hud.helpers;
 
+import com.inertiaclient.base.utils.LanguageConstants;
 import com.inertiaclient.base.value.impl.BooleanValue;
 import com.inertiaclient.base.value.impl.ColorValue;
 
@@ -13,8 +14,18 @@ public abstract class BasicTextComponent extends TextComponent {
     public BasicTextComponent(String name, Color defaultColor, boolean defaultRainbow) {
         super(name);
 
-        this.shadow = new BooleanValue("shadow", this.getMainGroup(), true);
-        this.colorValue = new ColorValue("color", this.getMainGroup(), defaultColor, defaultRainbow);
+        this.shadow = new BooleanValue("shadow", this.getMainGroup(), true) {
+            @Override
+            protected String parentBaseKey() {
+                return LanguageConstants.GLOBAL_HUD_BASIC_TEXT_COMPONENT_KEY;
+            }
+        };
+        this.colorValue = new ColorValue("color", this.getMainGroup(), defaultColor, defaultRainbow) {
+            @Override
+            protected String parentBaseKey() {
+                return LanguageConstants.GLOBAL_HUD_BASIC_TEXT_COMPONENT_KEY;
+            }
+        };
     }
 
     public BasicTextComponent(String name, Color defaultColor) {

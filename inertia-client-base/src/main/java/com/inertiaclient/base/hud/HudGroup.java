@@ -188,6 +188,10 @@ public class HudGroup implements LanguageBaseKey, JsonState {
         for (int i = 0; i < this.enabledComponents.size(); i++) {
             HudComponent component = this.enabledComponents.get(i);
 
+            if (component.getWidth() == 0 || component.getHeight() == 0) {
+                continue;
+            }
+
             float halfComponentSpacing = this.componentSpacing.getValue() / 2;
             boolean isFirstComponent = i == 0;
             boolean isLastComponent = i == this.components.size() - 1;

@@ -87,6 +87,10 @@ public class EntityUtils {
         };
     }
 
+    public static Comparator<Entity> comparatorByDistance() {
+        return Comparator.comparing((entity) -> InertiaBase.mc.player.distanceTo(entity));
+    }
+
     public static double getHealthAndAbsorption(LivingEntity entity) {
         return entity.getHealth() + entity.getAbsorptionAmount();
     }

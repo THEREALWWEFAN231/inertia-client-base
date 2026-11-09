@@ -8,6 +8,7 @@ import com.inertiaclient.base.mods.InertiaMod;
 import com.inertiaclient.base.render.skia.CanvasWrapper;
 import com.inertiaclient.base.utils.JsonState;
 import com.inertiaclient.base.utils.LanguageBaseKey;
+import com.inertiaclient.base.utils.LanguageConstants;
 import com.inertiaclient.base.value.group.ValueGroup;
 import com.inertiaclient.base.value.group.ValueGroupParent;
 import com.inertiaclient.base.value.impl.FloatValue;
@@ -71,9 +72,25 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
         this.valueGroups = new ValueGroupParent(() -> this.mod.getModSave().getHudComponentQueuedSave().queue());
         this.valueGroups.addGroup(this.mainGroup = new ValueGroup("main", this.getLanguageBaseKey()));
 
-        this.scale = new FloatValue("Scale", this.mainGroup, this.defaultScale(), 0.1f, 5);
-        this.topPadding = new FloatValue("Top Padding", this.mainGroup, this.defaultTopPadding(), 0, 5);
-        this.bottomPadding = new FloatValue("Bottom Padding", this.mainGroup, this.defaultBottomPadding(), 0, 5);
+        this.scale = new FloatValue("scale", this.mainGroup, this.defaultScale(), 0.1f, 5) {
+            @Override
+            protected String parentBaseKey() {
+                return LanguageConstants.GLOBAL_HUD_COMPONENT_KEY;
+            }
+        };
+        this.topPadding = new FloatValue("top_padding", this.mainGroup, this.defaultTopPadding(), 0, 5) {
+            @Override
+            protected String parentBaseKey() {
+                return LanguageConstants.GLOBAL_HUD_COMPONENT_KEY;
+            }
+        };
+        this.bottomPadding = new FloatValue("bottom_padding", this.mainGroup, this.defaultBottomPadding(), 0, 5) {
+            @Override
+            protected String parentBaseKey() {
+                return LanguageConstants.GLOBAL_HUD_COMPONENT_KEY;
+            }
+        };
+
 
         this.mc = InertiaBase.mc;
     }
@@ -185,11 +202,5 @@ public abstract class HudComponent implements LanguageBaseKey, JsonState {
         JsonElement groups = main.get("Value Groups");
         this.valueGroups.fromJson(groups);
     }
-
-    public interface WidthHeightValue {
-
-        float getValue(boolean editor);
-    }
-
 
 }

@@ -102,7 +102,6 @@ public class HudEditor {
 
             this.draggingGroup.setXPercentage(x, parentScreen.width);
             this.draggingGroup.setYPercentage(y, parentScreen.height);
-            InertiaBase.instance.getFileManager().getHudGroupQueuedSave().queue();
 
             this.dragLinkedToComponent = null;
             this.dragLinkToGroupAtIndex = -1;
@@ -220,6 +219,9 @@ public class HudEditor {
         if (button == ButtonIdentifier.LEFT) {
             if (dragLinkedToComponent != null) {
                 dragLinkedToComponent.addComponentsFromGroup(this.draggingGroup, this.dragLinkToGroupAtIndex);
+            }
+
+            if (this.dragLinkedToComponent != null || this.draggingGroup != null) {
                 InertiaBase.instance.getFileManager().getHudGroupQueuedSave().queue();
             }
 
