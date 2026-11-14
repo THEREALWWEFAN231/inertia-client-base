@@ -1,13 +1,13 @@
 package com.inertiaclient.base.value.impl;
 
 import com.google.gson.JsonElement;
-import com.inertiaclient.base.value.Value;
+import com.inertiaclient.base.value.ImmutableValue;
 import com.inertiaclient.base.value.WrappedColor;
 import com.inertiaclient.base.value.group.ValueGroup;
 
 import java.awt.Color;
 
-public class ColorValue extends Value<WrappedColor> {
+public class ColorValue extends ImmutableValue<WrappedColor> {
 
     public ColorValue(String id, ValueGroup parent, WrappedColor defaultValue) {
         super(id, parent, defaultValue);

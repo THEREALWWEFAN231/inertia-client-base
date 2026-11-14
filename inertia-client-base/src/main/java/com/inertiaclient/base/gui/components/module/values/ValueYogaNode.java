@@ -7,7 +7,7 @@ import com.inertiaclient.base.utils.InputUtils;
 import com.inertiaclient.base.value.Value;
 import lombok.Getter;
 
-public class ValueYogaNode<T extends Value<?>> extends YogaNode {
+public class ValueYogaNode<T extends Value<?, ?>> extends YogaNode {
 
     @Getter
     private T value;
@@ -38,7 +38,7 @@ public class ValueYogaNode<T extends Value<?>> extends YogaNode {
             return false;
         });
     }
-    
+
     public void _valueNodeSetShouldShowTooltip(boolean showTooltip) {
         this.showTooltip = showTooltip;
     }

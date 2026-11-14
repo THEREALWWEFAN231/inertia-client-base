@@ -28,7 +28,7 @@ public abstract class TextComponent extends HudComponent {
         }
 
         this.setWidth(this.renderedText != null ? CanvasWrapper.getFreshTextBuilder().setText(this.renderedText).getTextWidth() : 0);
-        this.setHeight(Fonts.DEFAULT_SIZE);
+        this.setHeight(this.renderedText != null ? Fonts.DEFAULT_SIZE : 0);
     }
 
     @Override

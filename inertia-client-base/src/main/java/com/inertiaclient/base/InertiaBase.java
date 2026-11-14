@@ -7,9 +7,7 @@ import com.inertiaclient.base.mods.InertiaMod;
 import com.inertiaclient.base.mods.ModLoader;
 import com.inertiaclient.base.module.ModuleManager;
 import com.inertiaclient.base.render.yoga.YogaConfig;
-import com.inertiaclient.base.utils.FileManager;
-import com.inertiaclient.base.utils.LibraryDownloader;
-import com.inertiaclient.base.utils.TickRateCalculator;
+import com.inertiaclient.base.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.loader.api.FabricLoader;
@@ -53,9 +51,12 @@ public class InertiaBase {
     @Getter
     private HudManager hudManager;
     @Getter
+    private FriendManager friendManager;
+
+    @Getter
     private TickRateCalculator tickRateCalculator;
     @Getter
-    private FriendManager friendManager;
+    private BlockSearcher blockSearcher;
 
     @Getter
     @Setter
@@ -78,8 +79,9 @@ public class InertiaBase {
         this.moduleManager = new ModuleManager();
         this.commandManager = new CommandManager();
         this.hudManager = new HudManager();
-        this.tickRateCalculator = new TickRateCalculator();
         this.friendManager = new FriendManager();
+        this.tickRateCalculator = new TickRateCalculator();
+        this.blockSearcher = new BlockSearcher();
 
         this.fileManager.clientLoaded();
 

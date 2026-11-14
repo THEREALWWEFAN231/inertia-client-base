@@ -1,6 +1,6 @@
 package com.inertiaclient.base.value;
 
-public interface ValueChangedListener<T> {
+public interface ImmutableChangedListener<T> {
 
     void onValueChange(T oldValue, T newValue);
 

@@ -301,6 +301,11 @@ public class WorldRenderUtils {
             return this;
         }
 
+
+        public ESPBuilder setRawFillColor(ColorValue color) {
+            return this.setRawFillColor(color.getValue().getRenderColor());
+        }
+
         //sets color but multiplies alpha by DEFAULT_FILL_ALPHA
         public ESPBuilder setFillColor(Color color) {
             this.fillRed = color.getRed();
@@ -308,6 +313,10 @@ public class WorldRenderUtils {
             this.fillBlue = color.getBlue();
             this.fillAlpha = (int) (color.getAlpha() * DEFAULT_FILL_ALPHA);
             return this;
+        }
+
+        public ESPBuilder setFillColor(ColorValue color) {
+            return this.setFillColor(color.getValue().getRenderColor());
         }
 
         public ESPBuilder setRawOutlineColor(Color color) {
@@ -318,6 +327,10 @@ public class WorldRenderUtils {
             return this;
         }
 
+        public ESPBuilder setRawOutlineColor(ColorValue color) {
+            return this.setRawOutlineColor(color.getValue().getRenderColor());
+        }
+
         //sets color but multiplies alpha by DEFAULT_FILL_ALPHA
         public ESPBuilder setOutlineColor(Color color) {
             this.outlineRed = color.getRed();
@@ -325,6 +338,10 @@ public class WorldRenderUtils {
             this.outlineBlue = color.getBlue();
             this.outlineAlpha = (int) (color.getAlpha() * DEFAULT_OUTLINE_ALPHA);
             return this;
+        }
+
+        public ESPBuilder setOutlineColor(ColorValue color) {
+            return this.setOutlineColor(color.getValue().getRenderColor());
         }
 
         public ESPBuilder setColor(Color color) {

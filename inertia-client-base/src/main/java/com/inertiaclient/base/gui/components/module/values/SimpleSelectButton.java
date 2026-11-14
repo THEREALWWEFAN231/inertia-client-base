@@ -8,9 +8,9 @@ import com.inertiaclient.base.value.Value;
 
 import java.util.function.Supplier;
 
-public class SimpleSelectButton extends ValueYogaNode<Value<?>> {
+public class SimpleSelectButton extends ValueYogaNode<Value<?, ?>> {
 
-    public SimpleSelectButton(Value<?> value, Supplier<Integer> selectedSize, Runnable onClick) {
+    public SimpleSelectButton(Value<?, ?> value, Supplier<Integer> selectedSize, Runnable onClick) {
         super(value);
 
         this.styleSetHeight(10);

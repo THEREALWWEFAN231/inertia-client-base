@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class HashsetValue<T> extends Value<HashSet<T>> {
+public abstract class HashsetValue<T> extends Value<HashSet<T>, HashsetValue.HashsetChangedListener<T>> {
 
     public HashsetValue(String id, ValueGroup parent, HashSet<T> defaultValue) {
         super(id, parent, defaultValue);
@@ -40,14 +40,25 @@ public abstract class HashsetValue<T> extends Value<HashSet<T>> {
         return new HashSet<>(value);
     }
 
+    @Override
+    protected void runChangeListenerForSetValue(HashSet<T> oldValue, HashSet<T> newValue) {
+        this.changeListener.onChange(ChangeReason.SET, null);
+    }
+
     public void addHard(T add) {
         this.getValue().add(add);
         this.getParent().getSaveHandler().run();
+        if (this.changeListener != null) {
+            this.changeListener.onChange(ChangeReason.ADD, add);
+        }
     }
 
     public void removeHard(T remove) {
         this.getValue().remove(remove);
         this.getParent().getSaveHandler().run();
+        if (this.changeListener != null) {
+            this.changeListener.onChange(ChangeReason.REMOVE, remove);
+        }
     }
 
     @Override
@@ -62,9 +73,10 @@ public abstract class HashsetValue<T> extends Value<HashSet<T>> {
 
     @Override
     public void fromJson(JsonElement data) {
-        JsonArray main = data.getAsJsonArray();
+        var oldValue = new HashSet<>(this.getValue());
         this.getValue().clear();
 
+        JsonArray main = data.getAsJsonArray();
         main.forEach(jsonElement -> {
             try {
                 T fromString = this.getEntryFromKey(jsonElement.getAsString());
@@ -72,6 +84,8 @@ public abstract class HashsetValue<T> extends Value<HashSet<T>> {
             } catch (Exception e) {
             }
         });
+
+        this.runChangeListenerForSetValue(oldValue, this.getValue());
     }
 
     public abstract String getKeyFromEntry(T entry);
@@ -82,4 +96,16 @@ public abstract class HashsetValue<T> extends Value<HashSet<T>> {
 
     @Nullable
     public abstract Stream<T> getAllPossibleEntriesStream();
+
+
+    public interface HashsetChangedListener<T> {
+
+        //set happens when config is loading, change will be null
+        void onChange(ChangeReason changeReason, T change);
+
+    }
+
+    public enum ChangeReason {
+        SET, ADD, REMOVE;
+    }
 }

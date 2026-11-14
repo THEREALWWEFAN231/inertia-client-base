@@ -5,13 +5,13 @@ import com.inertiaclient.base.value.Value;
 
 import java.util.function.Supplier;
 
-public abstract class ValueAdvanceInfoContainer extends InfoContainer<Value<?>> {
+public abstract class ValueAdvanceInfoContainer extends InfoContainer<Value<?, ?>> {
 
-    public ValueAdvanceInfoContainer(Value<?> value, Supplier<Float> xPosition, Supplier<Float> yPosition) {
+    public ValueAdvanceInfoContainer(Value<?, ?> value, Supplier<Float> xPosition, Supplier<Float> yPosition) {
         super(value, value::getNameString, xPosition, yPosition);
     }
 
-    public Value<?> getValue() {
+    public Value<?, ?> getValue() {
         return this.getWrapper();
     }
 

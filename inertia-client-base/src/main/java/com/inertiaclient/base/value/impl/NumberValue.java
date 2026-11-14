@@ -1,10 +1,10 @@
 package com.inertiaclient.base.value.impl;
 
-import com.inertiaclient.base.value.Value;
+import com.inertiaclient.base.value.ImmutableValue;
 import com.inertiaclient.base.value.group.ValueGroup;
 import lombok.Getter;
 
-public abstract class NumberValue<V extends Number> extends Value<V> {
+public abstract class NumberValue<V extends Number> extends ImmutableValue<V> {
 
     @Getter
     private final V minimumValue;

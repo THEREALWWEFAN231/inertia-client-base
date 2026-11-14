@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.inertiaclient.base.utils.CollectionUtils;
 import com.inertiaclient.base.utils.LanguageBaseKey;
-import com.inertiaclient.base.value.Value;
+import com.inertiaclient.base.value.ImmutableValue;
 import com.inertiaclient.base.value.group.ValueGroup;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
-public class ModeValue extends Value<ModeValue.Mode> {
+public class ModeValue extends ImmutableValue<ModeValue.Mode> {
 
     @Getter
     private ArrayList<Mode> modes;

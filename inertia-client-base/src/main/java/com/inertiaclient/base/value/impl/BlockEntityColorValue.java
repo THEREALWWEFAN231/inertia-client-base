@@ -9,12 +9,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityTypes;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.Color;
 import java.util.HashMap;
 
 //hashmap may not contain a BlockEntityType, you should use getColorFromHashMap or getColorForBlockEntity to get the color, not getValue
-public class BlockEntityColorValue extends Value<HashMap<BlockEntityType<?>, WrappedColor>> {
+public class BlockEntityColorValue extends Value<HashMap<BlockEntityType<?>, WrappedColor>, BlockEntityColorValue.BlockEntityColorChangeListener> {
 
     public BlockEntityColorValue(String id, ValueGroup parent, HashMap<BlockEntityType<?>, WrappedColor> defaultValue) {
         super(id, parent, defaultValue);
@@ -78,6 +79,23 @@ public class BlockEntityColorValue extends Value<HashMap<BlockEntityType<?>, Wra
         return new HashMap<>(value);
     }
 
+    @Override
+    protected void runChangeListenerForSetValue(HashMap<BlockEntityType<?>, WrappedColor> oldValue, HashMap<BlockEntityType<?>, WrappedColor> newValue) {
+        //should probably check if the color has actually changed??!?!
+        oldValue.forEach((blockEntityType, wrappedColor) -> {
+            if (!newValue.containsKey(blockEntityType)) {
+                //removed
+                this.changeListener.onChange(blockEntityType, null);
+            }
+        });
+
+        newValue.forEach((blockEntityType, wrappedColor) -> {
+            //changed or added :shrug
+            this.changeListener.onChange(blockEntityType, wrappedColor);
+        });
+
+    }
+
     public WrappedColor getColorFromHashMap(HashMap<BlockEntityType<?>, WrappedColor> value, BlockEntityType<?> blockEntityType) {
         return value.getOrDefault(blockEntityType, new WrappedColor(Color.white));//default color white
     }
@@ -89,6 +107,9 @@ public class BlockEntityColorValue extends Value<HashMap<BlockEntityType<?>, Wra
     public void setColorForBlockEntity(BlockEntityType<?> blockEntityType, WrappedColor color) {
         this.getValue().put(blockEntityType, color);
         this.getParent().getSaveHandler().run();
+        if (this.changeListener != null) {
+            this.changeListener.onChange(blockEntityType, color);
+        }
     }
 
     @Override
@@ -102,6 +123,9 @@ public class BlockEntityColorValue extends Value<HashMap<BlockEntityType<?>, Wra
 
     @Override
     public void fromJson(JsonElement data) {
+        var oldValue = new HashMap<>(this.getValue());
+        this.getValue().clear();
+
         JsonObject jsonObject = data.getAsJsonObject();
         jsonObject.entrySet().forEach(entry -> {
             try {
@@ -112,6 +136,17 @@ public class BlockEntityColorValue extends Value<HashMap<BlockEntityType<?>, Wra
             } catch (Exception e) {
             }
         });
+
+        this.runChangeListenerForSetValue(oldValue, this.getValue());
+    }
+
+    public interface BlockEntityColorChangeListener {
+
+        /**
+         * @param change what was changed
+         * @param color  its new color null if removed
+         */
+        void onChange(BlockEntityType<?> change, @Nullable WrappedColor color);
     }
 
 }

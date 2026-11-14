@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.function.Supplier;
 
-public abstract class Value<T> implements LanguageBaseKey, JsonState { //T is value
+public abstract class Value<T, C> implements LanguageBaseKey, JsonState { //T is value
 
     @Getter
     private final String id;
@@ -24,7 +24,7 @@ public abstract class Value<T> implements LanguageBaseKey, JsonState { //T is va
     @Getter
     private final T defaultValue;
     @Setter
-    private ValueChangedListener<T> changeListener;
+    protected C changeListener;
     @Setter
     private Supplier<Boolean> visibleWhen;
 
@@ -60,7 +60,7 @@ public abstract class Value<T> implements LanguageBaseKey, JsonState { //T is va
         }
         this.value = value;
         if (this.changeListener != null && !oldValue.equals(value)) {
-            this.changeListener.onValueChange(oldValue, this.value);
+            this.runChangeListenerForSetValue(oldValue, this.value);
         }
     }
 
@@ -90,5 +90,7 @@ public abstract class Value<T> implements LanguageBaseKey, JsonState { //T is va
     public String getDescriptionString() {
         return this.description.getString();
     }
+
+    protected abstract void runChangeListenerForSetValue(T oldValue, T newValue);
 
 }

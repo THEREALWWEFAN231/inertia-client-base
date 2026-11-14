@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 public class ValueNameLabel extends TextLabel {
 
-    public ValueNameLabel(Value<?> value) {
+    public ValueNameLabel(Value<?, ?> value) {
         this(value.getName());
     }
 

@@ -278,13 +278,13 @@ public class HudGroup implements LanguageBaseKey, JsonState {
 
     public void copyPropertiesFrom(HudGroup copyFrom) {
 
-        for (Value<?> value : this.valuesGroup.getValues()) {
+        for (Value<?, ?> value : this.valuesGroup.getValues()) {
             //TODO: map by name
-            for (Value<?> copyFromIteratingValue : copyFrom.valuesGroup.getValues()) {
+            for (Value<?, ?> copyFromIteratingValue : copyFrom.valuesGroup.getValues()) {
                 if (value.getId().equals(copyFromIteratingValue.getId())) {
                     //:flushed: :pensive: we could just use raw type but that's no fun, on the real, I spent like 3+ hours trying to figure out how to not do this and found nothing/:, changing properties to Object instead of ?, works but causes other "issues" I don't want
-                    Value<Object> firstHudPropertyObjectType = (Value<Object>) value;
-                    Value<Object> copyFromHudPropertyObjectType = (Value<Object>) copyFromIteratingValue;
+                    Value<Object, Object> firstHudPropertyObjectType = (Value<Object, Object>) value;
+                    Value<Object, Object> copyFromHudPropertyObjectType = (Value<Object, Object>) copyFromIteratingValue;
 
                     firstHudPropertyObjectType.setValue(copyFromHudPropertyObjectType.getValue());
                     break;

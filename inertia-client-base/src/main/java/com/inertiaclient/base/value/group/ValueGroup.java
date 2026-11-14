@@ -41,7 +41,7 @@ public class ValueGroup implements LanguageBaseKey, JsonState {
         this.name = this.createName();
     }
 
-    public void add(Value<?> value) {
+    public void add(Value<?, ?> value) {
         this.values.add(value);
     }
 
@@ -91,7 +91,7 @@ public class ValueGroup implements LanguageBaseKey, JsonState {
 
         if (!this.values.isEmpty()) {
             JsonObject values = new JsonObject();
-            for (Value<?> value : this.values) {
+            for (Value<?, ?> value : this.values) {
                 values.add(value.getId(), value.toJson());
             }
             jsonObject.add("Values", values);

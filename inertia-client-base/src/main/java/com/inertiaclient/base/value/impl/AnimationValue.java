@@ -4,10 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.inertiaclient.base.render.animation.Animations;
 import com.inertiaclient.base.render.animation.CustomTweenEquation;
-import com.inertiaclient.base.value.Value;
+import com.inertiaclient.base.value.ImmutableValue;
 import com.inertiaclient.base.value.group.ValueGroup;
 
-public class AnimationValue extends Value<CustomTweenEquation> {
+public class AnimationValue extends ImmutableValue<CustomTweenEquation> {
 
     public AnimationValue(String id, ValueGroup parent, CustomTweenEquation defaultValue) {
         super(id, parent, defaultValue);

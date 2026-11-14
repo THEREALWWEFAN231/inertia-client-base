@@ -15,7 +15,8 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesColorWrapper> {
+//TODO: fix generic ahhhh change listener, from generic runnable
+public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesColorWrapper, Runnable> {
 
     public EntityTypeColorValue(String id, ValueGroup parent, EntityTypeColorValue.EntitiesColorWrapper defaultValue) {
         super(id, parent, defaultValue.setChangeHandler(parent.getSaveHandler()));
@@ -28,6 +29,11 @@ public class EntityTypeColorValue extends Value<EntityTypeColorValue.EntitiesCol
     @Override
     protected EntityTypeColorValue.EntitiesColorWrapper copyDefaultValue(EntityTypeColorValue.EntitiesColorWrapper value) {
         return new EntitiesColorWrapper(value);
+    }
+
+    @Override
+    protected void runChangeListenerForSetValue(EntitiesColorWrapper oldValue, EntitiesColorWrapper newValue) {
+        this.changeListener.run();
     }
 
     @Override
